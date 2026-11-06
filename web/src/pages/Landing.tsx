@@ -1,26 +1,18 @@
 // Landing page. Its structure follows the Akash Network website's homepage (MIT, github.com/akash-network/website):
-// letter-hover headline, "Built on" strip, auto-advancing showcase, numbered "How it works" stepper beside a
+// headline, "Built on" strip, auto-advancing showcase, numbered "How it works" stepper beside a
 // live window, card grid, closing band and column footer. Content, brand and visuals are KINETIC's own.
 import { useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
 import {
   ArrowRight,
-  Binary,
   BrainCircuit,
   Check,
   ChevronRight,
-  CircuitBoard,
-  CodeXml,
-  Cpu,
   Database,
   Gauge,
-  HardDrive,
-  MemoryStick,
-  Microchip,
   MonitorCheck,
   Network,
   Pause,
   Play,
-  Server,
   ShieldX,
   X,
   type LucideProps,
@@ -94,7 +86,7 @@ export default function Landing() {
           <span className="ak-badge">
             <span aria-hidden /> Verifiable AI hub
           </span>
-          <LetterHeadline lines={["Verified AI models,", "run on community GPUs"]} />
+          <Headline lines={["Verified AI models,", "run on community GPUs"]} />
           <p className="ak-hero-sub">Every result is checked. If a GPU cheats, you're refunded from its bond.</p>
           <form
             className="ak-try"
@@ -172,54 +164,18 @@ export default function Landing() {
   );
 }
 
-/* ───────── Letter-hover headline ───────── */
+/* ───────── Headline ───────── */
 
-const TILE_ICONS: Icon[] = [Cpu, CircuitBoard, BrainCircuit, Server, Binary, Database, Network, MemoryStick, HardDrive, Microchip, CodeXml];
-
-/** Hovering a letter swaps it for a small tech tile (desktop pointers only, never with reduced motion). */
-function LetterHeadline({ lines }: { lines: string[] }) {
-  const [live] = useState(() => typeof window !== "undefined" && window.matchMedia("(hover: hover) and (min-width: 768px) and (prefers-reduced-motion: no-preference)").matches);
+/** The hero title: one line per entry, plain text. */
+function Headline({ lines }: { lines: string[] }) {
   return (
-    <h1 className="ak-headline" aria-label={lines.join(" ")}>
+    <h1 className="ak-headline">
       {lines.map((line) => (
-        <span key={line} className="ak-hl-line" aria-hidden>
-          {line.split(" ").map((word, wi) => (
-            <span key={wi} className="ak-hl-word">
-              {wi > 0 && <span className="ak-hl-space"> </span>}
-              {[...word].map((ch, ci) => (
-                <Letter key={ci} ch={ch} live={live} />
-              ))}
-            </span>
-          ))}
+        <span key={line} className="ak-hl-line">
+          {line}
         </span>
       ))}
     </h1>
-  );
-}
-
-function Letter({ ch, live }: { ch: string; live: boolean }) {
-  const [tile, setTile] = useState<number | null>(null);
-  const timer = useRef<number>();
-  if (!live) return <span className="ak-hl-letter">{ch}</span>;
-  const Tile = tile === null ? null : TILE_ICONS[tile];
-  return (
-    <span
-      className={`ak-hl-letter ${Tile ? "on" : ""}`}
-      onMouseEnter={() => {
-        window.clearTimeout(timer.current);
-        setTile((t) => t ?? Math.floor(Math.random() * TILE_ICONS.length));
-      }}
-      onMouseLeave={() => {
-        timer.current = window.setTimeout(() => setTile(null), 200);
-      }}
-    >
-      {ch}
-      {Tile && (
-        <span className="ak-hl-tile">
-          <Tile strokeWidth={1.75} />
-        </span>
-      )}
-    </span>
   );
 }
 

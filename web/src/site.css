@@ -146,68 +146,6 @@
   display: block;
 }
 
-.ak-hl-word {
-  display: inline-block;
-  white-space: nowrap;
-}
-
-.ak-hl-space {
-  display: inline-block;
-  width: 0.28em;
-}
-
-.ak-hl-letter {
-  position: relative;
-  display: inline-block;
-  cursor: default;
-  user-select: none;
-  transform-origin: center;
-  transition:
-    margin 0.4s var(--ak-ease),
-    transform 0.4s var(--ak-ease),
-    color 0.2s ease-out;
-}
-
-.ak-hl-letter.on {
-  margin: 0 0.3em;
-  color: transparent;
-  text-shadow: none;
-  transform: scale(1.2);
-}
-
-.ak-hl-tile {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 0.95em;
-  height: 0.95em;
-  border-radius: 0.22em;
-  background: linear-gradient(135deg, #ffb35c, var(--action) 55%, #c4620a);
-  color: #0a0a0a;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  transform: translate(-50%, -50%);
-  animation: ak-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-.ak-hl-tile svg {
-  width: 0.58em;
-  height: 0.58em;
-}
-
-@keyframes ak-pop {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
 .ak-hero-sub {
   margin: 20px 0 0;
   font-size: 15px;

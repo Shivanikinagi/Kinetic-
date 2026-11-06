@@ -291,7 +291,7 @@ The Akash Network website is the reference for each component and page. KINETIC 
 **Header.** A 12px-radius bar with the brand on the left, Models and Console centred, account on the right. On the landing page it stays transparent and full width until you scroll.
 
 **Landing sections, in order:**
-1. Hero inside the hexagon field: badge, a two-line headline whose letters turn into small tech tiles on hover (desktop pointers only, never with reduced motion), one-line subhead, model search.
+1. Hero inside the hexagon field: badge, a plain two-line headline (no icons or hover effects), one-line subhead, model search.
 2. "Built on" strip: Hedera, 0G, Arkiv and Swarm as text, each with its role.
 3. What KINETIC is: three roles (Run AI jobs, Rent out a GPU, Publish a model) that advance every 5 s, beside cross-fading console screenshots (`web/public/shots/`, captured from the synthetic replay). A pill of progress dots plus play/pause controls it; it only runs while on screen.
 4. How it works: four numbered steps (Publish, Run, Check, Refund) beside a window that plays a short example for each step. The window is labelled "Example".

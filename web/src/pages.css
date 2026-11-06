@@ -1,0 +1,789 @@
+/*
+ * Run, Jobs, GPUs, Earn and Audit in the hub's light style (see theme.css).
+ * Everything is scoped under .pg, the class those pages put on their root.
+ */
+
+/* ── Page head: title, one line, an action at the right ── */
+
+.pg .phead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 16px;
+  flex-wrap: wrap;
+  margin: 4px 0 24px;
+}
+
+.pg .phead h1 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 26px;
+  letter-spacing: -0.025em;
+}
+
+.pg .phead h1 .count {
+  color: var(--ink-4);
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.pg .phead h1.id {
+  font-family: var(--mono);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.pg .phead p {
+  color: var(--ink-3);
+  margin-top: 4px;
+  font-size: 14.5px;
+}
+
+.pg .phead-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pg .back {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 13.5px;
+}
+
+.pg .kpis {
+  margin: 0 0 4px;
+}
+
+.pg .kpi b.bad {
+  color: var(--bad);
+}
+
+.pg .tabs {
+  margin-top: 24px;
+}
+
+.pg .h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 16px;
+  margin: 32px 0 10px;
+}
+
+.pg .h3:first-child {
+  margin-top: 0;
+}
+
+.pg .note {
+  color: var(--ink-3);
+  font-size: 13.5px;
+  margin: 0 0 12px;
+}
+
+.pg .tag {
+  font-size: 11.5px;
+  padding: 1px 8px;
+}
+
+/* ── Cards and lists ── */
+
+.pg .card {
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.pg .card-body {
+  padding: 18px 20px;
+}
+
+.pg .rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pg .rows > li {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 13.5px;
+  min-width: 0;
+}
+
+.pg .rows > li:last-child {
+  border-bottom: 0;
+}
+
+.pg .rows .when {
+  flex: none;
+  width: 72px;
+  color: var(--ink-4);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pg .rows .when .seq {
+  display: block;
+  font-size: 11.5px;
+}
+
+.pg .rows .what {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+}
+
+.pg .rows .what > .tag {
+  margin-right: 6px;
+}
+
+.pg .side-list li.total {
+  border-top: 1px solid var(--rule);
+  padding-top: 10px;
+  font-weight: 600;
+}
+
+.pg .side-card h4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pg .side-card .side-list .v {
+  text-align: right;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.pg .side-card pre.cmd {
+  margin-top: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 11.5px;
+}
+
+.pg .empty-hub {
+  padding: 32px 24px;
+}
+
+/* ── Tables (the model page's file table, used for data) ── */
+
+.pg .files th {
+  font-family: var(--font);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+.pg .files td {
+  vertical-align: middle;
+}
+
+/* The progress bar's segments share a class name with the segmented control. */
+.pg .progress .seg {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.pg .chunks {
+  gap: 6px;
+  padding-bottom: 6px;
+}
+
+.pg .chunks + .legend {
+  margin-top: 14px;
+}
+
+.pg .meter-text {
+  font-family: var(--font);
+  font-size: 11.5px;
+}
+
+.pg .files td.wrap {
+  white-space: normal;
+  min-width: 180px;
+}
+
+.pg .files tbody tr.go {
+  cursor: pointer;
+}
+
+.pg .files tbody tr.go:hover td {
+  background: var(--bg-2);
+}
+
+.pg .files .sub {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+  font-weight: 400;
+  margin-top: 1px;
+}
+
+.pg .files .sub.ok {
+  color: var(--accent);
+}
+
+.pg .files .sub.bad {
+  color: var(--bad);
+}
+
+.pg .files .sub.warn {
+  color: var(--warn);
+}
+
+.pg .files a.id {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.pg .files a.id {
+  white-space: nowrap;
+}
+
+.pg .show-sm {
+  display: none;
+}
+
+.pg .files tr.go:hover a.id {
+  color: var(--link);
+}
+
+.pg .prog {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pg .prog .progress {
+  width: 96px;
+  flex: none;
+}
+
+/* ── Forms ── */
+
+.pg .fsec {
+  padding: 20px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.pg .fsec:last-child {
+  border-bottom: 0;
+}
+
+.pg .fsec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.pg .fsec-head h3 {
+  font-size: 15px;
+}
+
+.pg .form {
+  gap: 14px 16px;
+}
+
+.pg .form input,
+.pg .form select,
+.pg .form textarea {
+  background: var(--panel);
+  border-radius: 8px;
+  border-color: var(--rule-2);
+}
+
+.pg .form input:focus,
+.pg .form select:focus,
+.pg .form textarea:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: 0;
+  border-color: var(--accent-line);
+}
+
+.pg .form input[type="range"] {
+  outline: 0;
+}
+
+.pg .hint {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin-top: 8px;
+}
+
+.pg div.seg {
+  border-radius: 9px;
+  background: var(--panel-2);
+  border-color: var(--rule);
+}
+
+.pg div.seg button {
+  font-weight: 500;
+  border-radius: 7px;
+}
+
+.pg div.seg button.on {
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--rule-2);
+}
+
+.pg .pick {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--bg-2);
+}
+
+.pg .pick-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.pg .pick .mrow-id a {
+  color: var(--ink);
+}
+
+.pg .pick .mrow-id a:hover {
+  color: var(--link);
+}
+
+.pg .pick .chips {
+  margin-top: 8px;
+}
+
+.pg .pick .chip {
+  font-size: 12px;
+  padding: 1px 8px;
+  background: var(--panel);
+}
+
+.pg details.more.fsec {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.pg details.more.fsec[open] summary {
+  margin-bottom: 14px;
+}
+
+/* Run: the estimate and the button live in the side card. */
+.pg .est {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.pg .est.none {
+  font-size: 17px;
+  color: var(--warn);
+}
+
+.pg .est-sub {
+  color: var(--ink-3);
+  font-size: 13px;
+  margin: 4px 0 14px;
+}
+
+.pg .side-card .btn.lg {
+  margin-top: 16px;
+}
+
+.pg .stop {
+  display: block;
+  margin: 10px auto 0;
+  background: none;
+  border: 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.pg .stop:hover,
+.pg .stop.on {
+  color: var(--bad);
+}
+
+.pg .runs {
+  list-style: none;
+  margin: 0 -20px -18px;
+  padding: 0;
+}
+
+.pg .runs li {
+  padding: 11px 20px;
+  border-top: 1px solid var(--rule);
+  font-size: 12.5px;
+  color: var(--ink-3);
+  display: grid;
+  gap: 3px;
+}
+
+.pg .runs li.go {
+  cursor: pointer;
+}
+
+.pg .runs li.go:hover {
+  background: var(--bg-2);
+}
+
+.pg .runs .row-between .mono {
+  color: var(--ink);
+  font-size: 12.5px;
+}
+
+/* ── Numbered steps in a side card ── */
+
+.pg .flow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: flow;
+  display: grid;
+  gap: 12px;
+}
+
+.pg .flow li {
+  counter-increment: flow;
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 2px 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.pg .flow li::before {
+  content: counter(flow);
+  grid-row: span 2;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--panel-2);
+  color: var(--ink-2);
+}
+
+.pg .flow li span {
+  font-weight: 400;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+/* Earn: the card builder. */
+.pg .royalty-val {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pg .json pre.cmd {
+  max-height: 260px;
+}
+
+.pg .file-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+/* ── GPUs ── */
+
+.pg .gpu-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.pg .gpu-name .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.pg .gpu-sub {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
+
+.pg .test-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--warn-soft);
+  color: var(--warn);
+  border: 1px solid var(--warn-line);
+  cursor: help;
+}
+
+.pg .score {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pg .score .bar {
+  display: flex;
+  width: 64px;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--panel-2);
+}
+
+.pg .score .bar span:first-child {
+  background: var(--accent);
+}
+
+.pg .score .bar span:last-child {
+  background: var(--bad);
+}
+
+.pg tr.dim td {
+  color: var(--ink-4);
+}
+
+.pg tr.dim .gpu-name {
+  color: var(--ink-3);
+}
+
+.pg .files tr.more-row td {
+  background: var(--bg-2);
+  white-space: normal;
+  padding: 14px 18px 16px;
+}
+
+.pg .facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px 28px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.pg .facts dt {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.pg .facts dd {
+  margin: 2px 0 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.pg .caret {
+  border: 0;
+  background: none;
+  color: var(--ink-4);
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  transition: transform 140ms var(--ease);
+}
+
+.pg .caret[aria-expanded="true"] {
+  transform: rotate(90deg);
+  color: var(--ink);
+}
+
+.pg .toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 28px 0 14px;
+}
+
+.pg .chip {
+  cursor: pointer;
+}
+
+.pg .chip[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-ink);
+}
+
+.pg .chip[aria-pressed="true"] .n {
+  color: var(--on-ink-2);
+}
+
+/* ── Audit: a type list at the left, the log at the right ── */
+
+.pg .flist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.pg .flist button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--ink-2);
+  font-size: 13.5px;
+  text-align: left;
+}
+
+.pg .flist button:hover {
+  background: var(--panel-2);
+}
+
+.pg .flist button[aria-pressed="true"] {
+  background: var(--panel-2);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.pg .flist .n {
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+.pg .flist-select {
+  display: none;
+}
+
+/* ── Small screens ── */
+
+@media (max-width: 960px) {
+  .pg .hide-md {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .pg .phead h1 {
+    font-size: 22px;
+  }
+  .pg .phead h1.id {
+    font-size: 17px;
+  }
+  .pg .hide-sm {
+    display: none;
+  }
+  .pg .fsec {
+    padding: 16px;
+  }
+  .pg .rows > li {
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 14px;
+  }
+  .pg .rows .when {
+    width: auto;
+  }
+  .pg .rows .when .seq {
+    display: inline;
+    margin-right: 6px;
+  }
+  .pg div.seg {
+    display: flex;
+    width: 100%;
+  }
+  .pg div.seg button {
+    flex: 1;
+    padding: 6px 8px;
+  }
+  .pg .flist {
+    display: none;
+  }
+  .pg .flist-select {
+    display: block;
+    width: 100%;
+  }
+  .pg .kpi b {
+    font-size: 21px;
+  }
+  .pg .files td,
+  .pg .files th {
+    padding: 9px 8px;
+  }
+  .pg .files td:first-child,
+  .pg .files th:first-child {
+    padding-left: 12px;
+    white-space: normal;
+  }
+  .pg .gpu-name {
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+  .pg .gpu-sub {
+    max-width: 130px;
+  }
+  .pg .score .bar,
+  .pg .prog .progress {
+    display: none;
+  }
+  .pg .show-sm {
+    display: block;
+    margin-top: 4px;
+  }
+  .pg .files a.id {
+    font-size: 12px;
+  }
+  .pg .files .sub {
+    font-size: 11.5px;
+  }
+}
+
+.pg .show-more {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.pg .checks li.bad {
+  color: var(--ink);
+}

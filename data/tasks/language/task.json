@@ -1,0 +1,26 @@
+{
+  "kind": "classify",
+  "instructions": "Identify the language each sentence is written in.",
+  "labels": [
+    {
+      "name": "english",
+      "hint": " the , and , is , where"
+    },
+    {
+      "name": "spanish",
+      "hint": "dónde, gracias, está, quiero, por favor"
+    },
+    {
+      "name": "french",
+      "hint": "où, merci, je, est-ce, s'il vous plaît, bonjour"
+    },
+    {
+      "name": "german",
+      "hint": "ich, nicht, danke, wo ist, bitte, guten"
+    },
+    {
+      "name": "italian",
+      "hint": "grazie, dov'è, vorrei, buongiorno, per favore"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+# A sandboxed model runtime for a KINETIC provider: Ollama on a network with no route out, with
+# read-only access to nothing but the weights KINETIC already checked.
+#
+#   docker compose -f docker/ollama-sandbox.compose.yml up -d
+#   # import a checked model (its folder is written by the provider: PROVIDER_MODELS, see .env.example)
+#   docker compose -f docker/ollama-sandbox.compose.yml exec ollama ollama create <runtime model> -f /weights/<model key>/Modelfile
+#
+# Two networks. `sandbox` is internal: Ollama sits only there, so it can't reach the internet even
+# if a model misbehaved. The provider node sits on both: it talks to Ollama over `sandbox` and to
+# Hedera, Arkiv, Swarm and buyers over the default network. Weights are mounted read-only from the
+# provider's cache, where KINETIC put them only after checking every file's sha256 against the
+# Model Passport and running the malware checks on the exact bytes.
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    volumes:
+      - ollama-models:/root/.ollama
+      - ../.kinetic/models:/weights:ro
+    networks: [sandbox]
+    # Uncomment on a machine with an NVIDIA GPU and the container toolkit.
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices: [{ driver: nvidia, count: all, capabilities: [gpu] }]
+
+  provider:
+    image: node:22-bookworm-slim
+    working_dir: /app
+    command: ["npx", "tsx", "src/provider/server.ts"]
+    volumes:
+      - ..:/app
+    env_file: ../.kinetic/provider.env
+    environment:
+      PROVIDER_BACKEND: openai
+      PROVIDER_MODEL_URL: http://ollama:11434/v1
+      PROVIDER_SANDBOX: docker:no-network
+    ports:
+      - "5101:5101"
+    networks: [sandbox, default]
+    depends_on: [ollama]
+
+networks:
+  sandbox:
+    internal: true
+
+volumes:
+  ollama-models:

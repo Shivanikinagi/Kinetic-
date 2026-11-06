@@ -1,0 +1,26 @@
+{
+  "kind": "classify",
+  "instructions": "Classify what each customer wants to do.",
+  "labels": [
+    {
+      "name": "book_flight",
+      "hint": "flight, fly, ticket to, plane"
+    },
+    {
+      "name": "cancel_order",
+      "hint": "cancel my order, cancel the order, don't want the order"
+    },
+    {
+      "name": "check_balance",
+      "hint": "balance, how much money, account balance"
+    },
+    {
+      "name": "reset_password",
+      "hint": "password, forgot, reset, can't log in"
+    },
+    {
+      "name": "track_package",
+      "hint": "where is my package, tracking, parcel, delivery status"
+    }
+  ]
+}

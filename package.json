@@ -1,0 +1,67 @@
+{
+  "name": "kinetic",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cheap community GPUs for AI agents, with verified results and automatic refunds.",
+  "license": "MIT",
+  "dependencies": {
+    "@0gfoundation/0g-compute-ts-sdk": "^0.9.0",
+    "@0gfoundation/0g-storage-ts-sdk": "1.2.13",
+    "@arkiv-network/sdk": "^1.0.1",
+    "@hashgraphonline/standards-sdk": "0.1.192",
+    "@hiero-ledger/sdk": "2.85.0",
+    "@x402/core": "^2.28.0",
+    "@x402/hedera": "^2.28.0",
+    "ethers": "^6.17.0",
+    "express": "^5.3.0",
+    "viem": "^2.57.12",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@ethereumjs/block": "^10.1.3",
+    "@ethereumjs/evm": "^10.1.3",
+    "@ethereumjs/util": "^10.1.3",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "solc": "^0.8.38",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  },
+  "scripts": {
+    "setup:testnet": "tsx scripts/setup-testnet.ts",
+    "doctor": "tsx scripts/doctor.ts",
+    "zerog": "tsx scripts/zerog.ts",
+    "calibrate": "tsx scripts/calibrate.ts",
+    "passport:verify": "tsx scripts/verify-passport.ts",
+    "live": "tsx src/live.ts",
+    "verifier": "tsx src/verifier/server.ts",
+    "provider": "tsx src/provider/server.ts",
+    "agent": "tsx src/agent/cli.ts",
+    "kinetic": "tsx src/cli/kinetic.ts",
+    "deploy:vault": "tsx scripts/deploy-vault.ts",
+    "create:topic": "tsx scripts/create-topic.ts",
+    "keys": "tsx scripts/keys.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "web": "npm --prefix web run dev",
+    "smoke:hedera": "tsx scripts/smoke-hedera.ts",
+    "fingerprint": "tsx scripts/fingerprint.ts",
+    "cosigner": "tsx src/verifier/cosigner-server.ts",
+    "swarm:stamp": "tsx scripts/swarm-stamp.ts",
+    "swarm:roundtrip": "tsx scripts/swarm-roundtrip.ts",
+    "register:hol": "tsx scripts/register-hol.ts",
+    "passport:schema": "tsx scripts/passport-schema.ts",
+    "bonds": "tsx scripts/bonds.ts",
+    "gold:check": "tsx scripts/gold-check.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "overrides": {
+    "@0gfoundation/0g-storage-ts-sdk": {
+      "ethers": "$ethers"
+    }
+  }
+}

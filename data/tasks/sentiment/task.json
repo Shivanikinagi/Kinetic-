@@ -1,0 +1,18 @@
+{
+  "kind": "classify",
+  "instructions": "Classify the sentiment of each product review as positive, negative or neutral. Neutral means it states facts without liking or disliking the product.",
+  "labels": [
+    {
+      "name": "positive",
+      "hint": "love, great, excellent, perfect, happy, recommend"
+    },
+    {
+      "name": "negative",
+      "hint": "terrible, broke, awful, waste, disappointed, refund"
+    },
+    {
+      "name": "neutral",
+      "hint": "arrived, comes in, weighs, measures, contains, delivered"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "kinetic/spam-filter",
+  "version": "1.0.0",
+  "name": "Spam Filter",
+  "description": "Flags spam and phishing messages and lets real mail through. Runs on 0G Compute's TeeML model (0gm-1.0-35b-a3b).",
+  "license": "apache-2.0",
+  "task": {
+    "kind": "classify",
+    "instructions": "Classify each message as spam (unsolicited advertising, scams or phishing) or not_spam (a normal personal or work message).",
+    "labels": [
+      {
+        "name": "spam",
+        "hint": "winner, free, claim, prize, click, urgent offer, lottery"
+      },
+      {
+        "name": "not_spam",
+        "hint": "meeting, dinner, see you, thanks, attached, tomorrow"
+      }
+    ]
+  },
+  "runtime": {
+    "engine": "0g",
+    "model": "0gm-1.0-35b-a3b"
+  },
+  "royaltyBps": 400
+}

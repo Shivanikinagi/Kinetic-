@@ -1,0 +1,24 @@
+{"id": "g001", "text": "Hi, order ORD-4821 arrived broken. Reply to anna.k@example.com", "fields": {"email": "anna.k@example.com", "order_id": "ORD-4821"}}
+{"id": "g002", "text": "Please update order ORD-1093, my email is tom99@example.org", "fields": {"email": "tom99@example.org", "order_id": "ORD-1093"}}
+{"id": "g003", "text": "Where is ORD-7765? Contact me at li.wei@example.net", "fields": {"email": "li.wei@example.net", "order_id": "ORD-7765"}}
+{"id": "g004", "text": "My order ORD-3310 is missing a part.", "fields": {"email": null, "order_id": "ORD-3310"}}
+{"id": "g005", "text": "I changed my email to sara.m@example.com, please update my account.", "fields": {"email": "sara.m@example.com", "order_id": null}}
+{"id": "g006", "text": "Cancel ORD-5502 please. Thanks, raj@example.in", "fields": {"email": "raj@example.in", "order_id": "ORD-5502"}}
+{"id": "g007", "text": "Do you have this jacket in blue?", "fields": {"email": null, "order_id": null}}
+{"id": "g008", "text": "Invoice for ORD-8810 to billing@acme-example.com please.", "fields": {"email": "billing@acme-example.com", "order_id": "ORD-8810"}}
+{"id": "g009", "text": "ORD-2047 was charged twice. Email: pedro.g@example.es", "fields": {"email": "pedro.g@example.es", "order_id": "ORD-2047"}}
+{"id": "g010", "text": "Write to me at nina_r@example.co.uk about my refund.", "fields": {"email": "nina_r@example.co.uk", "order_id": null}}
+{"id": "g011", "text": "Order ORD-6699 never shipped.", "fields": {"email": null, "order_id": "ORD-6699"}}
+{"id": "g012", "text": "Hello, I'm max.b@example.de, my order is ORD-1188.", "fields": {"email": "max.b@example.de", "order_id": "ORD-1188"}}
+{"id": "g013", "text": "Please send the receipt for ORD-4410 to me@example.com", "fields": {"email": "me@example.com", "order_id": "ORD-4410"}}
+{"id": "g014", "text": "What are your store hours?", "fields": {"email": null, "order_id": null}}
+{"id": "g015", "text": "Contact jane.doe@example.com regarding order ORD-9021.", "fields": {"email": "jane.doe@example.com", "order_id": "ORD-9021"}}
+{"id": "g016", "text": "My ORD-3377 is late, again.", "fields": {"email": null, "order_id": "ORD-3377"}}
+{"id": "g017", "text": "Reach me at k.tanaka@example.jp, thanks.", "fields": {"email": "k.tanaka@example.jp", "order_id": null}}
+{"id": "g018", "text": "Order ORD-5150 came in the wrong size. omar@example.ae", "fields": {"email": "omar@example.ae", "order_id": "ORD-5150"}}
+{"id": "g019", "text": "Can I pay with PayPal?", "fields": {"email": null, "order_id": null}}
+{"id": "g020", "text": "Refund ORD-2626 to the card I used. Email ella@example.fr", "fields": {"email": "ella@example.fr", "order_id": "ORD-2626"}}
+{"id": "g021", "text": "ORD-7001: the box was empty.", "fields": {"email": null, "order_id": "ORD-7001"}}
+{"id": "g022", "text": "Please unsubscribe sam.p@example.com from the newsletter.", "fields": {"email": "sam.p@example.com", "order_id": null}}
+{"id": "g023", "text": "Order ORD-8443, contact lucia@example.it", "fields": {"email": "lucia@example.it", "order_id": "ORD-8443"}}
+{"id": "g024", "text": "Is the sale still on?", "fields": {"email": null, "order_id": null}}

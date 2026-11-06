@@ -1,0 +1,38 @@
+{
+  "id": "kinetic/language-id",
+  "version": "1.0.0",
+  "name": "Language ID",
+  "description": "Detects the language a short text is written in. Runs on 0G Compute's TeeML model (0gm-1.0-35b-a3b).",
+  "license": "apache-2.0",
+  "task": {
+    "kind": "classify",
+    "instructions": "Identify the language each sentence is written in.",
+    "labels": [
+      {
+        "name": "english",
+        "hint": " the , and , is , where"
+      },
+      {
+        "name": "spanish",
+        "hint": "d\u00f3nde, gracias, est\u00e1, quiero, por favor"
+      },
+      {
+        "name": "french",
+        "hint": "o\u00f9, merci, je, est-ce, s'il vous pla\u00eet, bonjour"
+      },
+      {
+        "name": "german",
+        "hint": "ich, nicht, danke, wo ist, bitte, guten"
+      },
+      {
+        "name": "italian",
+        "hint": "grazie, dov'\u00e8, vorrei, buongiorno, per favore"
+      }
+    ]
+  },
+  "runtime": {
+    "engine": "0g",
+    "model": "0gm-1.0-35b-a3b"
+  },
+  "royaltyBps": 200
+}

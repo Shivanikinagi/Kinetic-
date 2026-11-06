@@ -1,0 +1,444 @@
+{
+  "jobId": "job-mw3qzkrd-585265",
+  "status": "complete",
+  "chunks": 16,
+  "completed": 16,
+  "rerouted": 2,
+  "rechecked": 0,
+  "canaryFailures": 3,
+  "asset": {
+    "id": "0.0.0",
+    "symbol": "HBAR",
+    "decimals": 8
+  },
+  "paidTinybar": "2120000",
+  "refundedTinybar": "300000",
+  "verificationFeeTinybar": "160000",
+  "verificationFeeTx": "0.0.9185802@1793895386.914544162",
+  "auditRef": "84964866a8c2e58b8e086134a0ba2d3f9143af0ab180a8ae74d5a2f3e89eb58d",
+  "auditUrl": "https://api.gateway.ethswarm.org/bytes/84964866a8c2e58b8e086134a0ba2d3f9143af0ab180a8ae74d5a2f3e89eb58d",
+  "passport": {
+    "ref": "84964866a8c2e58b8e086134a0ba2d3f9143af0ab180a8ae74d5a2f3e89eb58d",
+    "url": "https://api.gateway.ethswarm.org/bytes/84964866a8c2e58b8e086134a0ba2d3f9143af0ab180a8ae74d5a2f3e89eb58d",
+    "digest": "c75d773b37f896b74b65a62cc883b1e8d5b1ae23ef43de5e9b065df744d70d54",
+    "attested": true,
+    "coverage": {
+      "verified": 4,
+      "formatOnly": 12,
+      "share": 0.25,
+      "known": 16
+    }
+  },
+  "strategy": "balanced",
+  "agreement": {
+    "v": 1,
+    "task": "bdedfb0a5ed8498dbba1257a55a086bb72331c150d7c6e93b5350af6312be728",
+    "canaryRate": 0.25,
+    "minAgreement": 0.8,
+    "admission": {
+      "source": "verifier",
+      "size": 0,
+      "minAccuracy": 0.8
+    },
+    "budget": {
+      "asset": "0.0.0",
+      "maxSpend": "2560000",
+      "maxPricePerChunk": "500000"
+    },
+    "tier": "standard",
+    "quote": {
+      "chunks": 16,
+      "allowance": 4,
+      "maxPricePerChunk": "120000",
+      "work": "2400000",
+      "fee": "160000",
+      "total": "2560000"
+    }
+  },
+  "outcome": {
+    "met": true,
+    "notes": [
+      "all 16 chunks finished within the budget",
+      "paid 0.0228 ℏ of the 0.0256 ℏ quoted"
+    ]
+  },
+  "commitment": "ca14660b2e749fd4383b29cfedd158872498b8566aa7f67de1a80e809ca79aa0",
+  "canaries": [
+    0,
+    1,
+    5,
+    11
+  ],
+  "providers": [
+    {
+      "name": "EdgeRelay",
+      "provider": "0xd943e795047d6f8796da522426ec42d84541dccd",
+      "priceTinybar": "80000",
+      "status": "offline",
+      "qualification": {
+        "admitted": true,
+        "agreement": 1,
+        "latencyMs": 11280,
+        "fingerprint": {
+          "declared": "0gm-1.0-35b-a3b",
+          "verdict": "consistent",
+          "match": 0.75
+        }
+      },
+      "served": 1,
+      "kept": 1,
+      "paidTinybar": "160000",
+      "refundTinybar": "0",
+      "undeliveredTinybar": "80000",
+      "payTo": "0.0.11212791",
+      "uaid": "uaid:aid:1nVW6PdWLA4xtPP5G46G7Hv2e24vj6wqXPMTf7FRCnSNu381DAmQPFCcak3G8KTxx;uid=0xd943e795047d6f8796da522426ec42d84541dccd;registry=kinetic;nativeId=hedera:testnet:0.0.11212791",
+      "gpu": "0G Compute (TeeML)",
+      "backend": "0g:0gm-1.0-35b-a3b",
+      "adversarial": "goes down while chunk 5 is paid, keeping that payment",
+      "rank": {
+        "score": 0.656,
+        "price": 0.5,
+        "reliability": 0.966,
+        "speed": 0.351,
+        "checks": 27,
+        "latencyMs": 9987,
+        "proof": "active"
+      }
+    },
+    {
+      "name": "BluePeak",
+      "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+      "priceTinybar": "100000",
+      "status": "active",
+      "qualification": {
+        "admitted": true,
+        "agreement": 1,
+        "latencyMs": 13076,
+        "fingerprint": {
+          "declared": "0gm-1.0-35b-a3b",
+          "verdict": "consistent",
+          "match": 0.92
+        }
+      },
+      "served": 7,
+      "kept": 7,
+      "paidTinybar": "700000",
+      "refundTinybar": "0",
+      "undeliveredTinybar": "0",
+      "payTo": "0.0.11212786",
+      "uaid": "uaid:aid:8xjT5oGWUwqdPP1HNG7rDRJPdbqRviz2wWZUdecuYhfwaGqXqXWWcaSnKGj4B81DRF;uid=0x7db49eb7d37ba00de37518f26b704c57ebecf5ab;registry=kinetic;nativeId=hedera:testnet:0.0.11212786",
+      "gpu": "0G Compute (TeeML)",
+      "backend": "0g:0gm-1.0-35b-a3b",
+      "rank": {
+        "score": 0.65,
+        "price": 0.4,
+        "reliability": 0.972,
+        "speed": 0.506,
+        "checks": 70,
+        "latencyMs": 6919,
+        "proof": "active"
+      }
+    },
+    {
+      "name": "Riverstone",
+      "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+      "priceTinybar": "120000",
+      "status": "active",
+      "qualification": {
+        "admitted": true,
+        "agreement": 1,
+        "latencyMs": 13474,
+        "fingerprint": {
+          "declared": "0gm-1.0-35b-a3b",
+          "verdict": "consistent",
+          "match": 0.92
+        }
+      },
+      "served": 8,
+      "kept": 8,
+      "paidTinybar": "960000",
+      "refundTinybar": "0",
+      "undeliveredTinybar": "0",
+      "payTo": "0.0.11212787",
+      "uaid": "uaid:aid:45uoyFKEHYs3kVusYdBfH4a2VbuyLemQoETDr4aKvh8ykQpzZftNkn2MMWoXTK2xRq;uid=0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda;registry=kinetic;nativeId=hedera:testnet:0.0.11212787",
+      "gpu": "0G Compute (TeeML)",
+      "backend": "0g:0gm-1.0-35b-a3b",
+      "rank": {
+        "score": 0.624,
+        "price": 0.333,
+        "reliability": 0.984,
+        "speed": 0.484,
+        "checks": 59,
+        "latencyMs": 7242,
+        "proof": "active"
+      }
+    },
+    {
+      "name": "QuickCompute",
+      "provider": "0xae37efe9cbb3a742d7f61b21dd58dec2013f78b2",
+      "priceTinybar": "60000",
+      "status": "slashed",
+      "qualification": {
+        "admitted": true,
+        "agreement": 1,
+        "latencyMs": 12764,
+        "fingerprint": {
+          "declared": "0gm-1.0-35b-a3b",
+          "verdict": "consistent",
+          "match": 0.92
+        }
+      },
+      "served": 5,
+      "kept": 0,
+      "paidTinybar": "300000",
+      "refundTinybar": "300000",
+      "undeliveredTinybar": "0",
+      "vaultTx": "0xa1026d293e6cb21fe302fc0fa6f2661326191397bf547a41b0a244013a18bdaf",
+      "slashId": "0xb7131f2b64a85494ce2736692e5baa21190a29fba7a8580ff21df6651738fd50",
+      "slashStatus": "executed",
+      "slashSigners": [
+        "0x5d3393fa6c0ca4296b28a48d860d4817951d2616",
+        "0x6ead394b4dcd43ce447a6e809776c00d157780d5",
+        "0xa19cc96ea9f0e414cebb149918e4c5549554adc8"
+      ],
+      "burnedTinybar": "99700000",
+      "payTo": "0.0.11326776",
+      "uaid": "uaid:aid:pchoUnPLtRHxU6tjAMHqx7nctYmT49ZuvNPSapVCFSktSDHDuFoG3r1SsNrEG8Jxq;uid=0xae37efe9cbb3a742d7f61b21dd58dec2013f78b2;registry=kinetic;nativeId=hedera:testnet:0.0.11326776",
+      "gpu": "0G Compute (TeeML)",
+      "backend": "0g:0gm-1.0-35b-a3b",
+      "adversarial": "stops calling its model after 3 chunks",
+      "rank": {
+        "score": 0.563,
+        "price": 0.667,
+        "reliability": 0.5,
+        "speed": 0.484,
+        "checks": 0
+      }
+    },
+    {
+      "name": "BudgetGPU",
+      "provider": "0xded1726fb7db5019c791b65ba3a8ac8788f99208",
+      "priceTinybar": "40000",
+      "status": "unqualified",
+      "qualification": {
+        "admitted": false,
+        "agreement": 0,
+        "latencyMs": 3160,
+        "reason": "matched 0% of known answers"
+      },
+      "served": 0,
+      "kept": 0,
+      "paidTinybar": "0",
+      "refundTinybar": "0",
+      "undeliveredTinybar": "0",
+      "payTo": "0.0.11213756",
+      "uaid": "uaid:aid:3y8wQHhLHeeNqPA97xhG1wrej1Z69QVsDq54AeiUrcbnZHoukATBdnB4ibkwyee1vK;uid=0xded1726fb7db5019c791b65ba3a8ac8788f99208;registry=kinetic;nativeId=hedera:testnet:0.0.11213756",
+      "gpu": "none",
+      "backend": "0g:0gm-1.0-35b-a3b",
+      "adversarial": "never calls its model",
+      "rank": {
+        "score": 0.627,
+        "price": 1,
+        "reliability": 0.067,
+        "speed": 1,
+        "checks": 13,
+        "latencyMs": 3503,
+        "proof": "unproven"
+      }
+    }
+  ],
+  "results": [
+    {
+      "id": "t001",
+      "label": "shipping"
+    },
+    {
+      "id": "t002",
+      "label": "feature_request"
+    },
+    {
+      "id": "t003",
+      "label": "feature_request"
+    },
+    {
+      "id": "t004",
+      "label": "billing"
+    },
+    {
+      "id": "t005",
+      "label": "other"
+    },
+    {
+      "id": "t006",
+      "label": "feature_request"
+    },
+    {
+      "id": "t007",
+      "label": "bug"
+    },
+    {
+      "id": "t008",
+      "label": "other"
+    },
+    {
+      "id": "t009",
+      "label": "other"
+    },
+    {
+      "id": "t010",
+      "label": "bug"
+    },
+    {
+      "id": "t011",
+      "label": "billing"
+    },
+    {
+      "id": "t012",
+      "label": "feature_request"
+    },
+    {
+      "id": "t013",
+      "label": "account"
+    },
+    {
+      "id": "t014",
+      "label": "billing"
+    },
+    {
+      "id": "t015",
+      "label": "shipping"
+    },
+    {
+      "id": "t016",
+      "label": "shipping"
+    },
+    {
+      "id": "t017",
+      "label": "other"
+    },
+    {
+      "id": "t018",
+      "label": "bug"
+    },
+    {
+      "id": "t019",
+      "label": "account"
+    },
+    {
+      "id": "t020",
+      "label": "bug"
+    },
+    {
+      "id": "t021",
+      "label": "account"
+    },
+    {
+      "id": "t022",
+      "label": "bug"
+    },
+    {
+      "id": "t023",
+      "label": "shipping"
+    },
+    {
+      "id": "t024",
+      "label": "feature_request"
+    },
+    {
+      "id": "t025",
+      "label": "shipping"
+    },
+    {
+      "id": "t026",
+      "label": "billing"
+    },
+    {
+      "id": "t027",
+      "label": "bug"
+    },
+    {
+      "id": "t028",
+      "label": "bug"
+    },
+    {
+      "id": "t029",
+      "label": "billing"
+    },
+    {
+      "id": "t030",
+      "label": "shipping"
+    },
+    {
+      "id": "t031",
+      "label": "account"
+    },
+    {
+      "id": "t032",
+      "label": "shipping"
+    },
+    {
+      "id": "t033",
+      "label": "feature_request"
+    },
+    {
+      "id": "t034",
+      "label": "feature_request"
+    },
+    {
+      "id": "t035",
+      "label": "feature_request"
+    },
+    {
+      "id": "t036",
+      "label": "feature_request"
+    },
+    {
+      "id": "t037",
+      "label": "account"
+    },
+    {
+      "id": "t038",
+      "label": "bug"
+    },
+    {
+      "id": "t039",
+      "label": "bug"
+    },
+    {
+      "id": "t040",
+      "label": "bug"
+    },
+    {
+      "id": "t041",
+      "label": "feature_request"
+    },
+    {
+      "id": "t042",
+      "label": "billing"
+    },
+    {
+      "id": "t043",
+      "label": "shipping"
+    },
+    {
+      "id": "t044",
+      "label": "feature_request"
+    },
+    {
+      "id": "t045",
+      "label": "account"
+    },
+    {
+      "id": "t046",
+      "label": "account"
+    },
+    {
+      "id": "t047",
+      "label": "other"
+    },
+    {
+      "id": "t048",
+      "label": "feature_request"
+    }
+  ]
+}

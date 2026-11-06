@@ -1,0 +1,1130 @@
+/*
+ * Website layer, adapted from the Akash Network website (MIT, github.com/akash-network/website).
+ * Geist and JetBrains Mono, near-black neutral surfaces, hairline borders, 12px bars and cards,
+ * semibold headings with tight tracking. KINETIC keeps its orange for primary actions and its
+ * teal for "verified". Loaded after design.css.
+ */
+
+:root {
+  --dp-typography-body-face: "Geist", system-ui, sans-serif;
+  --dp-typography-data-face: "JetBrains Mono", ui-monospace, monospace;
+
+  --ak-bg: #030303;
+  --ak-bg-2: #0d0d0e;
+  --ak-card: #171717;
+  --ak-card-2: #111112;
+  --ak-border: #2e2e2e;
+  --ak-border-soft: rgba(255, 255, 255, 0.1);
+  --ak-control: rgba(255, 255, 255, 0.15);
+  --ak-fg: #fafafa;
+  --ak-para: #a3a3a3;
+  --ak-muted: #737373;
+  --ak-ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* One neutral palette for the whole site, console included: the navy tints become greys.
+     Orange stays the single brand accent; teal still means "verified". */
+  --dp-color-ground: #0a0a0a;
+  --dp-color-ground-tint: #111112;
+  --dp-color-panel: #141414;
+  --dp-color-ink: var(--ak-fg);
+  --dp-color-ink-muted: #d4d4d4;
+  --dp-color-line: #262626;
+  --panel-2: #1c1c1c;
+  --rule-2: #333333;
+  --ink-3: var(--ak-para);
+  --ink-4: var(--ak-muted);
+  --topbar: rgba(10, 10, 10, 0.88);
+}
+
+.ide {
+  --chrome: #0a0a0a;
+  --chrome-2: #0f0f10;
+}
+
+/* ───────── Header: a 12px bar with centred links ───────── */
+
+.topbar {
+  border-color: var(--ak-border-soft);
+  border-radius: 12px;
+  background: rgba(10, 10, 10, 0.88);
+  box-shadow: none;
+}
+
+.nav a {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--ak-para);
+}
+
+.nav a:hover {
+  color: var(--ak-fg);
+  background: transparent;
+}
+
+.nav a[aria-current="page"] {
+  color: var(--ak-fg);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
+@media (min-width: 641px) {
+  .topbar .nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.topbar.is-landing.scrolled {
+  border-bottom-color: var(--ak-border-soft);
+  background: rgba(3, 3, 3, 0.8);
+}
+
+/* ───────── Landing ───────── */
+
+.landing.ak {
+  background:
+    radial-gradient(1100px 560px at 50% -8%, rgba(255, 255, 255, 0.06), transparent 65%),
+    var(--ak-bg);
+  color: var(--ak-fg);
+}
+
+.ak .btn {
+  border-radius: 8px;
+}
+
+.ak .btn.lg {
+  height: 44px;
+  padding: 0 20px;
+}
+
+/* Hero */
+.ak-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 72px 24px 104px;
+  text-align: center;
+}
+
+.ak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border: 1px solid var(--ak-border-soft);
+  border-radius: 999px;
+  background: rgba(23, 23, 23, 0.7);
+  font-size: 12.5px;
+  color: var(--ak-para);
+}
+
+.ak-badge span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--action);
+  box-shadow: 0 0 8px var(--action);
+}
+
+.ak-headline {
+  margin: 28px 0 0;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+  color: var(--ak-fg);
+  text-shadow:
+    0 0 18px rgba(0, 0, 0, 0.9),
+    0 0 4px rgba(0, 0, 0, 0.9);
+}
+
+.ak-hl-line {
+  display: block;
+}
+
+.ak-hl-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.ak-hl-space {
+  display: inline-block;
+  width: 0.28em;
+}
+
+.ak-hl-letter {
+  position: relative;
+  display: inline-block;
+  cursor: default;
+  user-select: none;
+  transform-origin: center;
+  transition:
+    margin 0.4s var(--ak-ease),
+    transform 0.4s var(--ak-ease),
+    color 0.2s ease-out;
+}
+
+.ak-hl-letter.on {
+  margin: 0 0.3em;
+  color: transparent;
+  text-shadow: none;
+  transform: scale(1.2);
+}
+
+.ak-hl-tile {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 0.95em;
+  height: 0.95em;
+  border-radius: 0.22em;
+  background: linear-gradient(135deg, #ffb35c, var(--action) 55%, #c4620a);
+  color: #0a0a0a;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%);
+  animation: ak-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.ak-hl-tile svg {
+  width: 0.58em;
+  height: 0.58em;
+}
+
+@keyframes ak-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.ak-hero-sub {
+  margin: 20px 0 0;
+  font-size: 15px;
+  color: var(--ak-para);
+  text-shadow: 0 0 14px rgba(0, 0, 0, 0.9);
+}
+
+.ak-try {
+  display: flex;
+  gap: 8px;
+  width: min(520px, 100%);
+  margin-top: 40px;
+}
+
+.ak-try input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--ak-control);
+  border-radius: 8px;
+  background: rgba(17, 17, 18, 0.9);
+  font: inherit;
+  font-size: 14px;
+  color: var(--ak-fg);
+}
+
+.ak-try input:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.ak-try .btn {
+  height: 44px;
+  padding: 0 18px;
+}
+
+/* Built on strip */
+.ak-builton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 22px 24px;
+  border-block: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--ak-bg);
+}
+
+.ak-builton-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ak-muted);
+}
+
+.ak-builton ul {
+  display: flex;
+  gap: 48px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ak-builton li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.ak-builton b {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #d4d4d4;
+}
+
+.ak-builton li span {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ak-muted);
+}
+
+/* Bands */
+.ak-band {
+  padding: 112px 24px;
+  background: var(--ak-bg-2);
+}
+
+.ak-band + .ak-band {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ak-wrap {
+  max-width: 1152px;
+  margin: 0 auto;
+}
+
+.ak-head h2 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--ak-fg);
+}
+
+.ak-head p {
+  max-width: 30rem;
+  margin: 12px 0 0;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--ak-para);
+}
+
+/* Text beside a square visual */
+.ak-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 80px;
+  align-items: center;
+}
+
+.ak-split.flip .ak-split-text {
+  order: 2;
+}
+
+.ak-split-text .ak-head {
+  margin-bottom: 24px;
+}
+
+.ak-rows,
+.ak-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ak-rows li,
+.ak-steps li {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ak-row-head,
+.ak-step-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 26px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 22px;
+  line-height: 1.3;
+  text-align: left;
+  color: var(--ak-para);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.ak-row-head:hover,
+.ak-step-head:hover {
+  color: #d4d4d4;
+}
+
+.on > .ak-row-head,
+.on > .ak-step-head {
+  padding-bottom: 8px;
+  font-weight: 600;
+  color: var(--ak-fg);
+}
+
+/* The dot hangs in the margin so every title lines up with the section heading. */
+.ak-row-head {
+  position: relative;
+}
+
+.ak-row-dot {
+  position: absolute;
+  left: -16px;
+  /* Centre on the first text line: top padding + half the 1.3 line height. */
+  top: calc(26px + 0.65em - 3px);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 0.3s;
+}
+
+.on .ak-row-dot {
+  background: var(--action);
+}
+
+.ak-row-body {
+  padding: 0 0 26px;
+}
+
+.ak-row-body p,
+.ak-steps li > p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ak-para);
+}
+
+.ak-steps li > p {
+  padding: 0 0 26px 44px;
+}
+
+.ak-step-head {
+  font-size: 20px;
+}
+
+.ak-step-n {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--ak-border);
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.on .ak-step-n {
+  border-color: var(--ak-fg);
+  background: var(--ak-fg);
+  color: var(--ak-bg);
+  font-weight: 600;
+}
+
+.ak-cta-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  margin-top: 16px;
+  padding: 0 12px;
+  border: 1px solid var(--ak-control);
+  border-radius: 6px;
+  background: var(--ak-card);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ak-fg);
+  transition: background 0.15s;
+}
+
+.ak-cta-sm:hover {
+  background: #262626;
+  text-decoration: none;
+}
+
+/* Slide progress: a pill of dots, the current one filling */
+.ak-progress {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.ak-progress-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--ak-control);
+  border-radius: 6px;
+  background: var(--ak-card);
+}
+
+.ak-progress-dots button {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  background: #525252;
+  cursor: pointer;
+  transition: width 0.3s ease;
+}
+
+.ak-progress-dots button.on {
+  width: 64px;
+  background: var(--ak-border);
+}
+
+.ak-progress-dots button span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--ak-fg);
+}
+
+.ak-progress-play {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--ak-control);
+  border-radius: 6px;
+  background: var(--ak-card);
+  color: var(--ak-fg);
+  cursor: pointer;
+}
+
+.ak-progress-play:hover {
+  background: #262626;
+}
+
+.ak-progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.ak-progress-row .ak-progress,
+.ak-progress-row .ak-cta-sm {
+  margin-top: 0;
+}
+
+/* Console screenshots, cross-fading */
+.ak-shot {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid var(--ak-border);
+  border-radius: 12px;
+  background: var(--ak-card-2);
+}
+
+.ak-shot img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.ak-shot img.on {
+  opacity: 1;
+}
+
+/* A window with live example frames */
+.ak-window {
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid var(--ak-border);
+  border-radius: 12px;
+  background: var(--ak-bg);
+}
+
+.ak-window-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ak-border);
+  background: var(--ak-card);
+}
+
+.ak-window-bar > span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.7);
+}
+
+.ak-window-bar > span:nth-child(2) {
+  background: rgba(245, 158, 11, 0.7);
+}
+
+.ak-window-bar > span:nth-child(3) {
+  background: rgba(34, 197, 94, 0.7);
+}
+
+.ak-window-bar b {
+  margin-left: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ak-para);
+}
+
+.ak-window-bar em {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ak-muted);
+}
+
+.ak-window-body {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  padding: 32px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.ak-frame {
+  width: 100%;
+  max-width: 420px;
+}
+
+.ak-frame-card {
+  padding: 18px;
+  border: 1px solid var(--ak-border);
+  border-radius: 10px;
+  background: var(--ak-card);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+}
+
+.ak-frame-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--ak-para);
+}
+
+.ak-frame-title b {
+  font-weight: 600;
+  color: var(--ak-fg);
+}
+
+.ak-pill {
+  flex: none;
+  padding: 2px 8px;
+  border: 1px solid var(--ak-border);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ak-para);
+  transition:
+    color 0.3s,
+    border-color 0.3s;
+}
+
+.ak-pill.ok {
+  border-color: rgba(122, 216, 193, 0.4);
+  color: var(--accent);
+}
+
+.ak-pill.bad {
+  border-color: rgba(248, 113, 113, 0.4);
+  color: var(--bad);
+}
+
+.ak-frame-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ak-frame-list li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+  color: #d4d4d4;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.ak-frame-list li.in {
+  opacity: 1;
+  transform: none;
+}
+
+.ak-frame-list .mono {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ak-para);
+}
+
+.ak-frame-list .mono.ok {
+  color: var(--accent);
+}
+
+.ak-frame-list .mono.bad {
+  color: var(--bad);
+}
+
+.ak-mark {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+.ak-mark.ok {
+  background: rgba(122, 216, 193, 0.14);
+  color: var(--accent);
+}
+
+.ak-mark.bad {
+  background: rgba(248, 113, 113, 0.14);
+  color: var(--bad);
+}
+
+.ak-dot {
+  justify-self: center;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #525252;
+}
+
+.ak-dot.ok {
+  background: var(--accent);
+}
+
+.ak-dot.bad {
+  background: var(--bad);
+}
+
+.ak-chunks {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 4px;
+  margin: 14px 0 16px;
+}
+
+.ak-chunks span {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: #262626;
+  transition: background 0.25s;
+}
+
+.ak-chunks span.run {
+  background: rgba(255, 149, 31, 0.55);
+}
+
+.ak-chunks span.ok {
+  background: rgba(122, 216, 193, 0.75);
+}
+
+.ak-frame-kv {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ak-frame-kv dt {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ak-muted);
+}
+
+.ak-frame-kv dd {
+  margin: 4px 0 0;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ak-fg);
+}
+
+.ak-frame-note {
+  margin: 14px 0 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: center;
+  color: var(--ak-muted);
+}
+
+/* Card grid */
+.ak-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 48px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ak-cards li {
+  padding: 24px;
+  border: 1px solid var(--ak-border);
+  border-radius: 12px;
+  background: var(--ak-card-2);
+  transition: border-color 0.2s;
+}
+
+.ak-cards li:hover {
+  border-color: #404040;
+}
+
+.ak-card-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--ak-border);
+  border-radius: 8px;
+  background: var(--ak-bg-2);
+  color: var(--action);
+}
+
+.ak-cards h3 {
+  margin: 18px 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ak-fg);
+}
+
+.ak-cards p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ak-para);
+}
+
+/* Closing band */
+.ak-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 140px 30px;
+  border-block: 1px solid var(--ak-border);
+  background: #121213;
+  text-align: center;
+}
+
+.ak-cta h2 {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(30px, 4.6vw, 56px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  color: var(--ak-fg);
+}
+
+.ak-cta p {
+  max-width: 600px;
+  margin: 20px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ak-para);
+}
+
+.ak-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 36px;
+}
+
+/* Footer */
+.ak-footer {
+  padding: 64px 24px 32px;
+  background: var(--ak-bg);
+}
+
+.ak-footer-top,
+.ak-footer-bottom {
+  max-width: 1152px;
+  margin: 0 auto;
+}
+
+.ak-footer-top {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.ak-footer-brand p {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--ak-para);
+}
+
+.ak-footer h4 {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ak-fg);
+}
+
+.ak-footer nav a {
+  display: block;
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--ak-para);
+}
+
+.ak-footer nav a:hover {
+  color: var(--ak-fg);
+}
+
+.ak-footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  color: var(--ak-muted);
+}
+
+/* ───────── Responsive ───────── */
+
+@media (max-width: 1023px) {
+  .ak-split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+  .ak-split.flip .ak-split-text {
+    order: 0;
+  }
+  .ak-window {
+    aspect-ratio: auto;
+    min-height: 420px;
+  }
+  .ak-shot {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (max-width: 900px) {
+  .ak-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ak-builton,
+  .ak-builton ul {
+    gap: 28px;
+  }
+}
+
+@media (max-width: 700px) {
+  .ak-band {
+    padding: 72px 20px;
+  }
+  .ak-head h2 {
+    font-size: 28px;
+  }
+  .ak-head p {
+    font-size: 15px;
+  }
+  .ak-row-head {
+    font-size: 18px;
+  }
+  .ak-step-head {
+    font-size: 17px;
+  }
+  .ak-builton {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .ak-builton ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px 28px;
+  }
+  .ak-footer-top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ak-footer-brand {
+    grid-column: 1 / -1;
+  }
+  .ak-cta {
+    padding: 88px 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .ak-hero {
+    padding: 48px 20px 72px;
+  }
+  .ak-try {
+    flex-direction: column;
+  }
+  .ak-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ak-window-body {
+    padding: 20px 14px;
+  }
+  .ak-chunks {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+  .ak-footer-bottom {
+    flex-direction: column;
+  }
+}
+
+/* ───────── Console forms ───────── */
+
+/* The two-column settings grid is for Publish (sections led by a <header>). Sections led by
+   .fsec-head (Run, Earn) stack: title row, then fields, each box spanning the full width. */
+.fsec:has(> .fsec-head) {
+  display: block;
+}
+
+.fsec > .hint {
+  margin-top: 10px;
+}
+
+/* ───────── One palette, one control shape ───────── */
+
+:root {
+  /* Values read in plain white; orange is for actions, teal and red for status. */
+  --dp-color-value: var(--ak-fg);
+  /* Buttons, inputs and selects: 8px corners instead of pills. */
+  --dp-radius-control: 8px;
+}
+
+/* Website pages fill the viewport, so the footer never floats mid-screen. */
+.topbar:not(.is-landing) ~ main#main {
+  min-height: calc(100vh - 88px);
+}
+
+.ak-live {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: middle;
+}
+
+/* ───────── Website pages: an Akash-style page heading ───────── */
+
+.ak-page-head {
+  margin: 24px 0 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.ak-page-head h1 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.ak-page-head p {
+  margin: 10px 0 0;
+  font-size: 17px;
+  color: var(--ak-para);
+}
+
+/* The list title sits on the same line as the first filter group. */
+.hub-head {
+  min-height: 38px;
+}
+
+.hub-head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.hub-head .count {
+  font-size: 15px;
+}
+
+@media (max-width: 700px) {
+  .ak-page-head {
+    margin: 8px 0 28px;
+    padding-bottom: 24px;
+  }
+  .ak-page-head h1 {
+    font-size: 28px;
+  }
+  .ak-page-head p {
+    font-size: 15px;
+  }
+}
+
+/* Timestamps ("04:11:39 PM") stay on one line in a fixed column, so feed rows line up. */
+.pg .rows .when,
+.feed .when {
+  width: 88px;
+  white-space: nowrap;
+}
+
+/* Side by side, the first filter label shares a line with the list title. */
+@media (min-width: 961px) {
+  .hub .facets {
+    padding-top: 10px;
+  }
+}

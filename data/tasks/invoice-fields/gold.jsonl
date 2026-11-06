@@ -1,0 +1,24 @@
+{"id": "g001", "text": "Invoice INV-48213 is due on 2026-03-14.", "fields": {"invoice_number": "INV-48213", "due_date": "2026-03-14"}}
+{"id": "g002", "text": "Please pay INV-10077 by 2026-01-31.", "fields": {"invoice_number": "INV-10077", "due_date": "2026-01-31"}}
+{"id": "g003", "text": "Reminder: INV-55820, due date 2026-05-02.", "fields": {"invoice_number": "INV-55820", "due_date": "2026-05-02"}}
+{"id": "g004", "text": "Invoice INV-30001 has been paid, thank you.", "fields": {"invoice_number": "INV-30001", "due_date": null}}
+{"id": "g005", "text": "Payment due 2026-07-15 for consulting services.", "fields": {"invoice_number": null, "due_date": "2026-07-15"}}
+{"id": "g006", "text": "INV-77432 (due 2026-02-28) covers the March rent.", "fields": {"invoice_number": "INV-77432", "due_date": "2026-02-28"}}
+{"id": "g007", "text": "Thanks for your business!", "fields": {"invoice_number": null, "due_date": null}}
+{"id": "g008", "text": "Attached is INV-21909. It is due 2026-09-01.", "fields": {"invoice_number": "INV-21909", "due_date": "2026-09-01"}}
+{"id": "g009", "text": "Overdue: INV-64218 was due 2025-12-20.", "fields": {"invoice_number": "INV-64218", "due_date": "2025-12-20"}}
+{"id": "g010", "text": "Your invoice INV-90515 for the annual licence.", "fields": {"invoice_number": "INV-90515", "due_date": null}}
+{"id": "g011", "text": "The balance is due on 2026-04-10.", "fields": {"invoice_number": null, "due_date": "2026-04-10"}}
+{"id": "g012", "text": "INV-13579, due 2026-06-30, net 30 terms.", "fields": {"invoice_number": "INV-13579", "due_date": "2026-06-30"}}
+{"id": "g013", "text": "Invoice number INV-24680, payable by 2026-08-18.", "fields": {"invoice_number": "INV-24680", "due_date": "2026-08-18"}}
+{"id": "g014", "text": "We have received your payment.", "fields": {"invoice_number": null, "due_date": null}}
+{"id": "g015", "text": "INV-11223 for web hosting is due 2026-10-05.", "fields": {"invoice_number": "INV-11223", "due_date": "2026-10-05"}}
+{"id": "g016", "text": "Please settle INV-44556 before 2026-11-11.", "fields": {"invoice_number": "INV-44556", "due_date": "2026-11-11"}}
+{"id": "g017", "text": "Credit note for INV-66778 issued today.", "fields": {"invoice_number": "INV-66778", "due_date": null}}
+{"id": "g018", "text": "Due date: 2026-12-24. Amount: 300 EUR.", "fields": {"invoice_number": null, "due_date": "2026-12-24"}}
+{"id": "g019", "text": "INV-88990 due 2027-01-15, thank you.", "fields": {"invoice_number": "INV-88990", "due_date": "2027-01-15"}}
+{"id": "g020", "text": "Questions about billing? Call us.", "fields": {"invoice_number": null, "due_date": null}}
+{"id": "g021", "text": "Invoice INV-35791 must be paid by 2026-03-03.", "fields": {"invoice_number": "INV-35791", "due_date": "2026-03-03"}}
+{"id": "g022", "text": "INV-46802 was sent to your email.", "fields": {"invoice_number": "INV-46802", "due_date": null}}
+{"id": "g023", "text": "Final reminder, due 2026-02-14.", "fields": {"invoice_number": null, "due_date": "2026-02-14"}}
+{"id": "g024", "text": "Invoice INV-57913, due on 2026-05-20, for cleaning.", "fields": {"invoice_number": "INV-57913", "due_date": "2026-05-20"}}

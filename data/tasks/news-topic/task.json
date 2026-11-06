@@ -1,0 +1,26 @@
+{
+  "kind": "classify",
+  "instructions": "Classify each news headline by its main topic.",
+  "labels": [
+    {
+      "name": "sports",
+      "hint": "match, goal, championship, league, tournament, coach"
+    },
+    {
+      "name": "politics",
+      "hint": "election, parliament, minister, vote, senate, president"
+    },
+    {
+      "name": "technology",
+      "hint": "smartphone, software, chip, app, startup launches, ai model"
+    },
+    {
+      "name": "business",
+      "hint": "shares, profit, quarterly, merger, stock, revenue"
+    },
+    {
+      "name": "health",
+      "hint": "vaccine, hospital, disease, patients, doctors, clinical trial"
+    }
+  ]
+}

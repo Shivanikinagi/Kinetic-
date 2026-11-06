@@ -1,0 +1,32 @@
+# Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+
+# Node
+node_modules/
+web/node_modules/
+web/dist/
+dist/
+*.tsbuildinfo
+npm-debug.log*
+
+# Runtime output
+out/
+.kinetic/
+*.log
+coverage/
+
+# Local UI restore points (see DESIGN.md §12)
+ui-snapshots/
+
+# Python caches (helper scripts)
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

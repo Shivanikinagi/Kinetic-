@@ -1,0 +1,1665 @@
+{
+  "kind": "kinetic.passport.v2",
+  "jobId": "job-mw3qzkrd-585265",
+  "issuedAt": "2026-11-05T16:22:29.362Z",
+  "network": "testnet",
+  "buyer": {
+    "address": "0x8ed8a58f08a2caa800cbb4083e3691e5ca1e73a6",
+    "uaid": "uaid:aid:8zWkDYkb4zorN7Cn6EM51Tm4FzedKn7j46HChL2A7dpcjEQY5yYpwNrJ2ALM6srBFo;uid=0x8ed8a58f08a2caa800cbb4083e3691e5ca1e73a6;registry=kinetic;nativeId=hedera:testnet:0.0.11212785"
+  },
+  "task": {
+    "kind": "classify",
+    "labels": [
+      "billing",
+      "bug",
+      "account",
+      "shipping",
+      "feature_request",
+      "other"
+    ]
+  },
+  "items": 48,
+  "chunkSize": 3,
+  "chunks": 16,
+  "completed": 16,
+  "output": {
+    "resultsHash": "d8843a6dfe4233665158b8f0aa65309525f8586d77ca851f173e2cffeb5b789e"
+  },
+  "hcsTopic": "0.0.11212792",
+  "references": {
+    "x402Network": "hedera:testnet",
+    "hcsTopic": "0.0.11212792",
+    "mirrorUrl": "https://testnet.mirrornode.hedera.com",
+    "vault": "0x585054f20af2c3023156c10a3ee4bdeed90bb48a",
+    "swarmGateway": "https://api.gateway.ethswarm.org"
+  },
+  "strategy": "balanced",
+  "agreement": {
+    "v": 1,
+    "task": "bdedfb0a5ed8498dbba1257a55a086bb72331c150d7c6e93b5350af6312be728",
+    "canaryRate": 0.25,
+    "minAgreement": 0.8,
+    "admission": {
+      "source": "verifier",
+      "size": 0,
+      "minAccuracy": 0.8
+    },
+    "budget": {
+      "asset": "0.0.0",
+      "maxSpend": "2560000",
+      "maxPricePerChunk": "500000"
+    },
+    "tier": "standard",
+    "quote": {
+      "chunks": 16,
+      "allowance": 4,
+      "maxPricePerChunk": "120000",
+      "work": "2400000",
+      "fee": "160000",
+      "total": "2560000"
+    }
+  },
+  "outcome": {
+    "met": true,
+    "notes": [
+      "all 16 chunks finished within the budget",
+      "paid 0.0228 ℏ of the 0.0256 ℏ quoted"
+    ]
+  },
+  "canaries": {
+    "commitment": "ca14660b2e749fd4383b29cfedd158872498b8566aa7f67de1a80e809ca79aa0",
+    "revealed": [
+      0,
+      1,
+      5,
+      11
+    ],
+    "salt": "98b12e137e0220605ae2c3a79fe438ac",
+    "checked": [
+      {
+        "idx": 1,
+        "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+        "agreement": 1,
+        "pass": true,
+        "zeroGRequest": "33ef19e7-209e-4311-8771-d57d1ba72076",
+        "model": "glm-5.3",
+        "tee": {
+          "trustMode": "private",
+          "provider": "0x6446fe523d8f3678185ed53e3adeffb4d27475cc",
+          "guarantee": "TeeML",
+          "chatId": "db3680cf-3f8f-4bed-b42e-f34993340419",
+          "verification": "verified",
+          "routerTeeVerified": null,
+          "costUsdMicro": 2174,
+          "providerType": "decentralized",
+          "signer": "0xb280b63823a5a572acd9296c46f8ced8cff68eb7",
+          "signedText": "zg-sig-v1/e2ee-ct:c483049284bd864b520e51fd2cba5c5d1523b7c44891d95bf25851d66f04a5ff:910cbcc08bd5e9adb47db19b1edb97caeab29e5ac8fe493ce02828c5c5b78778",
+          "signedTextHash": "cd67cc4f4c1a70f3cefaccd0f75119405b93906e47686dc9f84e066651eb71c7",
+          "signature": "0xe7a3df322ccbf372a78cf8567d01f31dbd3c389bdaa6fb629546f8a0bb8e85c712f45a00cfcb5ea15113ba612648199eb3609ad674a95a11aa20d6d0ea8a4e541c",
+          "scheme": "zg-sig-v1/e2ee-ct"
+        }
+      },
+      {
+        "idx": 0,
+        "provider": "0xd943e795047d6f8796da522426ec42d84541dccd",
+        "agreement": 1,
+        "pass": true,
+        "zeroGRequest": "fe69da5e-29d3-42b8-b7a4-32c34b91cf20",
+        "model": "glm-5.3",
+        "tee": {
+          "trustMode": "private",
+          "provider": "0x6446fe523d8f3678185ed53e3adeffb4d27475cc",
+          "guarantee": "TeeML",
+          "chatId": "c4bfd4cc-043a-4e17-b95a-3c70764bee55",
+          "verification": "verified",
+          "routerTeeVerified": null,
+          "costUsdMicro": 1567,
+          "providerType": "decentralized",
+          "signer": "0xb280b63823a5a572acd9296c46f8ced8cff68eb7",
+          "signedText": "zg-sig-v1/e2ee-ct:c53a3b11148b31790f52876aa47d8a0bfbff0a50077b6b313cb20a3d9e6d1779:98a383fbd0a14a6c67e1eb19ed61ee569a028e9e4242cd1920f97d1bfbd3befa",
+          "signedTextHash": "4ed04b1fea325163bf97622346e7d2e92597deffc6ebf770e058d16cc3380856",
+          "signature": "0xaed701fe5142780effdd175075352bced79397c70cca62e36257532efc6065f4520df4b853bbc17bb9a7f21070579d686af7df9e40bd17a09ca6a4e5dd12278d1c",
+          "scheme": "zg-sig-v1/e2ee-ct"
+        }
+      },
+      {
+        "idx": 5,
+        "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+        "agreement": 1,
+        "pass": true,
+        "zeroGRequest": "0cd4bf9e-bb0d-46af-8ed0-bcaa6c3f8e28",
+        "model": "glm-5.3",
+        "tee": {
+          "trustMode": "private",
+          "provider": "0x6446fe523d8f3678185ed53e3adeffb4d27475cc",
+          "guarantee": "TeeML",
+          "chatId": "31a4b7c9-03fa-4ff4-a9e7-03803b52a61d",
+          "verification": "verified",
+          "routerTeeVerified": null,
+          "costUsdMicro": 1866,
+          "providerType": "decentralized",
+          "signer": "0xb280b63823a5a572acd9296c46f8ced8cff68eb7",
+          "signedText": "zg-sig-v1/e2ee-ct:e35b66559b8df3e081d1cdccb0a4e4462670ce95d7f7fd2848ece0c01ca17fff:802e56575f8a051f3f1fa0ad4fa14463926c06e6cabd43dfb89aba10243ee8f7",
+          "signedTextHash": "9e273a1c5541bdd17070416a9ef0d51ba07018432952e98ab33ce931e09f5ffc",
+          "signature": "0x7cefaefc4c500adca298324f00236cc1552df487fbfb272d9b159f00fce525841bf30c51ba76f9259af766a406f68f18d00766885215413b290bf302bd59c2c91c",
+          "scheme": "zg-sig-v1/e2ee-ct"
+        }
+      },
+      {
+        "idx": 11,
+        "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+        "agreement": 1,
+        "pass": true,
+        "zeroGRequest": "b60f4dd1-ad75-4891-af93-b4716734d053",
+        "model": "glm-5.3",
+        "tee": {
+          "trustMode": "private",
+          "provider": "0x6446fe523d8f3678185ed53e3adeffb4d27475cc",
+          "guarantee": "TeeML",
+          "chatId": "490b172e-2ab6-4795-8547-f5c2c4393e1b",
+          "verification": "verified",
+          "routerTeeVerified": null,
+          "costUsdMicro": 1797,
+          "providerType": "decentralized",
+          "signer": "0xb280b63823a5a572acd9296c46f8ced8cff68eb7",
+          "signedText": "zg-sig-v1/e2ee-ct:82dbf7254a6f4152fafd3f0b06e0c05754f48c90c51a97c0dd238d04de2f6024:dc6a4a04423145a54993f096093675ac5e48b1f04ff1221d354652dc9eaff911",
+          "signedTextHash": "ddb5eaafaf046a3137725c9a49e20372c3aecd1f4ac61e8b6bc0121419080832",
+          "signature": "0xdc3dde6b52176344fda81ae8e832f271b2a5c0a23c07c1368561499b7af9c843636c58ba9aa1bd25b3c078bf366415c30dad67d32b7d53617640f2a5400869221c",
+          "scheme": "zg-sig-v1/e2ee-ct"
+        }
+      }
+    ],
+    "known": {
+      "commitment": "ae6d2de491e2e3ea35a67c478a8bd854ede8bece1689a9c28ea376abf32785dd",
+      "placements": [
+        {
+          "idx": 0,
+          "ids": [
+            "t113"
+          ]
+        },
+        {
+          "idx": 1,
+          "ids": [
+            "t253"
+          ]
+        },
+        {
+          "idx": 2,
+          "ids": [
+            "t636"
+          ]
+        },
+        {
+          "idx": 3,
+          "ids": [
+            "t222"
+          ]
+        },
+        {
+          "idx": 4,
+          "ids": [
+            "t213"
+          ]
+        },
+        {
+          "idx": 5,
+          "ids": [
+            "t361"
+          ]
+        },
+        {
+          "idx": 6,
+          "ids": [
+            "t148"
+          ]
+        },
+        {
+          "idx": 7,
+          "ids": [
+            "t411"
+          ]
+        },
+        {
+          "idx": 8,
+          "ids": [
+            "t071"
+          ]
+        },
+        {
+          "idx": 9,
+          "ids": [
+            "t958"
+          ]
+        },
+        {
+          "idx": 10,
+          "ids": [
+            "t781"
+          ]
+        },
+        {
+          "idx": 11,
+          "ids": [
+            "t683"
+          ]
+        },
+        {
+          "idx": 12,
+          "ids": [
+            "t730"
+          ]
+        },
+        {
+          "idx": 13,
+          "ids": [
+            "t249"
+          ]
+        },
+        {
+          "idx": 14,
+          "ids": [
+            "t863"
+          ]
+        },
+        {
+          "idx": 15,
+          "ids": [
+            "t790"
+          ]
+        }
+      ],
+      "salt": "5d99040eee786328026cb9c10b6aa520",
+      "checked": [
+        {
+          "idx": 3,
+          "provider": "0xae37efe9cbb3a742d7f61b21dd58dec2013f78b2",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 1,
+          "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 2,
+          "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 0,
+          "provider": "0xd943e795047d6f8796da522426ec42d84541dccd",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 4,
+          "provider": "0xae37efe9cbb3a742d7f61b21dd58dec2013f78b2",
+          "items": 1,
+          "correct": 0,
+          "pass": false
+        },
+        {
+          "idx": 5,
+          "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 6,
+          "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 7,
+          "provider": "0xae37efe9cbb3a742d7f61b21dd58dec2013f78b2",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 8,
+          "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 9,
+          "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 10,
+          "provider": "0xae37efe9cbb3a742d7f61b21dd58dec2013f78b2",
+          "items": 1,
+          "correct": 0,
+          "pass": false
+        },
+        {
+          "idx": 11,
+          "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 12,
+          "provider": "0xae37efe9cbb3a742d7f61b21dd58dec2013f78b2",
+          "items": 1,
+          "correct": 0,
+          "pass": false
+        },
+        {
+          "idx": 13,
+          "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 14,
+          "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 15,
+          "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 4,
+          "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 10,
+          "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 12,
+          "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 3,
+          "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        },
+        {
+          "idx": 7,
+          "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+          "items": 1,
+          "correct": 1,
+          "pass": true
+        }
+      ]
+    }
+  },
+  "coverage": {
+    "verified": 4,
+    "formatOnly": 12,
+    "share": 0.25,
+    "known": 16
+  },
+  "policy": {
+    "canaryRate": 0.25,
+    "minAgreement": 0.8,
+    "window": 10,
+    "failLimit": 3
+  },
+  "payment": {
+    "id": "0.0.0",
+    "symbol": "HBAR",
+    "decimals": 8
+  },
+  "verificationFee": {
+    "tinybar": "160000",
+    "tx": "0.0.9185802@1793895386.914544162"
+  },
+  "providers": [
+    {
+      "name": "EdgeRelay",
+      "address": "0xd943e795047d6f8796da522426ec42d84541dccd",
+      "payTo": "0.0.11212791",
+      "uaid": "uaid:aid:1nVW6PdWLA4xtPP5G46G7Hv2e24vj6wqXPMTf7FRCnSNu381DAmQPFCcak3G8KTxx;uid=0xd943e795047d6f8796da522426ec42d84541dccd;registry=kinetic;nativeId=hedera:testnet:0.0.11212791",
+      "gpu": "0G Compute (TeeML)",
+      "declaredModel": "0g:0gm-1.0-35b-a3b",
+      "adversarial": "goes down while chunk 5 is paid, keeping that payment",
+      "status": "offline",
+      "rank": {
+        "score": 0.656,
+        "price": 0.5,
+        "reliability": 0.966,
+        "speed": 0.351,
+        "checks": 27,
+        "latencyMs": 9987,
+        "proof": "active"
+      },
+      "admission": {
+        "admitted": true,
+        "agreement": 1,
+        "latencyMs": 11280,
+        "fingerprint": {
+          "declared": "0gm-1.0-35b-a3b",
+          "verdict": "consistent",
+          "match": 0.75
+        }
+      },
+      "price": "80000",
+      "served": 1,
+      "kept": 1,
+      "paid": "160000",
+      "refund": "0",
+      "undelivered": "80000"
+    },
+    {
+      "name": "BluePeak",
+      "address": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+      "payTo": "0.0.11212786",
+      "uaid": "uaid:aid:8xjT5oGWUwqdPP1HNG7rDRJPdbqRviz2wWZUdecuYhfwaGqXqXWWcaSnKGj4B81DRF;uid=0x7db49eb7d37ba00de37518f26b704c57ebecf5ab;registry=kinetic;nativeId=hedera:testnet:0.0.11212786",
+      "gpu": "0G Compute (TeeML)",
+      "declaredModel": "0g:0gm-1.0-35b-a3b",
+      "status": "active",
+      "rank": {
+        "score": 0.65,
+        "price": 0.4,
+        "reliability": 0.972,
+        "speed": 0.506,
+        "checks": 70,
+        "latencyMs": 6919,
+        "proof": "active"
+      },
+      "admission": {
+        "admitted": true,
+        "agreement": 1,
+        "latencyMs": 13076,
+        "fingerprint": {
+          "declared": "0gm-1.0-35b-a3b",
+          "verdict": "consistent",
+          "match": 0.92
+        }
+      },
+      "price": "100000",
+      "served": 7,
+      "kept": 7,
+      "paid": "700000",
+      "refund": "0",
+      "undelivered": "0"
+    },
+    {
+      "name": "Riverstone",
+      "address": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+      "payTo": "0.0.11212787",
+      "uaid": "uaid:aid:45uoyFKEHYs3kVusYdBfH4a2VbuyLemQoETDr4aKvh8ykQpzZftNkn2MMWoXTK2xRq;uid=0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda;registry=kinetic;nativeId=hedera:testnet:0.0.11212787",
+      "gpu": "0G Compute (TeeML)",
+      "declaredModel": "0g:0gm-1.0-35b-a3b",
+      "status": "active",
+      "rank": {
+        "score": 0.624,
+        "price": 0.333,
+        "reliability": 0.984,
+        "speed": 0.484,
+        "checks": 59,
+        "latencyMs": 7242,
+        "proof": "active"
+      },
+      "admission": {
+        "admitted": true,
+        "agreement": 1,
+        "latencyMs": 13474,
+        "fingerprint": {
+          "declared": "0gm-1.0-35b-a3b",
+          "verdict": "consistent",
+          "match": 0.92
+        }
+      },
+      "price": "120000",
+      "served": 8,
+      "kept": 8,
+      "paid": "960000",
+      "refund": "0",
+      "undelivered": "0"
+    },
+    {
+      "name": "QuickCompute",
+      "address": "0xae37efe9cbb3a742d7f61b21dd58dec2013f78b2",
+      "payTo": "0.0.11326776",
+      "uaid": "uaid:aid:pchoUnPLtRHxU6tjAMHqx7nctYmT49ZuvNPSapVCFSktSDHDuFoG3r1SsNrEG8Jxq;uid=0xae37efe9cbb3a742d7f61b21dd58dec2013f78b2;registry=kinetic;nativeId=hedera:testnet:0.0.11326776",
+      "gpu": "0G Compute (TeeML)",
+      "declaredModel": "0g:0gm-1.0-35b-a3b",
+      "adversarial": "stops calling its model after 3 chunks",
+      "status": "slashed",
+      "rank": {
+        "score": 0.563,
+        "price": 0.667,
+        "reliability": 0.5,
+        "speed": 0.484,
+        "checks": 0
+      },
+      "admission": {
+        "admitted": true,
+        "agreement": 1,
+        "latencyMs": 12764,
+        "fingerprint": {
+          "declared": "0gm-1.0-35b-a3b",
+          "verdict": "consistent",
+          "match": 0.92
+        }
+      },
+      "price": "60000",
+      "served": 5,
+      "kept": 0,
+      "paid": "300000",
+      "refund": "300000",
+      "undelivered": "0",
+      "vaultTx": "0xa1026d293e6cb21fe302fc0fa6f2661326191397bf547a41b0a244013a18bdaf",
+      "slashId": "0xb7131f2b64a85494ce2736692e5baa21190a29fba7a8580ff21df6651738fd50",
+      "slashStatus": "executed",
+      "slashSigners": [
+        "0x5d3393fa6c0ca4296b28a48d860d4817951d2616",
+        "0x6ead394b4dcd43ce447a6e809776c00d157780d5",
+        "0xa19cc96ea9f0e414cebb149918e4c5549554adc8"
+      ],
+      "burned": "99700000"
+    },
+    {
+      "name": "BudgetGPU",
+      "address": "0xded1726fb7db5019c791b65ba3a8ac8788f99208",
+      "payTo": "0.0.11213756",
+      "uaid": "uaid:aid:3y8wQHhLHeeNqPA97xhG1wrej1Z69QVsDq54AeiUrcbnZHoukATBdnB4ibkwyee1vK;uid=0xded1726fb7db5019c791b65ba3a8ac8788f99208;registry=kinetic;nativeId=hedera:testnet:0.0.11213756",
+      "gpu": "none",
+      "declaredModel": "0g:0gm-1.0-35b-a3b",
+      "adversarial": "never calls its model",
+      "status": "unqualified",
+      "rank": {
+        "score": 0.627,
+        "price": 1,
+        "reliability": 0.067,
+        "speed": 1,
+        "checks": 13,
+        "latencyMs": 3503,
+        "proof": "unproven"
+      },
+      "admission": {
+        "admitted": false,
+        "agreement": 0,
+        "latencyMs": 3160,
+        "reason": "matched 0% of known answers"
+      },
+      "price": "40000",
+      "served": 0,
+      "kept": 0,
+      "paid": "0",
+      "refund": "0",
+      "undelivered": "0"
+    }
+  ],
+  "work": [
+    {
+      "idx": 0,
+      "items": 3,
+      "planted": [
+        {
+          "at": 0,
+          "item": {
+            "id": "t113",
+            "label": "feature_request"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "36d06fef1079090f7ef1bdb5178b99878596408c3fbad6784191c22c334ad472",
+      "provider": "0xd943e795047d6f8796da522426ec42d84541dccd",
+      "resultHash": "7a6bc4ab3218b04a4561aec148ffc4e899181a6b44a5d9bb466bab5388c7f8d9",
+      "signature": "0x0281a4a6ab0ddf56929c1e27e0aae7590e40b41729e28b3ee424472908ca94c978ba062bb543a17001bb0e4db4dbd8f63506a5cee366a682f4a93944697536d51c",
+      "payTx": "0.0.9185802@1793895467.065696155",
+      "amount": "80000",
+      "check": "verified",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers",
+          "model-agreement"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "781e60a7ae6299fef1f79f233c3279c26d56ff9198fd9aebbe6561a93d3407fc",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "73761be91639d9699f27b2cb752e369be2f19502d8183d6b90eaeb9d643f9c47",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "0819fefb2eeeb45ae22b871bf5d5cb455db7b4fc441279e58e21df1b08c80d04",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "27e7dbc86dc0997cb10ebdb25631a5f8b69f218dadc3edf39fa517d18427f828",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "idx": 1,
+      "items": 3,
+      "planted": [
+        {
+          "at": 3,
+          "item": {
+            "id": "t253",
+            "label": "account"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "b1f63fa92bef2781cd464b9f56fe5c749ee93ca2076f14dc4ea97c7fd922df0b",
+      "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+      "resultHash": "f6fac3b571e584ef6f259ffe7daa6842ddc52d7346715eb1f8bffa8ea7319824",
+      "signature": "0x07a42964250debc0312269f6f7c87f72b68ff1de608473fe510e17a24dc2e9210885137b0b4e5ef0538a758fbd60becc5ab29667632f4f5e3259c252b56833ea1b",
+      "payTx": "0.0.9185802@1793895467.507564363",
+      "amount": "100000",
+      "check": "verified",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers",
+          "model-agreement"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "622d20fe52796b7b790d714d0ca8c2789eb81587bf16b9643bbfc105f0afeb03",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "73761be91639d9699f27b2cb752e369be2f19502d8183d6b90eaeb9d643f9c47",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "0819fefb2eeeb45ae22b871bf5d5cb455db7b4fc441279e58e21df1b08c80d04",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "27e7dbc86dc0997cb10ebdb25631a5f8b69f218dadc3edf39fa517d18427f828",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "idx": 2,
+      "items": 3,
+      "planted": [
+        {
+          "at": 0,
+          "item": {
+            "id": "t636",
+            "label": "other"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "af1b2ab15baedc0b725f91b96517a886ba460e322b9cdfd1046dd912dd1a4a34",
+      "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+      "resultHash": "f1990085cd0512fd4dcf4f02ebe9164a1154479fbdc97616920871ea341a3200",
+      "signature": "0x0af6e6b52b97830955a662e946fa8b4f57911cda94035efd19becfd245acdf4e3033c6a11dd58b004ca1b0029b2eaa402bd4fc35f31886ec37a056a66d27e2881c",
+      "payTx": "0.0.9185802@1793895466.571600054",
+      "amount": "120000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "db30a83b7e4ae251a437fa87bf5d73788d7cd48e28c226e05783470e8c086722",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "9bf6c76f0d3df4028f8ddf543a8a5e2583f178cf32f174adf974b14863221b4b",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "0819fefb2eeeb45ae22b871bf5d5cb455db7b4fc441279e58e21df1b08c80d04",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "27e7dbc86dc0997cb10ebdb25631a5f8b69f218dadc3edf39fa517d18427f828",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "idx": 3,
+      "items": 3,
+      "planted": [
+        {
+          "at": 1,
+          "item": {
+            "id": "t222",
+            "label": "billing"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "c5bc3d74bb7001d57f0b7441266e36ca3bd1358904527675753f6065ec4b0375",
+      "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+      "resultHash": "405eccf8d4b071aec65eac1a2aa8b49c0d1f9ee1cd6741611fa3f2d1efa277cf",
+      "signature": "0x2837687e0d35544b27579f8c48d8bff420476b269a5e1ea39166451ad82b07897930cc729e8a39eebc2e793a80e61ede14fc101b81263b60d445234d58e12e621b",
+      "payTx": "0.0.9185802@1793895665.344368387",
+      "amount": "100000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "c129e03f743cae388171bbc19e9e8f36f98b67c4b87d4ceebf94e6e710731b94",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "9bf6c76f0d3df4028f8ddf543a8a5e2583f178cf32f174adf974b14863221b4b",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "0819fefb2eeeb45ae22b871bf5d5cb455db7b4fc441279e58e21df1b08c80d04",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "27e7dbc86dc0997cb10ebdb25631a5f8b69f218dadc3edf39fa517d18427f828",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "idx": 4,
+      "items": 3,
+      "planted": [
+        {
+          "at": 1,
+          "item": {
+            "id": "t213",
+            "label": "shipping"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "4e07be326d3c5ef8f80ec31e4533ef3abc625ff61c614845d3bb2e6612b503fd",
+      "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+      "resultHash": "f476db26b54c64b97bf051396888622d3261cafe20a4978c1f50c34b1dab7d8f",
+      "signature": "0xb49c329140cc55d64eddc29f9b7e8d319ff2bf2df1091abec45b2d72123d88ee54c3cd13b6666ef53f9a20d5e7f3ecf893b0736631e35163a5c1bc5a54e23b361b",
+      "payTx": "0.0.9185802@1793895629.657298266",
+      "amount": "120000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "72fb74fe023bbc1195826d4f652945bc3f5d88833624aa9b16919fc8f5008146",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "30ba9da733cd05e90e091e3dbf290c2893c6bf9ee41bff44a65863ca8527304a",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "05dc0332ead05aa07c90d1750963f9f85dbdc412bb1b0a317eb6e7f2a5a6b959",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "27e7dbc86dc0997cb10ebdb25631a5f8b69f218dadc3edf39fa517d18427f828",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "idx": 5,
+      "items": 3,
+      "planted": [
+        {
+          "at": 0,
+          "item": {
+            "id": "t361",
+            "label": "shipping"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "e5bac7769ea1827b15bdcc1ec1f4b470a0a47f1cfb8494909bb3250b86faae37",
+      "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+      "resultHash": "d30d06007b2f2e827fe0fc4363da80e60d3f146161ca9bd5e4680a0b68df35b2",
+      "signature": "0x074b878c0ab70b7f3ddbe7ace04d5df7e2a5ae1b9a3e34651fb6ced7d73ee1fe6530497d82a9344fbd898d5e28df7d481d7f591ed2de31f4268cdca096d166cd1c",
+      "payTx": "0.0.9185802@1793895505.529590227",
+      "amount": "120000",
+      "check": "verified",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers",
+          "model-agreement"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "961ef0a5cce4f2d85a7cdb9a0f61d5276bb38e8f1e55909ae79659e1adca8559",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "30ba9da733cd05e90e091e3dbf290c2893c6bf9ee41bff44a65863ca8527304a",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "05dc0332ead05aa07c90d1750963f9f85dbdc412bb1b0a317eb6e7f2a5a6b959",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "27e7dbc86dc0997cb10ebdb25631a5f8b69f218dadc3edf39fa517d18427f828",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "idx": 6,
+      "items": 3,
+      "planted": [
+        {
+          "at": 2,
+          "item": {
+            "id": "t148",
+            "label": "account"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "9236d146ff63440a4473701b7e3a408a8e7e2886fc8340ead5e55e2b0c491657",
+      "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+      "resultHash": "f578cc2ee87df331b3e768e9e89644ba666cddb9e76ba1b62b19abd70a2b1ccf",
+      "signature": "0xd3c537c146b452e6f20a9719e05cf8d5a652bd65c3ec7848a24db54bb790db5f329cb75228e31cea9f6bf6c126e1e8a4c1e79c2bb0f55bbf886d0cc1961fb18b1c",
+      "payTx": "0.0.9185802@1793895507.215949611",
+      "amount": "100000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "a369b8d77248d2a6b7205805efce1bfe4ab2199da7f20244ddfbb14d922dc31a",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "6f924ac4ab7c6a7d709fedc35232620478f8247280b78d1466b15baa419b747b",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "05dc0332ead05aa07c90d1750963f9f85dbdc412bb1b0a317eb6e7f2a5a6b959",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "27e7dbc86dc0997cb10ebdb25631a5f8b69f218dadc3edf39fa517d18427f828",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "idx": 7,
+      "items": 3,
+      "planted": [
+        {
+          "at": 0,
+          "item": {
+            "id": "t411",
+            "label": "billing"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "74e9d09fbf328ddb4da9c5607187b6a81983583bae17fbe8745cb17a6b64508d",
+      "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+      "resultHash": "b1253bc723d6f9f88e4d71de5e0925bf15cce6876287a5948d84730a9b38ad5d",
+      "signature": "0xdca09dbc94202342107ab1222f7f9a308e29c4052e9fd0d30f0a1b9c2007e9142a57f59df3d88843adebb1b39d948e141e7871733a68081c9c4a28bbc85a75b11c",
+      "payTx": "0.0.9185802@1793895687.171321507",
+      "amount": "120000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "da03c72e316a5f5a399a997cc73875fa0f20a6446f8803a993e92371895be74d",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "6f924ac4ab7c6a7d709fedc35232620478f8247280b78d1466b15baa419b747b",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "05dc0332ead05aa07c90d1750963f9f85dbdc412bb1b0a317eb6e7f2a5a6b959",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "27e7dbc86dc0997cb10ebdb25631a5f8b69f218dadc3edf39fa517d18427f828",
+          "position": "right"
+        }
+      ]
+    },
+    {
+      "idx": 8,
+      "items": 3,
+      "planted": [
+        {
+          "at": 0,
+          "item": {
+            "id": "t071",
+            "label": "feature_request"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "7576a524419dab0c12c4cb624e2037bd3fcd09361ce35e3850a872d655d9f9b4",
+      "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+      "resultHash": "63c8e47c1884e1f4070004653dac02ae50f3d5bcf66be2c6f5205952a8762f1b",
+      "signature": "0x59ad1b9a75dae41b24ff447c569e031951bad123516a6d0ed6d817b51a18d3f37265e258c41b08375a3641f384d6f839cfe858660c96003a11d205d7e43366e41c",
+      "payTx": "0.0.9185802@1793895541.469592411",
+      "amount": "120000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "c90e6acfeee7022846dfea3de924d790942c70bb0c66e7c22c3208194835f10e",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "c6570c2e91765a84f65137e58e919f31feb055f3994961862a0dd36f5f9c25e7",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "dc2e79f5ac483a3c71d9a6ebc77b06786fef6f5c83bba2c319457d5841c4e13e",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "157409d4e592336a9c985d7eb9ff31fac99958fea4fc64c83e7cd977740c4174",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "idx": 9,
+      "items": 3,
+      "planted": [
+        {
+          "at": 3,
+          "item": {
+            "id": "t958",
+            "label": "bug"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "35a55dc3444f19603cf5723b6105e5f3a01001f5c93f9752e589725cac7a4ae6",
+      "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+      "resultHash": "714ed853cce13c5cc4990135a3e77b7eadb38624994869d2d1cdd87848ab95eb",
+      "signature": "0xadc1dab86cbce08bfe86b3db8f4c11ef51b68dcc1e783e9215069d371790944c767211bd27d05a513b9ef95d11a60f00d4b55b9abd3fc37a0d76a896cba30ae71b",
+      "payTx": "0.0.9185802@1793895540.197381036",
+      "amount": "100000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "089fa2899ec20e4a5c6288145c9d946d6423241ce4c05e49bec51a9fe5f206bf",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "c6570c2e91765a84f65137e58e919f31feb055f3994961862a0dd36f5f9c25e7",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "dc2e79f5ac483a3c71d9a6ebc77b06786fef6f5c83bba2c319457d5841c4e13e",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "157409d4e592336a9c985d7eb9ff31fac99958fea4fc64c83e7cd977740c4174",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "idx": 10,
+      "items": 3,
+      "planted": [
+        {
+          "at": 2,
+          "item": {
+            "id": "t781",
+            "label": "other"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "bfeefd57c83f3cc2494749b20f00426b7020fb9186d3ef97cca5c29ad8cc4ca6",
+      "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+      "resultHash": "cf837261b3adc6b6f3ff513670b820e574bd1c0341a18ca702179595890f4ba4",
+      "signature": "0xd640eae2c02c0697cb52195daed54d49cd2f31992390e65d28a84024fba44fef4a674fafb9f6ab90a691c567e0871ae47cc4f21d55355c6bf9960b215b68c4471c",
+      "payTx": "0.0.9185802@1793895637.130373748",
+      "amount": "100000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "80136e7e563a24baf0e9aa99d33ac575a5a15d30e8e75a3001a94103ab39249b",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "723fca97aed666483490500fda2dec5195796b894efa4fa80dd538fece4f28ad",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "dc2e79f5ac483a3c71d9a6ebc77b06786fef6f5c83bba2c319457d5841c4e13e",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "157409d4e592336a9c985d7eb9ff31fac99958fea4fc64c83e7cd977740c4174",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "idx": 11,
+      "items": 3,
+      "planted": [
+        {
+          "at": 1,
+          "item": {
+            "id": "t683",
+            "label": "bug"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "3bdd9857e3e9e4e38fa5a5b9eaa2d85a539710a3c86028fa10e2877cef02baed",
+      "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+      "resultHash": "cdc87f59f038deca51356503327b70481f6464ed60dc71a2cbaae792e6bec207",
+      "signature": "0x7051f1d0151d3e08eeeb079cfaea9c8a79a7d741e1021ff93115e8d136038e586a0b9186c0a1a809f4631a5b00fe9c80d84358e6026b66b8f8c3fb58184d03341c",
+      "payTx": "0.0.9185802@1793895567.055286392",
+      "amount": "120000",
+      "check": "verified",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers",
+          "model-agreement"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "360757bc9f9ade8d5effb30b7e98c281b4bf28496db6839b21f4fa6cfd95dc04",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "723fca97aed666483490500fda2dec5195796b894efa4fa80dd538fece4f28ad",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "dc2e79f5ac483a3c71d9a6ebc77b06786fef6f5c83bba2c319457d5841c4e13e",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "157409d4e592336a9c985d7eb9ff31fac99958fea4fc64c83e7cd977740c4174",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "idx": 12,
+      "items": 3,
+      "planted": [
+        {
+          "at": 0,
+          "item": {
+            "id": "t730",
+            "label": "bug"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "337fb5aed933fb11b59bde7e38ce058d04bfff278ec475f10b527efed7061f4e",
+      "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+      "resultHash": "732da897035b6ed6bddc70619ebf5b513b6a2fa7c65e232a3ec5b4efa2f2e47d",
+      "signature": "0x0e32af5d88ac507d5f96dc99e21fc1fcb32fe305580ec7b7cbec4ccdb16459a600a5b6e0573f610b42eb31f1ce0cdf0d28d061dea679201592dca5d0f65f53381c",
+      "payTx": "0.0.9185802@1793895664.362573428",
+      "amount": "120000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "d3b3931e43b82c7a3f50e028c4c31a07558ce7efc3bb698b9ed718d1bbed84cc",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "53f2bd9c1033eaddf0f197246c8e915c4c55a5c99817259a32fa60a1b5f324a2",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "ebc6626c96f5c48027736feda36cd6db83fa2e2106dda801b909838d698893a2",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "157409d4e592336a9c985d7eb9ff31fac99958fea4fc64c83e7cd977740c4174",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "idx": 13,
+      "items": 3,
+      "planted": [
+        {
+          "at": 3,
+          "item": {
+            "id": "t249",
+            "label": "feature_request"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "5dabfed4d006b6f7fac4aa26e3fef3e947a62575a7458bd8083d6a7ed244c984",
+      "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+      "resultHash": "559ebb90fc2d0a9ffbd9ccc83286cc801cb3eb280fb321e3d2387ad3d5dc7e8b",
+      "signature": "0x2c09fdf3ef2741ba59ede75c98cd420a84dbcbfd3fab3e2019fb943a948b47e04304f135b047313efe10c8c8ffdb4a5afdcf108eea8c9d3aa64ad4cf1aabe08c1c",
+      "payTx": "0.0.9185802@1793895572.927649908",
+      "amount": "100000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "2893cedbf8cb3cda2303db6fc09a466a6e52d56a3982e35188705b816d0f6da3",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "53f2bd9c1033eaddf0f197246c8e915c4c55a5c99817259a32fa60a1b5f324a2",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "ebc6626c96f5c48027736feda36cd6db83fa2e2106dda801b909838d698893a2",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "157409d4e592336a9c985d7eb9ff31fac99958fea4fc64c83e7cd977740c4174",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "idx": 14,
+      "items": 3,
+      "planted": [
+        {
+          "at": 1,
+          "item": {
+            "id": "t863",
+            "label": "billing"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "0c8f400c19c3991bc2edc31ca5ae510729935f6bb3c378c347d353d7ffe32797",
+      "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+      "resultHash": "c3669834db57db3b8db4ae7532860d27099d33403be54ad83b22621542f19569",
+      "signature": "0x8fccdebcf5750b17b205006398e9031b118489d7fb9c5dad80d4463f6982a07c239946a782e474368d79d51f6b480b1a67a001c55ad88476de0728ab5bb206881b",
+      "payTx": "0.0.9185802@1793895597.385876705",
+      "amount": "120000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "cc086b733f20c5b3c671f4f835aa8ff950771174531d1a14141b94029fbd5054",
+          "position": "right"
+        },
+        {
+          "siblingHashHex": "dc36568ec9b48ea039aee4cbf79b2964ca324d8e6219a91c62626be4140b36ce",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "ebc6626c96f5c48027736feda36cd6db83fa2e2106dda801b909838d698893a2",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "157409d4e592336a9c985d7eb9ff31fac99958fea4fc64c83e7cd977740c4174",
+          "position": "left"
+        }
+      ]
+    },
+    {
+      "idx": 15,
+      "items": 3,
+      "planted": [
+        {
+          "at": 1,
+          "item": {
+            "id": "t790",
+            "label": "other"
+          }
+        }
+      ],
+      "known": {
+        "items": 1,
+        "correct": 1
+      },
+      "inputCommitment": "5e5c992bdd582afa84b0bcab996bd9cbf1758b4aed991fb8667a19b6415d3d33",
+      "provider": "0x7db49eb7d37ba00de37518f26b704c57ebecf5ab",
+      "resultHash": "a399f314e82a70af1796d40a56713b485a0fdd74e6059d91b63d8fb42260014c",
+      "signature": "0xb56bfa06ce264b5ecae5f15b30109fa7e344c54abc0c83c6d7b0c1af10132bfd2b4182ee8e9117b6986c6ae581c25b3102677e525e02a198f7b0eee0e6aaac841b",
+      "payTx": "0.0.9185802@1793895603.145908460",
+      "amount": "100000",
+      "check": "format",
+      "authenticity": {
+        "method": "0g-router",
+        "model": {
+          "declared": "0g:0gm-1.0-35b-a3b",
+          "hash": null
+        },
+        "guarantee": "none",
+        "attestation": "none"
+      },
+      "correctness": {
+        "methods": [
+          "signature",
+          "format",
+          "known-answers"
+        ],
+        "level": "ground-truth"
+      },
+      "merkleProof": [
+        {
+          "siblingHashHex": "ba75425ceda2a561e1768ea76077fbd137d35677867b0a8fdf652bef741b336d",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "dc36568ec9b48ea039aee4cbf79b2964ca324d8e6219a91c62626be4140b36ce",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "ebc6626c96f5c48027736feda36cd6db83fa2e2106dda801b909838d698893a2",
+          "position": "left"
+        },
+        {
+          "siblingHashHex": "157409d4e592336a9c985d7eb9ff31fac99958fea4fc64c83e7cd977740c4174",
+          "position": "left"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "verification": "passed",
+    "assurance": {
+      "tier": "standard",
+      "met": true,
+      "shortfalls": []
+    },
+    "correctness": {
+      "groundTruth": 16,
+      "redundantAgreement": 0,
+      "modelAgreement": 0,
+      "formatOnly": 0
+    },
+    "authenticity": {
+      "byGuarantee": {
+        "TeeML": 0,
+        "TeeTLS": 0,
+        "SPML": 0,
+        "OpML": 0,
+        "ZKML": 0,
+        "none": 16
+      },
+      "attested": 0,
+      "unavailable": 0,
+      "invalid": 0,
+      "unattested": 16
+    },
+    "knownAnswers": {
+      "sampled": 21,
+      "passed": 18
+    },
+    "modelCanaries": {
+      "sampled": 4,
+      "passed": 4
+    },
+    "payments": "settled",
+    "slashes": {
+      "executed": 1,
+      "pending": 0,
+      "overturned": 0,
+      "cancelled": 0
+    }
+  },
+  "limitations": [
+    "Checks are sampled: 4 of 16 chunks were compared with a 0G verified run; 12 passed a format check only.",
+    "Ground truth: 16 of 16 chunks answered the verifier's planted known-answer items correctly; that is what slashing rests on. A known answer checks one item per chunk, not every item.",
+    "Agreement with 0G measures consistency with a reference model, not ground truth.",
+    "Each provider's model is what it declared; nothing here proves which model ran.",
+    "One verifier ran the checks. It committed to the canary set on HCS before any chunk ran and revealed it at the end.",
+    "0G reference runs: 4 of 4 canary TEE signatures verified by the verifier against the signer in 0G's serving contract. The router seals each request to the enclave, so the signature covers the encrypted exchange; 0G's attested E2EE gateway, not KINETIC, holds the ciphertext it binds.",
+    "PRNG spot checks: 1 chunk picked after the job by a Hedera PRNG seed and re-run on 0G; 1 of 1 scored agreed. They are evidence only: they don't change a chunk's check, and don't count toward slashing."
+  ],
+  "anchor": {
+    "schema": "hcs.merkleRootAnchor",
+    "hashAlg": "sha256",
+    "leaf": "kinetic.chunk.v1",
+    "merkleRoot": "1ce131e6eb9122b7bbc0a32dbdeaa8996c03ce84b383ecd5f2fd158f864b7d41",
+    "recordCount": 16,
+    "hcsSequence": 1460,
+    "tx": "0.0.11212783@1793895739.545281990"
+  },
+  "spot": {
+    "tag": "0x2f27a0e3536524c4fba78dab4567bfc5a1cc199ffb1d5c4e158a974e05f85027",
+    "seed": "0x0b95df9bcda3820bbf52af86cdeb34d4fe197fcb702f35678d217bc46087efdb",
+    "drawnAt": 1793895730,
+    "seedTx": "0x49570ff2b757f20def80dbf5d15b0ba31a3a802b498c20aa198e908742c21464",
+    "picks": [
+      14
+    ],
+    "checked": [
+      {
+        "idx": 14,
+        "provider": "0x2d3a9cdf8fc2512c71d8393dbf2e2f2c1209fcda",
+        "agreement": 1,
+        "pass": true,
+        "zeroGRequest": "4f8d005f-46b8-41fc-92e8-c3b3c78b9316",
+        "model": "glm-5.3"
+      }
+    ],
+    "hcsSequence": 1459
+  },
+  "attestations": {
+    "buyer": {
+      "address": "0x8ed8a58f08a2caa800cbb4083e3691e5ca1e73a6",
+      "signature": "0xe8f346413c7a20593e8eaa6c03a576cbf746c9a225f44f9f398d155f2a0131ce74c55724a5702e49e51b334da5547cae72c47b1308fc9cebe658502917e48c781b"
+    },
+    "verifier": {
+      "address": "0xa19cc96ea9f0e414cebb149918e4c5549554adc8",
+      "signature": "0xd1a89cd8d2ee5b040946b6df8617f402cf1b514051f99c71a5cbe1f52c8f030875fc8ee6ddbed1ad5ca9354cada148c58d6877d860ce9864fec5645dcd8caa9e1b",
+      "uaid": "uaid:aid:ALsFEQUoJSvx6dqoTYXJaiVSQwpAfDGzzzWFQv3tEv2T6QRB4U6rknAK6VuWkwMH2L;uid=0xa19cc96ea9f0e414cebb149918e4c5549554adc8;registry=kinetic;nativeId=hedera:testnet:0.0.11212783"
+    }
+  }
+}

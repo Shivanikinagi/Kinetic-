@@ -1,0 +1,28 @@
+{
+  "id": "kinetic/ticket-fields",
+  "version": "1.0.0",
+  "name": "Ticket Field Extractor",
+  "description": "Extracts structured fields such as order numbers and emails from support tickets. Runs on 0G Compute's TeeML model (0gm-1.0-35b-a3b).",
+  "license": "apache-2.0",
+  "task": {
+    "kind": "extract",
+    "instructions": "From each support ticket extract the customer's email address and the order id (format ORD- followed by four digits). Copy them exactly as written. Use null when a field is not in the ticket.",
+    "fields": [
+      {
+        "name": "email",
+        "hint": "customer email address",
+        "pattern": "[\\w.+-]+@[\\w-]+\\.[\\w.-]+"
+      },
+      {
+        "name": "order_id",
+        "hint": "order id like ORD-1234",
+        "pattern": "ORD-\\d{4}"
+      }
+    ]
+  },
+  "runtime": {
+    "engine": "0g",
+    "model": "0gm-1.0-35b-a3b"
+  },
+  "royaltyBps": 500
+}

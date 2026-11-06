@@ -1,0 +1,28 @@
+{
+  "id": "kinetic/invoice-extractor",
+  "version": "1.0.0",
+  "name": "Invoice Extractor",
+  "description": "Pulls the invoice number and due date out of invoice notes, exactly as written. Runs on 0G Compute's TeeML model (0gm-1.0-35b-a3b).",
+  "license": "apache-2.0",
+  "task": {
+    "kind": "extract",
+    "instructions": "From each invoice note extract the invoice number (format INV- followed by five digits) and the due date (format YYYY-MM-DD). Copy them exactly as written. Use null when a field is not in the note.",
+    "fields": [
+      {
+        "name": "invoice_number",
+        "hint": "invoice number like INV-12345",
+        "pattern": "INV-\\d{5}"
+      },
+      {
+        "name": "due_date",
+        "hint": "due date as YYYY-MM-DD",
+        "pattern": "\\d{4}-\\d{2}-\\d{2}"
+      }
+    ]
+  },
+  "runtime": {
+    "engine": "0g",
+    "model": "0gm-1.0-35b-a3b"
+  },
+  "royaltyBps": 600
+}

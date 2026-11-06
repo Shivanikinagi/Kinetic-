@@ -1,0 +1,1114 @@
+{
+  "task": "data/classify-tickets.task.json",
+  "builtAt": "2026-10-30T07:23:25.860Z",
+  "models": {
+    "0gm-1.0-35b-a3b": {
+      "f005": "account",
+      "f006": "bug",
+      "f007": "billing",
+      "f008": "feature_request",
+      "f009": "bug",
+      "f010": "shipping",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f014": "billing",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "billing",
+      "f018": "bug",
+      "f019": "billing",
+      "f020": "bug",
+      "f025": "shipping",
+      "f026": "other",
+      "f027": "billing",
+      "f028": "account",
+      "f029": "shipping",
+      "f030": "feature_request",
+      "f031": "account",
+      "f033": "billing",
+      "f034": "feature_request",
+      "f035": "bug",
+      "f036": "bug",
+      "f038": "account",
+      "f039": "shipping"
+    },
+    "glm-5.3": {
+      "f001": "billing",
+      "f002": "account",
+      "f003": "shipping",
+      "f004": "feature_request",
+      "f005": "account",
+      "f006": "account",
+      "f007": "billing",
+      "f008": "feature_request",
+      "f009": "bug",
+      "f010": "shipping",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f014": "billing",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "billing",
+      "f018": "bug",
+      "f019": "billing",
+      "f020": "bug",
+      "f025": "bug",
+      "f026": "other",
+      "f027": "billing",
+      "f028": "account",
+      "f029": "shipping",
+      "f030": "feature_request",
+      "f031": "account",
+      "f032": "other",
+      "f033": "billing",
+      "f034": "billing",
+      "f035": "bug",
+      "f036": "bug",
+      "f037": "billing",
+      "f038": "account",
+      "f039": "shipping",
+      "f040": "other"
+    },
+    "qwen3.7-flash": {
+      "f001": "billing",
+      "f002": "account",
+      "f003": "shipping",
+      "f004": "feature_request",
+      "f005": "account",
+      "f007": "billing",
+      "f008": "feature_request",
+      "f009": "bug",
+      "f010": "shipping",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "billing",
+      "f018": "bug",
+      "f019": "billing",
+      "f020": "bug",
+      "f021": "account",
+      "f022": "billing",
+      "f023": "shipping",
+      "f024": "account",
+      "f025": "bug",
+      "f026": "other",
+      "f027": "billing",
+      "f029": "shipping",
+      "f030": "billing",
+      "f031": "account",
+      "f033": "billing",
+      "f034": "billing",
+      "f035": "bug",
+      "f036": "bug",
+      "f037": "billing",
+      "f038": "account",
+      "f039": "shipping"
+    },
+    "qwen3.5-flash": {
+      "f001": "billing",
+      "f002": "account",
+      "f003": "shipping",
+      "f004": "feature_request",
+      "f005": "account",
+      "f006": "bug",
+      "f007": "billing",
+      "f008": "feature_request",
+      "f009": "bug",
+      "f010": "shipping",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f014": "billing",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "billing",
+      "f018": "bug",
+      "f019": "billing",
+      "f020": "bug",
+      "f021": "account",
+      "f022": "billing",
+      "f023": "shipping",
+      "f024": "billing",
+      "f025": "shipping",
+      "f026": "other",
+      "f027": "billing",
+      "f028": "account",
+      "f029": "shipping",
+      "f030": "feature_request",
+      "f031": "account",
+      "f032": "shipping",
+      "f033": "billing",
+      "f035": "bug",
+      "f036": "bug",
+      "f037": "billing",
+      "f038": "account",
+      "f039": "shipping",
+      "f040": "account"
+    },
+    "qwen-flash": {
+      "f001": "billing",
+      "f002": "account",
+      "f003": "shipping",
+      "f004": "feature_request",
+      "f005": "account",
+      "f006": "account",
+      "f007": "billing",
+      "f008": "feature_request",
+      "f009": "bug",
+      "f010": "shipping",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f014": "billing",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "billing",
+      "f018": "bug",
+      "f019": "billing",
+      "f020": "bug",
+      "f021": "account",
+      "f022": "billing",
+      "f023": "shipping",
+      "f024": "billing",
+      "f025": "shipping",
+      "f026": "other",
+      "f027": "billing",
+      "f028": "account",
+      "f029": "shipping",
+      "f030": "billing",
+      "f031": "account",
+      "f032": "shipping",
+      "f033": "billing",
+      "f034": "other",
+      "f035": "bug",
+      "f036": "bug",
+      "f037": "bug",
+      "f038": "account",
+      "f039": "shipping",
+      "f040": "other"
+    },
+    "qwen3.5-27b": {
+      "f001": "billing",
+      "f002": "account",
+      "f003": "shipping",
+      "f004": "feature_request",
+      "f005": "account",
+      "f006": "account",
+      "f007": "billing",
+      "f008": "feature_request",
+      "f009": "bug",
+      "f010": "shipping",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f014": "billing",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "billing",
+      "f018": "bug",
+      "f019": "billing",
+      "f020": "other",
+      "f021": "account",
+      "f022": "billing",
+      "f023": "shipping",
+      "f024": "account",
+      "f025": "shipping",
+      "f026": "other",
+      "f027": "billing",
+      "f028": "account",
+      "f029": "shipping",
+      "f030": "feature_request",
+      "f031": "account",
+      "f032": "other",
+      "f033": "billing",
+      "f034": "other",
+      "f035": "bug",
+      "f036": "bug",
+      "f037": "bug",
+      "f038": "account",
+      "f039": "shipping",
+      "f040": "other"
+    },
+    "deepseek-v4-flash": {
+      "f001": "billing",
+      "f002": "account",
+      "f003": "shipping",
+      "f004": "feature_request",
+      "f005": "account",
+      "f007": "billing",
+      "f008": "feature_request",
+      "f009": "bug",
+      "f010": "shipping",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f014": "billing",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "billing",
+      "f018": "bug",
+      "f019": "billing",
+      "f021": "account",
+      "f022": "billing",
+      "f023": "shipping",
+      "f024": "billing",
+      "f025": "shipping",
+      "f026": "other",
+      "f027": "billing",
+      "f028": "account",
+      "f029": "shipping",
+      "f030": "feature_request",
+      "f031": "account",
+      "f032": "shipping",
+      "f033": "billing",
+      "f034": "billing",
+      "f035": "bug",
+      "f036": "bug",
+      "f037": "bug",
+      "f038": "account",
+      "f039": "shipping",
+      "f040": "other"
+    },
+    "minimax-m3.1-flash": {
+      "f001": "billing",
+      "f002": "account",
+      "f003": "shipping",
+      "f004": "feature_request",
+      "f005": "account",
+      "f006": "account",
+      "f007": "billing",
+      "f008": "feature_request",
+      "f009": "bug",
+      "f010": "shipping",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f014": "billing",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "billing",
+      "f018": "bug",
+      "f019": "billing",
+      "f020": "bug",
+      "f021": "account",
+      "f022": "billing",
+      "f023": "shipping",
+      "f024": "billing",
+      "f025": "shipping",
+      "f026": "other",
+      "f027": "billing",
+      "f028": "account",
+      "f029": "shipping",
+      "f030": "billing",
+      "f031": "account",
+      "f033": "billing",
+      "f034": "billing",
+      "f035": "bug",
+      "f036": "bug",
+      "f037": "billing",
+      "f038": "account",
+      "f039": "shipping",
+      "f040": "account"
+    },
+    "mimo-v2.6-flash": {
+      "f001": "billing",
+      "f002": "account",
+      "f003": "shipping",
+      "f004": "feature_request",
+      "f005": "account",
+      "f006": "account",
+      "f007": "billing",
+      "f008": "feature_request",
+      "f009": "bug",
+      "f010": "shipping",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f014": "billing",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "billing",
+      "f018": "bug",
+      "f019": "billing",
+      "f020": "bug",
+      "f021": "account",
+      "f022": "billing",
+      "f023": "shipping",
+      "f024": "account",
+      "f025": "bug",
+      "f026": "other",
+      "f027": "billing",
+      "f028": "account",
+      "f029": "shipping",
+      "f031": "account",
+      "f032": "other",
+      "f033": "billing",
+      "f034": "billing",
+      "f035": "bug",
+      "f036": "bug",
+      "f038": "account",
+      "f039": "shipping",
+      "f040": "other"
+    },
+    "glm-5.3-flash": {
+      "f001": "billing",
+      "f002": "account",
+      "f003": "shipping",
+      "f004": "feature_request",
+      "f005": "account",
+      "f006": "account",
+      "f007": "billing",
+      "f008": "feature_request",
+      "f009": "bug",
+      "f010": "shipping",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f014": "feature_request",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "billing",
+      "f018": "bug",
+      "f019": "account",
+      "f020": "bug",
+      "f021": "account",
+      "f022": "bug",
+      "f023": "shipping",
+      "f024": "account",
+      "f026": "other",
+      "f027": "billing",
+      "f028": "account",
+      "f029": "shipping",
+      "f030": "feature_request",
+      "f031": "account",
+      "f033": "billing",
+      "f035": "bug",
+      "f036": "bug",
+      "f038": "account",
+      "f039": "shipping",
+      "f040": "other"
+    },
+    "qwen2.5:3b-instruct": {
+      "f001": "bug",
+      "f002": "account",
+      "f003": "shipping",
+      "f004": "billing",
+      "f009": "bug",
+      "f010": "account",
+      "f011": "account",
+      "f012": "billing",
+      "f013": "bug",
+      "f014": "billing",
+      "f015": "account",
+      "f016": "shipping",
+      "f017": "bug",
+      "f018": "billing",
+      "f019": "account",
+      "f020": "other",
+      "f021": "account",
+      "f022": "other",
+      "f023": "shipping",
+      "f024": "billing",
+      "f025": "bug",
+      "f026": "other",
+      "f027": "account",
+      "f028": "account",
+      "f033": "billing",
+      "f034": "other",
+      "f035": "billing",
+      "f036": "other",
+      "f037": "billing",
+      "f038": "account",
+      "f039": "shipping",
+      "f040": "other"
+    }
+  },
+  "probes": {
+    "0gm-1.0-35b-a3b": [
+      {
+        "id": "f034",
+        "text": "Can I get a student discount?",
+        "label": "feature_request"
+      },
+      {
+        "id": "f006",
+        "text": "The app keeps logging me out every few minutes.",
+        "label": "bug"
+      },
+      {
+        "id": "f025",
+        "text": "The tracking link in the email leads to a 404 page.",
+        "label": "shipping"
+      },
+      {
+        "id": "f030",
+        "text": "Please let me pay in instalments for bigger orders.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "billing"
+      },
+      {
+        "id": "f020",
+        "text": "Your website is really slow today.",
+        "label": "bug"
+      },
+      {
+        "id": "f010",
+        "text": "Why does the courier need my phone number? I don't want to share it.",
+        "label": "shipping"
+      },
+      {
+        "id": "f014",
+        "text": "Is it possible to pay by bank transfer instead of card?",
+        "label": "billing"
+      },
+      {
+        "id": "f017",
+        "text": "I keep getting charged for a plan I cancelled after the app froze.",
+        "label": "billing"
+      },
+      {
+        "id": "f018",
+        "text": "The search doesn't find orders older than a year.",
+        "label": "bug"
+      },
+      {
+        "id": "f027",
+        "text": "I can't find where to download my receipts.",
+        "label": "billing"
+      },
+      {
+        "id": "f035",
+        "text": "The order confirmation page is blank after I pay.",
+        "label": "bug"
+      }
+    ],
+    "glm-5.3": [
+      {
+        "id": "f025",
+        "text": "The tracking link in the email leads to a 404 page.",
+        "label": "bug"
+      },
+      {
+        "id": "f034",
+        "text": "Can I get a student discount?",
+        "label": "billing"
+      },
+      {
+        "id": "f030",
+        "text": "Please let me pay in instalments for bigger orders.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f032",
+        "text": "Notifications about delivery come in at 3am and wake me up.",
+        "label": "other"
+      },
+      {
+        "id": "f037",
+        "text": "My gift card balance disappeared after the last update.",
+        "label": "billing"
+      },
+      {
+        "id": "f006",
+        "text": "The app keeps logging me out every few minutes.",
+        "label": "account"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "billing"
+      },
+      {
+        "id": "f020",
+        "text": "Your website is really slow today.",
+        "label": "bug"
+      },
+      {
+        "id": "f040",
+        "text": "How do I stop the weekly marketing emails?",
+        "label": "other"
+      },
+      {
+        "id": "f001",
+        "text": "I was charged twice because the checkout page crashed halfway through.",
+        "label": "billing"
+      },
+      {
+        "id": "f004",
+        "text": "Would be great if invoices showed the VAT number, right now they don't.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f010",
+        "text": "Why does the courier need my phone number? I don't want to share it.",
+        "label": "shipping"
+      }
+    ],
+    "qwen3.7-flash": [
+      {
+        "id": "f025",
+        "text": "The tracking link in the email leads to a 404 page.",
+        "label": "bug"
+      },
+      {
+        "id": "f030",
+        "text": "Please let me pay in instalments for bigger orders.",
+        "label": "billing"
+      },
+      {
+        "id": "f024",
+        "text": "I'd like to close my account and get the remaining credit refunded.",
+        "label": "account"
+      },
+      {
+        "id": "f034",
+        "text": "Can I get a student discount?",
+        "label": "billing"
+      },
+      {
+        "id": "f037",
+        "text": "My gift card balance disappeared after the last update.",
+        "label": "billing"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "billing"
+      },
+      {
+        "id": "f020",
+        "text": "Your website is really slow today.",
+        "label": "bug"
+      },
+      {
+        "id": "f022",
+        "text": "The discount code says invalid even though it's in your newsletter.",
+        "label": "billing"
+      },
+      {
+        "id": "f001",
+        "text": "I was charged twice because the checkout page crashed halfway through.",
+        "label": "billing"
+      },
+      {
+        "id": "f004",
+        "text": "Would be great if invoices showed the VAT number, right now they don't.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f010",
+        "text": "Why does the courier need my phone number? I don't want to share it.",
+        "label": "shipping"
+      },
+      {
+        "id": "f017",
+        "text": "I keep getting charged for a plan I cancelled after the app froze.",
+        "label": "billing"
+      }
+    ],
+    "qwen3.5-flash": [
+      {
+        "id": "f040",
+        "text": "How do I stop the weekly marketing emails?",
+        "label": "account"
+      },
+      {
+        "id": "f006",
+        "text": "The app keeps logging me out every few minutes.",
+        "label": "bug"
+      },
+      {
+        "id": "f024",
+        "text": "I'd like to close my account and get the remaining credit refunded.",
+        "label": "billing"
+      },
+      {
+        "id": "f025",
+        "text": "The tracking link in the email leads to a 404 page.",
+        "label": "shipping"
+      },
+      {
+        "id": "f030",
+        "text": "Please let me pay in instalments for bigger orders.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f032",
+        "text": "Notifications about delivery come in at 3am and wake me up.",
+        "label": "shipping"
+      },
+      {
+        "id": "f037",
+        "text": "My gift card balance disappeared after the last update.",
+        "label": "billing"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "billing"
+      },
+      {
+        "id": "f020",
+        "text": "Your website is really slow today.",
+        "label": "bug"
+      },
+      {
+        "id": "f022",
+        "text": "The discount code says invalid even though it's in your newsletter.",
+        "label": "billing"
+      },
+      {
+        "id": "f001",
+        "text": "I was charged twice because the checkout page crashed halfway through.",
+        "label": "billing"
+      },
+      {
+        "id": "f004",
+        "text": "Would be great if invoices showed the VAT number, right now they don't.",
+        "label": "feature_request"
+      }
+    ],
+    "qwen-flash": [
+      {
+        "id": "f030",
+        "text": "Please let me pay in instalments for bigger orders.",
+        "label": "billing"
+      },
+      {
+        "id": "f034",
+        "text": "Can I get a student discount?",
+        "label": "other"
+      },
+      {
+        "id": "f037",
+        "text": "My gift card balance disappeared after the last update.",
+        "label": "bug"
+      },
+      {
+        "id": "f024",
+        "text": "I'd like to close my account and get the remaining credit refunded.",
+        "label": "billing"
+      },
+      {
+        "id": "f025",
+        "text": "The tracking link in the email leads to a 404 page.",
+        "label": "shipping"
+      },
+      {
+        "id": "f032",
+        "text": "Notifications about delivery come in at 3am and wake me up.",
+        "label": "shipping"
+      },
+      {
+        "id": "f006",
+        "text": "The app keeps logging me out every few minutes.",
+        "label": "account"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "billing"
+      },
+      {
+        "id": "f020",
+        "text": "Your website is really slow today.",
+        "label": "bug"
+      },
+      {
+        "id": "f022",
+        "text": "The discount code says invalid even though it's in your newsletter.",
+        "label": "billing"
+      },
+      {
+        "id": "f040",
+        "text": "How do I stop the weekly marketing emails?",
+        "label": "other"
+      },
+      {
+        "id": "f001",
+        "text": "I was charged twice because the checkout page crashed halfway through.",
+        "label": "billing"
+      }
+    ],
+    "qwen3.5-27b": [
+      {
+        "id": "f020",
+        "text": "Your website is really slow today.",
+        "label": "other"
+      },
+      {
+        "id": "f034",
+        "text": "Can I get a student discount?",
+        "label": "other"
+      },
+      {
+        "id": "f024",
+        "text": "I'd like to close my account and get the remaining credit refunded.",
+        "label": "account"
+      },
+      {
+        "id": "f037",
+        "text": "My gift card balance disappeared after the last update.",
+        "label": "bug"
+      },
+      {
+        "id": "f025",
+        "text": "The tracking link in the email leads to a 404 page.",
+        "label": "shipping"
+      },
+      {
+        "id": "f030",
+        "text": "Please let me pay in instalments for bigger orders.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f032",
+        "text": "Notifications about delivery come in at 3am and wake me up.",
+        "label": "other"
+      },
+      {
+        "id": "f006",
+        "text": "The app keeps logging me out every few minutes.",
+        "label": "account"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "billing"
+      },
+      {
+        "id": "f022",
+        "text": "The discount code says invalid even though it's in your newsletter.",
+        "label": "billing"
+      },
+      {
+        "id": "f040",
+        "text": "How do I stop the weekly marketing emails?",
+        "label": "other"
+      },
+      {
+        "id": "f001",
+        "text": "I was charged twice because the checkout page crashed halfway through.",
+        "label": "billing"
+      }
+    ],
+    "deepseek-v4-flash": [
+      {
+        "id": "f037",
+        "text": "My gift card balance disappeared after the last update.",
+        "label": "bug"
+      },
+      {
+        "id": "f024",
+        "text": "I'd like to close my account and get the remaining credit refunded.",
+        "label": "billing"
+      },
+      {
+        "id": "f025",
+        "text": "The tracking link in the email leads to a 404 page.",
+        "label": "shipping"
+      },
+      {
+        "id": "f034",
+        "text": "Can I get a student discount?",
+        "label": "billing"
+      },
+      {
+        "id": "f030",
+        "text": "Please let me pay in instalments for bigger orders.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f032",
+        "text": "Notifications about delivery come in at 3am and wake me up.",
+        "label": "shipping"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "billing"
+      },
+      {
+        "id": "f022",
+        "text": "The discount code says invalid even though it's in your newsletter.",
+        "label": "billing"
+      },
+      {
+        "id": "f040",
+        "text": "How do I stop the weekly marketing emails?",
+        "label": "other"
+      },
+      {
+        "id": "f001",
+        "text": "I was charged twice because the checkout page crashed halfway through.",
+        "label": "billing"
+      },
+      {
+        "id": "f004",
+        "text": "Would be great if invoices showed the VAT number, right now they don't.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f010",
+        "text": "Why does the courier need my phone number? I don't want to share it.",
+        "label": "shipping"
+      }
+    ],
+    "minimax-m3.1-flash": [
+      {
+        "id": "f040",
+        "text": "How do I stop the weekly marketing emails?",
+        "label": "account"
+      },
+      {
+        "id": "f030",
+        "text": "Please let me pay in instalments for bigger orders.",
+        "label": "billing"
+      },
+      {
+        "id": "f024",
+        "text": "I'd like to close my account and get the remaining credit refunded.",
+        "label": "billing"
+      },
+      {
+        "id": "f025",
+        "text": "The tracking link in the email leads to a 404 page.",
+        "label": "shipping"
+      },
+      {
+        "id": "f034",
+        "text": "Can I get a student discount?",
+        "label": "billing"
+      },
+      {
+        "id": "f037",
+        "text": "My gift card balance disappeared after the last update.",
+        "label": "billing"
+      },
+      {
+        "id": "f006",
+        "text": "The app keeps logging me out every few minutes.",
+        "label": "account"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "billing"
+      },
+      {
+        "id": "f020",
+        "text": "Your website is really slow today.",
+        "label": "bug"
+      },
+      {
+        "id": "f022",
+        "text": "The discount code says invalid even though it's in your newsletter.",
+        "label": "billing"
+      },
+      {
+        "id": "f001",
+        "text": "I was charged twice because the checkout page crashed halfway through.",
+        "label": "billing"
+      },
+      {
+        "id": "f004",
+        "text": "Would be great if invoices showed the VAT number, right now they don't.",
+        "label": "feature_request"
+      }
+    ],
+    "mimo-v2.6-flash": [
+      {
+        "id": "f025",
+        "text": "The tracking link in the email leads to a 404 page.",
+        "label": "bug"
+      },
+      {
+        "id": "f024",
+        "text": "I'd like to close my account and get the remaining credit refunded.",
+        "label": "account"
+      },
+      {
+        "id": "f034",
+        "text": "Can I get a student discount?",
+        "label": "billing"
+      },
+      {
+        "id": "f032",
+        "text": "Notifications about delivery come in at 3am and wake me up.",
+        "label": "other"
+      },
+      {
+        "id": "f006",
+        "text": "The app keeps logging me out every few minutes.",
+        "label": "account"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "billing"
+      },
+      {
+        "id": "f020",
+        "text": "Your website is really slow today.",
+        "label": "bug"
+      },
+      {
+        "id": "f022",
+        "text": "The discount code says invalid even though it's in your newsletter.",
+        "label": "billing"
+      },
+      {
+        "id": "f040",
+        "text": "How do I stop the weekly marketing emails?",
+        "label": "other"
+      },
+      {
+        "id": "f001",
+        "text": "I was charged twice because the checkout page crashed halfway through.",
+        "label": "billing"
+      },
+      {
+        "id": "f004",
+        "text": "Would be great if invoices showed the VAT number, right now they don't.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f010",
+        "text": "Why does the courier need my phone number? I don't want to share it.",
+        "label": "shipping"
+      }
+    ],
+    "glm-5.3-flash": [
+      {
+        "id": "f014",
+        "text": "Is it possible to pay by bank transfer instead of card?",
+        "label": "feature_request"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "account"
+      },
+      {
+        "id": "f022",
+        "text": "The discount code says invalid even though it's in your newsletter.",
+        "label": "bug"
+      },
+      {
+        "id": "f024",
+        "text": "I'd like to close my account and get the remaining credit refunded.",
+        "label": "account"
+      },
+      {
+        "id": "f030",
+        "text": "Please let me pay in instalments for bigger orders.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f006",
+        "text": "The app keeps logging me out every few minutes.",
+        "label": "account"
+      },
+      {
+        "id": "f020",
+        "text": "Your website is really slow today.",
+        "label": "bug"
+      },
+      {
+        "id": "f040",
+        "text": "How do I stop the weekly marketing emails?",
+        "label": "other"
+      },
+      {
+        "id": "f001",
+        "text": "I was charged twice because the checkout page crashed halfway through.",
+        "label": "billing"
+      },
+      {
+        "id": "f004",
+        "text": "Would be great if invoices showed the VAT number, right now they don't.",
+        "label": "feature_request"
+      },
+      {
+        "id": "f010",
+        "text": "Why does the courier need my phone number? I don't want to share it.",
+        "label": "shipping"
+      },
+      {
+        "id": "f017",
+        "text": "I keep getting charged for a plan I cancelled after the app froze.",
+        "label": "billing"
+      }
+    ],
+    "qwen2.5:3b-instruct": [
+      {
+        "id": "f010",
+        "text": "Why does the courier need my phone number? I don't want to share it.",
+        "label": "account"
+      },
+      {
+        "id": "f017",
+        "text": "I keep getting charged for a plan I cancelled after the app froze.",
+        "label": "bug"
+      },
+      {
+        "id": "f018",
+        "text": "The search doesn't find orders older than a year.",
+        "label": "billing"
+      },
+      {
+        "id": "f027",
+        "text": "I can't find where to download my receipts.",
+        "label": "account"
+      },
+      {
+        "id": "f035",
+        "text": "The order confirmation page is blank after I pay.",
+        "label": "billing"
+      },
+      {
+        "id": "f036",
+        "text": "Support chat closes on its own before an agent answers.",
+        "label": "other"
+      },
+      {
+        "id": "f001",
+        "text": "I was charged twice because the checkout page crashed halfway through.",
+        "label": "bug"
+      },
+      {
+        "id": "f004",
+        "text": "Would be great if invoices showed the VAT number, right now they don't.",
+        "label": "billing"
+      },
+      {
+        "id": "f019",
+        "text": "Can you send the invoice to my work email instead?",
+        "label": "account"
+      },
+      {
+        "id": "f020",
+        "text": "Your website is really slow today.",
+        "label": "other"
+      },
+      {
+        "id": "f022",
+        "text": "The discount code says invalid even though it's in your newsletter.",
+        "label": "other"
+      },
+      {
+        "id": "f025",
+        "text": "The tracking link in the email leads to a 404 page.",
+        "label": "bug"
+      }
+    ]
+  }
+}

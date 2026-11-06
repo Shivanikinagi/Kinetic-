@@ -1,0 +1,24 @@
+{"id": "g001", "text": "Where is the nearest train station?", "label": "english"}
+{"id": "g002", "text": "The weather is lovely today and the park is full.", "label": "english"}
+{"id": "g003", "text": "Could you send me the report by Friday?", "label": "english"}
+{"id": "g004", "text": "My brother is learning to play the guitar.", "label": "english"}
+{"id": "g005", "text": "¿Dónde está la estación de tren?", "label": "spanish"}
+{"id": "g006", "text": "Muchas gracias por tu ayuda, eres muy amable.", "label": "spanish"}
+{"id": "g007", "text": "Quiero reservar una mesa para dos personas, por favor.", "label": "spanish"}
+{"id": "g008", "text": "Mi hermana vive en Madrid desde hace tres años.", "label": "spanish"}
+{"id": "g009", "text": "Où est la gare la plus proche ?", "label": "french"}
+{"id": "g010", "text": "Merci beaucoup, je suis très content.", "label": "french"}
+{"id": "g011", "text": "Bonjour, je voudrais un café, s'il vous plaît.", "label": "french"}
+{"id": "g012", "text": "Nous allons au cinéma ce soir avec nos amis.", "label": "french"}
+{"id": "g013", "text": "Wo ist der nächste Bahnhof?", "label": "german"}
+{"id": "g014", "text": "Ich verstehe das nicht, kannst du es wiederholen?", "label": "german"}
+{"id": "g015", "text": "Danke schön, das ist sehr nett von Ihnen.", "label": "german"}
+{"id": "g016", "text": "Guten Morgen, ich hätte gern ein Brötchen, bitte.", "label": "german"}
+{"id": "g017", "text": "Dov'è la stazione dei treni?", "label": "italian"}
+{"id": "g018", "text": "Grazie mille per la cena, era buonissima.", "label": "italian"}
+{"id": "g019", "text": "Buongiorno, vorrei un cappuccino, per favore.", "label": "italian"}
+{"id": "g020", "text": "Mia sorella abita a Roma da tre anni.", "label": "italian"}
+{"id": "g021", "text": "I would like to book a room for two nights.", "label": "english"}
+{"id": "g022", "text": "El perro está durmiendo en el sofá.", "label": "spanish"}
+{"id": "g023", "text": "Le chat dort sur le canapé.", "label": "french"}
+{"id": "g024", "text": "Der Hund schläft auf dem Sofa.", "label": "german"}

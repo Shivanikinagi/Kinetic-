@@ -1,0 +1,24 @@
+{"id": "g001", "text": "I need a flight from London to Rome next Friday.", "label": "book_flight"}
+{"id": "g002", "text": "Can you book me a plane ticket to Tokyo?", "label": "book_flight"}
+{"id": "g003", "text": "I want to fly to New York on the 3rd of May.", "label": "book_flight"}
+{"id": "g004", "text": "Find me the cheapest flight to Paris this weekend.", "label": "book_flight"}
+{"id": "g005", "text": "Please cancel my order, I bought the wrong size.", "label": "cancel_order"}
+{"id": "g006", "text": "I don't want the order I placed yesterday anymore, cancel it.", "label": "cancel_order"}
+{"id": "g007", "text": "Cancel order 5521 please.", "label": "cancel_order"}
+{"id": "g008", "text": "How do I cancel the order I just made?", "label": "cancel_order"}
+{"id": "g009", "text": "What is my account balance?", "label": "check_balance"}
+{"id": "g010", "text": "How much money do I have in my savings account?", "label": "check_balance"}
+{"id": "g011", "text": "Show me the balance on my checking account.", "label": "check_balance"}
+{"id": "g012", "text": "Can you tell me my current balance?", "label": "check_balance"}
+{"id": "g013", "text": "I forgot my password, can you reset it?", "label": "reset_password"}
+{"id": "g014", "text": "I can't log in, I need a new password.", "label": "reset_password"}
+{"id": "g015", "text": "Please reset my password.", "label": "reset_password"}
+{"id": "g016", "text": "How do I change my forgotten password?", "label": "reset_password"}
+{"id": "g017", "text": "Where is my package? It was due yesterday.", "label": "track_package"}
+{"id": "g018", "text": "Can I get the tracking status of my parcel?", "label": "track_package"}
+{"id": "g019", "text": "My delivery hasn't arrived, where is it now?", "label": "track_package"}
+{"id": "g020", "text": "Track my package please.", "label": "track_package"}
+{"id": "g021", "text": "Book a flight to Berlin for two adults.", "label": "book_flight"}
+{"id": "g022", "text": "I want to cancel my order before it ships.", "label": "cancel_order"}
+{"id": "g023", "text": "How much is left in my account?", "label": "check_balance"}
+{"id": "g024", "text": "What is the delivery status of my parcel?", "label": "track_package"}

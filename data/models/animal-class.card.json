@@ -1,0 +1,38 @@
+{
+  "id": "kinetic/animal-class",
+  "version": "1.0.0",
+  "name": "Animal Class",
+  "description": "Names the animal class (mammal, bird, reptile and so on) of the animal described. Runs on 0G Compute's TeeML model (0gm-1.0-35b-a3b).",
+  "license": "apache-2.0",
+  "task": {
+    "kind": "classify",
+    "instructions": "Each sentence is about one animal. Classify the animal it is about into its class.",
+    "labels": [
+      {
+        "name": "mammal",
+        "hint": "dog, cat, elephant, whale, horse, bat, lion"
+      },
+      {
+        "name": "bird",
+        "hint": "eagle, parrot, owl, penguin, sparrow, swan"
+      },
+      {
+        "name": "fish",
+        "hint": "salmon, shark, trout, tuna, goldfish, cod"
+      },
+      {
+        "name": "reptile",
+        "hint": "snake, lizard, crocodile, turtle, iguana, gecko"
+      },
+      {
+        "name": "insect",
+        "hint": "bee, ant, butterfly, beetle, mosquito, grasshopper"
+      }
+    ]
+  },
+  "runtime": {
+    "engine": "0g",
+    "model": "0gm-1.0-35b-a3b"
+  },
+  "royaltyBps": 200
+}

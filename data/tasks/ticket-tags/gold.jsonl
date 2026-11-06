@@ -1,0 +1,24 @@
+{"id": "g001", "text": "Please give me my money back for the broken toaster.", "tags": ["refund"]}
+{"id": "g002", "text": "I want a refund for my cancelled subscription.", "tags": ["refund"]}
+{"id": "g003", "text": "I can't log in to my account on the website.", "tags": ["login"]}
+{"id": "g004", "text": "My password doesn't work and I cannot sign in.", "tags": ["login"]}
+{"id": "g005", "text": "The Android app crashes when I open my profile.", "tags": ["mobile"]}
+{"id": "g006", "text": "The iPhone app shows a blank screen.", "tags": ["mobile"]}
+{"id": "g007", "text": "My package has not been delivered yet.", "tags": ["shipping"]}
+{"id": "g008", "text": "The courier left my parcel at the wrong address.", "tags": ["shipping"]}
+{"id": "g009", "text": "I can't sign in on the Android app.", "tags": ["login", "mobile"]}
+{"id": "g010", "text": "The package never arrived, I want a refund.", "tags": ["refund", "shipping"]}
+{"id": "g011", "text": "The mobile app won't let me log in on my iPhone.", "tags": ["login", "mobile"]}
+{"id": "g012", "text": "My delivery was late and I want my money back.", "tags": ["refund", "shipping"]}
+{"id": "g013", "text": "What are your opening hours on Sunday?", "tags": []}
+{"id": "g014", "text": "Do you sell gift wrapping?", "tags": []}
+{"id": "g015", "text": "Please add a dark mode to the website.", "tags": []}
+{"id": "g016", "text": "Can I change the colour of my order before it ships?", "tags": ["shipping"]}
+{"id": "g017", "text": "I was charged for an item I returned, please refund me.", "tags": ["refund"]}
+{"id": "g018", "text": "Two-factor code never arrives so I cannot log in.", "tags": ["login"]}
+{"id": "g019", "text": "Notifications on the Android app are delayed.", "tags": ["mobile"]}
+{"id": "g020", "text": "Tracking says my package was shipped a week ago.", "tags": ["shipping"]}
+{"id": "g021", "text": "Is there a student discount?", "tags": []}
+{"id": "g022", "text": "The iPhone app logs me out and I can't sign in again.", "tags": ["login", "mobile"]}
+{"id": "g023", "text": "Refund me please, the courier lost my package.", "tags": ["refund", "shipping"]}
+{"id": "g024", "text": "How do I update my billing address?", "tags": []}

@@ -1,0 +1,61 @@
+  ✓ passport bytes match Swarm reference 84964866a8c2e58b…
+
+  Compute Passport job-mw3qzkrd-585265 (testnet)
+  16/16 chunks · 4 checked against 0G (25%) · 1 slashed
+
+Detected mainnet (chain ID: 16661)
+Using mainnet inference contract (chain ID: 16661)
+  ✓ format  (kinetic.passport.v2)
+  ✓ matches the Compute Passport v2 schema
+  ✓ authenticity claims follow from the execution records
+  ✓ correctness levels follow from the checks
+  ✓ summary matches the evidence
+  ✓ signed by the buyer
+  ✓ co-signed by the verifier  (0xa19cc96ea9f0e414cebb149918e4c5549554adc8)
+  ✓ canary reveal matches the commitment
+  ✓ every scored canary was in the committed set
+  ✓ canary TEE signatures re-verified  (4 of 4 canaries signed by the 0G provider's TEE)
+  ✓ every canary ran TeeML-only (private) with a verified TEE signature
+  ✓ known-answer placements match the commitment
+  ✓ every chunk's known answers were planted where committed, and passed  (18 chunks)
+  ✓ each chunk's result is signed by its provider  (16 chunks)
+  ✓ each verified chunk has a passing canary
+  ✓ coverage numbers add up
+  ✓ checks meet the agreed rate  (4 of 16 chunks; agreed 25%)
+  ✓ verified chunks meet the agreed pass mark  (80%)
+  ✓ outcome matches the work  (agreement met)
+  ✓ spending stayed within the firm quote  (0.0228 ℏ of 0.0256 ℏ)
+  ✓ results match the output hash
+  ✓ results match each chunk's signed hash
+  ✓ Merkle root over the chunks matches the anchor  (16 chunks, root 1ce131e6eb91…)
+  ✓ each chunk's Merkle proof leads to the anchored root
+  ✓ spot checks were picked by their PRNG seed  (1 of 12 non-canary chunks)
+  ✓ PRNG spot checks agreed with 0G  (1 checked)
+  ✓ HCS: job commitment matches
+  ✓ HCS: agreement matches what was committed before work
+  ✓ HCS: canary reveal matches
+  ✓ HCS: known answers committed before work and revealed after
+  ✓ HCS: a receipt for every known-answer check  (21 checks)
+  ✓ HCS: a receipt for every chunk  (16 chunks)
+  ✓ HCS: a receipt for every slash  (1 slashed)
+  ✓ HCS: the chunks' Merkle root is anchored (hcs.merkleRootAnchor)  (sequence 1460)
+  ✓ HCS: spot-check receipt matches
+  ✓ HCS: the number of spot checks was committed before work  (1 committed)
+  ✓ vault: the spot-check seed is the job's one PRNG draw  (drawn at 2026-11-05T16:22:10.000Z)
+  ✓ the spot-check seed was drawn after the canary reveal  (seed tx at 1793895730.641393908, reveal at 1793895727.161498681)
+  ✓ mirror node: every chunk payment settled
+  ✓ vault: every slash stands where the passport says
+  ✓ vault: the co-signer is one of the vault's verifiers  (3 verifiers)
+  ✓ 0G: canary TEE signers registered on-chain  (1 provider(s))
+
+  What this passport does not prove:
+    · Checks are sampled: 4 of 16 chunks were compared with a 0G verified run; 12 passed a format check only.
+    · Ground truth: 16 of 16 chunks answered the verifier's planted known-answer items correctly; that is what slashing rests on. A known answer checks one item per chunk, not every item.
+    · Agreement with 0G measures consistency with a reference model, not ground truth.
+    · Each provider's model is what it declared; nothing here proves which model ran.
+    · One verifier ran the checks. It committed to the canary set on HCS before any chunk ran and revealed it at the end.
+    · 0G reference runs: 4 of 4 canary TEE signatures verified by the verifier against the signer in 0G's serving contract. The router seals each request to the enclave, so the signature covers the encrypted exchange; 0G's attested E2EE gateway, not KINETIC, holds the ciphertext it binds.
+    · PRNG spot checks: 1 chunk picked after the job by a Hedera PRNG seed and re-run on 0G; 1 of 1 scored agreed. They are evidence only: they don't change a chunk's check, and don't count toward slashing.
+
+  All checks passed.
+

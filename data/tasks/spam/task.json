@@ -1,0 +1,14 @@
+{
+  "kind": "classify",
+  "instructions": "Classify each message as spam (unsolicited advertising, scams or phishing) or not_spam (a normal personal or work message).",
+  "labels": [
+    {
+      "name": "spam",
+      "hint": "winner, free, claim, prize, click, urgent offer, lottery"
+    },
+    {
+      "name": "not_spam",
+      "hint": "meeting, dinner, see you, thanks, attached, tomorrow"
+    }
+  ]
+}

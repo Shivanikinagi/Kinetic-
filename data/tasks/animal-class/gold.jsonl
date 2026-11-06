@@ -1,0 +1,24 @@
+{"id": "g001", "text": "The elephant sprayed water over its back with its trunk.", "label": "mammal"}
+{"id": "g002", "text": "Our dog waits by the door every evening.", "label": "mammal"}
+{"id": "g003", "text": "A humpback whale surfaced next to the boat.", "label": "mammal"}
+{"id": "g004", "text": "The horse galloped across the field.", "label": "mammal"}
+{"id": "g005", "text": "An eagle circled high above the valley.", "label": "bird"}
+{"id": "g006", "text": "The parrot repeated every word we said.", "label": "bird"}
+{"id": "g007", "text": "An owl hooted from the oak tree at midnight.", "label": "bird"}
+{"id": "g008", "text": "The penguin slid on its belly across the ice.", "label": "bird"}
+{"id": "g009", "text": "A salmon leapt up the waterfall to reach its spawning ground.", "label": "fish"}
+{"id": "g010", "text": "The shark circled the reef slowly.", "label": "fish"}
+{"id": "g011", "text": "My goldfish swims around its bowl all day.", "label": "fish"}
+{"id": "g012", "text": "We caught a trout in the mountain stream.", "label": "fish"}
+{"id": "g013", "text": "A snake slid under the rock to hide.", "label": "reptile"}
+{"id": "g014", "text": "The crocodile lay motionless on the riverbank.", "label": "reptile"}
+{"id": "g015", "text": "A small gecko climbed the kitchen wall.", "label": "reptile"}
+{"id": "g016", "text": "The old turtle laid her eggs in the sand.", "label": "reptile"}
+{"id": "g017", "text": "A bee collected pollen from the lavender.", "label": "insect"}
+{"id": "g018", "text": "Ants marched in a line towards the sugar.", "label": "insect"}
+{"id": "g019", "text": "A butterfly landed on the flower.", "label": "insect"}
+{"id": "g020", "text": "The mosquito buzzed near my ear all night.", "label": "insect"}
+{"id": "g021", "text": "The lion roared at the edge of the savanna.", "label": "mammal"}
+{"id": "g022", "text": "A swan glided across the lake.", "label": "bird"}
+{"id": "g023", "text": "The tuna swam in a large school.", "label": "fish"}
+{"id": "g024", "text": "A grasshopper jumped into the tall grass.", "label": "insect"}

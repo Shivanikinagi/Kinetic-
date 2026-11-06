@@ -1,0 +1,26 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      # The contract compiles and runs as bytecode in an in-process EVM; everything else runs on
+      # the local emulator, so no keys or network access are needed.
+      - run: npm test
+      - name: dashboard
+        working-directory: web
+        run: npm ci && npx tsc --noEmit

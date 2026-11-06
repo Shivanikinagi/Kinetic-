@@ -1,0 +1,1544 @@
+{
+  "$id": "urn:kinetic:compute-passport:v2",
+  "title": "KINETIC Compute Passport v2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "kinetic.passport.v2"
+    },
+    "jobId": {
+      "type": "string"
+    },
+    "issuedAt": {
+      "type": "string"
+    },
+    "network": {
+      "type": "string"
+    },
+    "buyer": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{40}$"
+        },
+        "uaid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "task": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "classify",
+            "extract",
+            "tag"
+          ]
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "items": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "chunkSize": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "chunks": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "completed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "resultsHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "resultsHash"
+      ],
+      "additionalProperties": false
+    },
+    "hcsTopic": {
+      "type": "string"
+    },
+    "references": {
+      "type": "object",
+      "properties": {
+        "x402Network": {
+          "type": "string"
+        },
+        "hcsTopic": {
+          "type": "string"
+        },
+        "mirrorUrl": {
+          "type": "string"
+        },
+        "vault": {
+          "type": "string"
+        },
+        "swarmGateway": {
+          "type": "string"
+        },
+        "devnetUrl": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "x402Network",
+        "hcsTopic",
+        "mirrorUrl",
+        "swarmGateway"
+      ],
+      "additionalProperties": false
+    },
+    "strategy": {
+      "type": "string"
+    },
+    "agreement": {
+      "type": "object",
+      "properties": {
+        "v": {
+          "type": "number",
+          "const": 1
+        },
+        "task": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "canaryRate": {
+          "type": "number"
+        },
+        "minAgreement": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "v",
+        "task",
+        "canaryRate",
+        "minAgreement"
+      ],
+      "additionalProperties": {}
+    },
+    "outcome": {
+      "type": "object",
+      "properties": {
+        "met": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "met",
+        "notes"
+      ],
+      "additionalProperties": false
+    },
+    "canaries": {
+      "type": "object",
+      "properties": {
+        "commitment": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "revealed": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "salt": {
+          "type": "string"
+        },
+        "checked": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "idx": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "provider": {
+                "type": "string"
+              },
+              "agreement": {
+                "type": "number"
+              },
+              "pass": {
+                "type": "boolean"
+              },
+              "zeroGRequest": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "tee": {
+                "type": "object",
+                "properties": {
+                  "trustMode": {
+                    "type": "string"
+                  },
+                  "fallback": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$"
+                  },
+                  "providerType": {
+                    "type": "string",
+                    "enum": [
+                      "decentralized",
+                      "centralized"
+                    ]
+                  },
+                  "providerIdentity": {
+                    "type": "string"
+                  },
+                  "guarantee": {
+                    "type": "string",
+                    "enum": [
+                      "TeeML",
+                      "TeeTLS",
+                      "unknown"
+                    ]
+                  },
+                  "chatId": {
+                    "type": "string"
+                  },
+                  "scheme": {
+                    "type": "string"
+                  },
+                  "signedText": {
+                    "type": "string"
+                  },
+                  "signedTextHash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "signature": {
+                    "type": "string"
+                  },
+                  "signer": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$"
+                  },
+                  "routingProof": {
+                    "type": "object",
+                    "properties": {
+                      "text": {
+                        "type": "string"
+                      },
+                      "signature": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "text",
+                      "signature"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "verification": {
+                    "type": "string",
+                    "enum": [
+                      "verified",
+                      "invalid",
+                      "unavailable"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "routerTeeVerified": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "costUsdMicro": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "chainId": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "trustMode",
+                  "provider",
+                  "guarantee",
+                  "chatId",
+                  "verification",
+                  "routerTeeVerified",
+                  "costUsdMicro"
+                ],
+                "additionalProperties": false,
+                "description": "The canary's 0G reference run, checked by the verifier itself: the trust mode (private = TeeML only), the 0G provider, the chat id, the text its TEE signed and the EIP-191 signature, the signer registered on-chain, the result, and 0G's charge. Re-check the signature offline; the signer against 0G's serving contract online."
+              }
+            },
+            "required": [
+              "idx",
+              "provider",
+              "agreement",
+              "pass",
+              "zeroGRequest",
+              "model"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "known": {
+          "type": "object",
+          "properties": {
+            "commitment": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "placements": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "idx": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "idx",
+                  "ids"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "salt": {
+              "type": "string"
+            },
+            "checked": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "idx": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "provider": {
+                    "type": "string"
+                  },
+                  "items": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "correct": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "pass": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "idx",
+                  "provider",
+                  "items",
+                  "correct",
+                  "pass"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "commitment",
+            "placements",
+            "salt",
+            "checked"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commitment",
+        "revealed",
+        "salt",
+        "checked"
+      ],
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "verified": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "formatOnly": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "share": {
+          "type": "number"
+        },
+        "known": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "verified",
+        "formatOnly",
+        "share"
+      ],
+      "additionalProperties": false
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "canaryRate": {
+          "type": "number"
+        },
+        "minAgreement": {
+          "type": "number"
+        },
+        "window": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "failLimit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "canaryRate",
+        "minAgreement",
+        "window",
+        "failLimit"
+      ],
+      "additionalProperties": false
+    },
+    "payment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "decimals": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "id",
+        "symbol",
+        "decimals"
+      ],
+      "additionalProperties": false
+    },
+    "verificationFee": {
+      "type": "object",
+      "properties": {
+        "tinybar": {
+          "type": "string",
+          "pattern": "^\\d+$"
+        },
+        "tx": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "tinybar"
+      ],
+      "additionalProperties": false
+    },
+    "providers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "payTo": {
+            "type": "string"
+          },
+          "uaid": {
+            "type": "string"
+          },
+          "gpu": {
+            "type": "string"
+          },
+          "declaredModel": {
+            "type": "string"
+          },
+          "adversarial": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "offline",
+              "slashed",
+              "capped",
+              "quarantined",
+              "unqualified",
+              "reserve"
+            ]
+          },
+          "rank": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "type": "number"
+              },
+              "price": {
+                "type": "number"
+              },
+              "reliability": {
+                "type": "number"
+              },
+              "speed": {
+                "type": "number"
+              },
+              "checks": {
+                "type": "number"
+              },
+              "latencyMs": {
+                "type": "number"
+              },
+              "proof": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "stale",
+                  "unproven"
+                ]
+              }
+            },
+            "required": [
+              "score",
+              "price",
+              "reliability",
+              "speed",
+              "checks"
+            ],
+            "additionalProperties": false
+          },
+          "admission": {
+            "type": "object",
+            "properties": {
+              "admitted": {
+                "type": "boolean"
+              },
+              "agreement": {
+                "type": "number"
+              },
+              "latencyMs": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "admitted",
+              "agreement",
+              "latencyMs"
+            ],
+            "additionalProperties": {}
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^\\d+$"
+          },
+          "served": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "kept": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "paid": {
+            "type": "string",
+            "pattern": "^\\d+$"
+          },
+          "refund": {
+            "type": "string",
+            "pattern": "^\\d+$"
+          },
+          "undelivered": {
+            "type": "string",
+            "pattern": "^\\d+$"
+          },
+          "vaultTx": {
+            "type": "string"
+          },
+          "slashId": {
+            "type": "string"
+          },
+          "slashStatus": {
+            "type": "string",
+            "enum": [
+              "proposed",
+              "disputed",
+              "executed",
+              "overturned",
+              "cancelled"
+            ]
+          },
+          "slashSigners": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "burned": {
+            "type": "string",
+            "pattern": "^\\d+$"
+          }
+        },
+        "required": [
+          "name",
+          "address",
+          "status",
+          "price",
+          "served",
+          "kept",
+          "paid",
+          "refund",
+          "undelivered"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "work": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "idx": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "provider": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "resultHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "payTx": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+$"
+          },
+          "check": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "format"
+            ]
+          },
+          "execution": {
+            "type": "object",
+            "properties": {
+              "zgProvider": {
+                "type": "string"
+              },
+              "endpoint": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "chatId": {
+                "type": "string"
+              },
+              "verifiability": {
+                "type": "string"
+              },
+              "providerType": {
+                "type": "string",
+                "enum": [
+                  "decentralized",
+                  "centralized"
+                ]
+              },
+              "providerIdentity": {
+                "type": "string"
+              },
+              "requestHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "responseHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "attestation": {
+                "type": "string",
+                "enum": [
+                  "verified",
+                  "unavailable",
+                  "invalid"
+                ]
+              },
+              "latencyMs": {
+                "type": "number"
+              },
+              "at": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "zgProvider",
+              "endpoint",
+              "model",
+              "chatId",
+              "verifiability",
+              "providerType",
+              "responseHash",
+              "attestation",
+              "latencyMs",
+              "at"
+            ],
+            "additionalProperties": false
+          },
+          "attestation": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "unavailable",
+              "invalid"
+            ]
+          },
+          "attestationReason": {
+            "type": "string"
+          },
+          "planted": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "at": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "item": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "fields": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "at",
+                "item"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "known": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "correct": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "items",
+              "correct"
+            ],
+            "additionalProperties": false
+          },
+          "verifiability": {
+            "type": "string"
+          },
+          "inputCommitment": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "redundancy": {
+            "type": "object",
+            "properties": {
+              "with": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "agreement": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "with",
+              "agreement"
+            ],
+            "additionalProperties": false
+          },
+          "authenticity": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "0g-direct",
+                  "0g-router",
+                  "self-hosted",
+                  "unknown"
+                ]
+              },
+              "model": {
+                "type": "object",
+                "properties": {
+                  "declared": {
+                    "type": "string"
+                  },
+                  "served": {
+                    "type": "string"
+                  },
+                  "hash": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "hash"
+                ],
+                "additionalProperties": false
+              },
+              "node": {
+                "type": "string"
+              },
+              "guarantee": {
+                "type": "string",
+                "enum": [
+                  "TeeML",
+                  "TeeTLS",
+                  "SPML",
+                  "OpML",
+                  "ZKML",
+                  "none"
+                ]
+              },
+              "attestation": {
+                "type": "string",
+                "enum": [
+                  "verified",
+                  "unavailable",
+                  "invalid",
+                  "none"
+                ]
+              },
+              "requestHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "responseHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "method",
+              "model",
+              "guarantee",
+              "attestation"
+            ],
+            "additionalProperties": false,
+            "description": "Where and how the chunk ran, and what was attested. Says nothing about whether the answer is right."
+          },
+          "correctness": {
+            "type": "object",
+            "properties": {
+              "methods": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "signature",
+                    "format",
+                    "known-answers",
+                    "redundant-agreement",
+                    "model-agreement"
+                  ]
+                }
+              },
+              "level": {
+                "type": "string",
+                "enum": [
+                  "ground-truth",
+                  "redundant-agreement",
+                  "model-agreement",
+                  "format-only"
+                ]
+              }
+            },
+            "required": [
+              "methods",
+              "level"
+            ],
+            "additionalProperties": false,
+            "description": "How the answer was checked, and the strongest check it passed. Says nothing about which model ran."
+          },
+          "merkleProof": {
+            "description": "This chunk's record under the job's HCS Merkle anchor: sibling hashes from the leaf up.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "siblingHashHex": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "position": {
+                  "type": "string",
+                  "enum": [
+                    "left",
+                    "right"
+                  ]
+                }
+              },
+              "required": [
+                "siblingHashHex",
+                "position"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "idx",
+          "items",
+          "provider",
+          "resultHash",
+          "signature",
+          "amount",
+          "check",
+          "authenticity",
+          "correctness"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "verification": {
+          "type": "string",
+          "enum": [
+            "passed",
+            "partial",
+            "failed"
+          ]
+        },
+        "assurance": {
+          "type": "object",
+          "properties": {
+            "tier": {
+              "type": "string",
+              "enum": [
+                "basic",
+                "standard",
+                "high",
+                "confidential"
+              ]
+            },
+            "met": {
+              "type": "boolean"
+            },
+            "shortfalls": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "tier",
+            "met",
+            "shortfalls"
+          ],
+          "additionalProperties": false
+        },
+        "correctness": {
+          "type": "object",
+          "properties": {
+            "groundTruth": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "redundantAgreement": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "modelAgreement": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "formatOnly": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "groundTruth",
+            "redundantAgreement",
+            "modelAgreement",
+            "formatOnly"
+          ],
+          "additionalProperties": false
+        },
+        "authenticity": {
+          "type": "object",
+          "properties": {
+            "byGuarantee": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": [
+                  "TeeML",
+                  "TeeTLS",
+                  "SPML",
+                  "OpML",
+                  "ZKML",
+                  "none"
+                ]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "required": [
+                "TeeML",
+                "TeeTLS",
+                "SPML",
+                "OpML",
+                "ZKML",
+                "none"
+              ]
+            },
+            "attested": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "unavailable": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "invalid": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "unattested": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "byGuarantee",
+            "attested",
+            "unavailable",
+            "invalid",
+            "unattested"
+          ],
+          "additionalProperties": false
+        },
+        "knownAnswers": {
+          "type": "object",
+          "properties": {
+            "sampled": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "passed": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "sampled",
+            "passed"
+          ],
+          "additionalProperties": false
+        },
+        "modelCanaries": {
+          "type": "object",
+          "properties": {
+            "sampled": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "passed": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "sampled",
+            "passed"
+          ],
+          "additionalProperties": false
+        },
+        "payments": {
+          "type": "string",
+          "enum": [
+            "settled",
+            "incomplete"
+          ]
+        },
+        "slashes": {
+          "type": "object",
+          "properties": {
+            "executed": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "pending": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "overturned": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "cancelled": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "executed",
+            "pending",
+            "overturned",
+            "cancelled"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "verification",
+        "assurance",
+        "correctness",
+        "authenticity",
+        "knownAnswers",
+        "modelCanaries",
+        "payments",
+        "slashes"
+      ],
+      "additionalProperties": false,
+      "description": "Derived from the chunks and checks: recompute it to check it."
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "model": {
+      "description": "A model job: the listed model, its Model Passport, and the creator's royalty.",
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^m[0-9a-f]{15}$"
+        },
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "passportRef": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "passportDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "royaltyBps": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payTo": {
+          "type": "string"
+        },
+        "royalty": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            },
+            "basis": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            },
+            "tx": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "amount",
+            "basis",
+            "tx"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "key",
+        "id",
+        "version",
+        "passportRef",
+        "passportDigest",
+        "royaltyBps",
+        "payTo"
+      ],
+      "additionalProperties": false
+    },
+    "anchor": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "string",
+          "const": "hcs.merkleRootAnchor"
+        },
+        "hashAlg": {
+          "type": "string",
+          "const": "sha256"
+        },
+        "leaf": {
+          "type": "string",
+          "const": "kinetic.chunk.v1"
+        },
+        "merkleRoot": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "recordCount": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hcsSequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "tx": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "hashAlg",
+        "leaf",
+        "merkleRoot",
+        "recordCount",
+        "hcsSequence"
+      ],
+      "additionalProperties": false,
+      "description": "The job's one hcs.merkleRootAnchor on HCS: SHA-256 Merkle root over each chunk's canonical JSON {job, idx, provider, resultHash, payTx}, in chunk order; odd levels duplicate their last node."
+    },
+    "spot": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string",
+          "pattern": "^0x[0-9a-f]{64}$"
+        },
+        "seed": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{64}$"
+        },
+        "drawnAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "seedTx": {
+          "type": "string"
+        },
+        "picks": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "checked": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "idx": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "provider": {
+                "type": "string"
+              },
+              "agreement": {
+                "type": "number"
+              },
+              "pass": {
+                "type": "boolean"
+              },
+              "zeroGRequest": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "idx",
+              "provider"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "hcsSequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "tag",
+        "seed",
+        "drawnAt",
+        "picks",
+        "checked",
+        "hcsSequence"
+      ],
+      "additionalProperties": false,
+      "description": "Chunks re-run on 0G after the job, picked by a Hedera PRNG seed the verifier drew in the bond vault after the canary reveal."
+    },
+    "attestations": {
+      "type": "object",
+      "properties": {
+        "buyer": {
+          "type": "object",
+          "properties": {
+            "address": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$"
+            },
+            "signature": {
+              "type": "string"
+            },
+            "uaid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "address",
+            "signature"
+          ],
+          "additionalProperties": false
+        },
+        "verifier": {
+          "type": "object",
+          "properties": {
+            "address": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$"
+            },
+            "signature": {
+              "type": "string"
+            },
+            "uaid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "address",
+            "signature"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "kind",
+    "jobId",
+    "issuedAt",
+    "network",
+    "buyer",
+    "task",
+    "items",
+    "chunkSize",
+    "chunks",
+    "completed",
+    "output",
+    "hcsTopic",
+    "references",
+    "agreement",
+    "outcome",
+    "canaries",
+    "coverage",
+    "policy",
+    "payment",
+    "verificationFee",
+    "providers",
+    "work",
+    "summary",
+    "limitations",
+    "attestations"
+  ],
+  "additionalProperties": false,
+  "description": "KINETIC Compute Passport v2: how a job's results were produced, checked and paid for. No input data, no keys."
+}

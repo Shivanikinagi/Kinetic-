@@ -1,0 +1,38 @@
+{
+  "id": "kinetic/news-topic",
+  "version": "1.0.0",
+  "name": "News Topic",
+  "description": "Sorts news headlines and snippets into their topic. Runs on 0G Compute's TeeML model (0gm-1.0-35b-a3b).",
+  "license": "apache-2.0",
+  "task": {
+    "kind": "classify",
+    "instructions": "Classify each news headline by its main topic.",
+    "labels": [
+      {
+        "name": "sports",
+        "hint": "match, goal, championship, league, tournament, coach"
+      },
+      {
+        "name": "politics",
+        "hint": "election, parliament, minister, vote, senate, president"
+      },
+      {
+        "name": "technology",
+        "hint": "smartphone, software, chip, app, startup launches, ai model"
+      },
+      {
+        "name": "business",
+        "hint": "shares, profit, quarterly, merger, stock, revenue"
+      },
+      {
+        "name": "health",
+        "hint": "vaccine, hospital, disease, patients, doctors, clinical trial"
+      }
+    ]
+  },
+  "runtime": {
+    "engine": "0g",
+    "model": "0gm-1.0-35b-a3b"
+  },
+  "royaltyBps": 250
+}

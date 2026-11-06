@@ -1,0 +1,461 @@
+/*
+ * Product screens: Try it, Publish, Creators, Docs. Built on the theme tokens (theme.css), so
+ * they follow the dashboard's colours.
+ */
+
+.pg-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.pg-head h1 {
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.pg-head p {
+  margin-top: 6px;
+  max-width: 680px;
+}
+
+/* ── Stepper: one row per step, live ── */
+
+.stepper {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.stepper li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 10px 0;
+}
+
+.stepper li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 34px;
+  bottom: -6px;
+  width: 2px;
+  background: var(--rule);
+}
+
+.stepper li.done:not(:last-child)::after {
+  background: var(--accent-line);
+}
+
+.stepper .dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 2px solid var(--rule-2);
+  background: var(--panel);
+  color: var(--ink-4);
+}
+
+.stepper li.done .dot {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-ink, #0b0c0e);
+}
+
+.stepper li.active .dot {
+  border-color: var(--accent);
+  border-top-color: transparent;
+  animation: spin 0.9s linear infinite;
+}
+
+.stepper li.bad .dot {
+  border-color: var(--bad);
+  background: var(--bad);
+  color: #fff;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.stepper b {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.stepper li.todo b {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.stepper .d {
+  display: block;
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+
+.stepper .when {
+  font-size: 12px;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.stepper.big li {
+  padding: 14px 0;
+}
+
+.stepper.big b {
+  font-size: 15px;
+}
+
+/* ── Try it ── */
+
+.try {
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--panel);
+  padding: 18px;
+}
+
+.try-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.try-head h3 {
+  font-size: 17px;
+}
+
+.try-input {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-2);
+  background: var(--bg-2);
+  color: var(--ink);
+  resize: vertical;
+}
+
+.try-input:focus {
+  outline: 2px solid var(--focus, var(--accent-line));
+  outline-offset: 0;
+}
+
+.try-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.try-run {
+  margin-top: 16px;
+  border-top: 1px solid var(--rule);
+  padding-top: 12px;
+}
+
+.try-results td {
+  white-space: normal;
+  vertical-align: top;
+}
+
+.try-results td.out {
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.try-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+/* ── Publish ── */
+
+.form-h {
+  font-size: 16px;
+  margin: 4px 0 12px;
+}
+
+.form-h:not(:first-child) {
+  margin-top: 28px;
+}
+
+.templates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.template {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border-radius: var(--r);
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  color: var(--ink);
+  transition: border-color 140ms var(--ease), background 140ms var(--ease);
+}
+
+.template:hover {
+  border-color: var(--rule-2);
+}
+
+.template.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.template .kind {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.template b {
+  font-size: 14.5px;
+}
+
+.template .labels {
+  font-size: 12px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.form-grid label.full {
+  grid-column: 1 / -1;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+  font: inherit;
+  font-size: 14px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-2);
+  background: var(--bg-2);
+  color: var(--ink);
+}
+
+.form-grid input[type="range"] {
+  padding: 0;
+  accent-color: var(--accent);
+}
+
+.form-grid input:disabled {
+  color: var(--ink-3);
+}
+
+.mini-steps {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.side-card.success {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+  text-align: center;
+}
+
+.big-check {
+  width: 48px;
+  height: 48px;
+  margin: 4px auto 10px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  font-weight: 700;
+  background: var(--accent);
+  color: var(--on-ink, #0b0c0e);
+}
+
+/* ── Creators ── */
+
+.files.clickable tbody tr {
+  cursor: pointer;
+}
+
+.files.clickable tbody tr:hover td {
+  background: var(--bg-2);
+}
+
+/* ── Docs ── */
+
+.doc-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.doc-step {
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--panel);
+  padding: 18px;
+  min-width: 0;
+}
+
+.doc-step .n {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.doc-step h3 {
+  font-size: 17px;
+  margin: 4px 0 6px;
+}
+
+.doc-step p {
+  font-size: 13.5px;
+  margin-bottom: 12px;
+}
+
+.code {
+  position: relative;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--bg-2);
+}
+
+.code pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 40px 14px 12px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  overflow-x: auto;
+  color: var(--ink);
+}
+
+.code .copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.doc-step details.more {
+  margin-top: 10px;
+}
+
+.doc-step details.more .code {
+  margin-top: 8px;
+}
+
+@media (max-width: 960px) {
+  .doc-steps,
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.activity li {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 8px;
+  color: var(--ink-2);
+}
+
+.activity li span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+
+.activity .when {
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  border-top-color: transparent;
+  animation: spin 0.9s linear infinite;
+}
+
+.erc-pill {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  background: var(--accent-soft);
+  white-space: nowrap;
+}

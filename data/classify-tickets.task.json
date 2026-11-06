@@ -1,0 +1,12 @@
+{
+  "kind": "classify",
+  "instructions": "Classify each customer support ticket into exactly one category.",
+  "labels": [
+    { "name": "billing", "hint": "refund, charged, invoice, payment, card" },
+    { "name": "bug", "hint": "crash, error, broken, bug, freezes" },
+    { "name": "account", "hint": "password, login, locked, two-factor, email address" },
+    { "name": "shipping", "hint": "delivery, package, tracking, shipped, courier" },
+    { "name": "feature_request", "hint": "would love, please add, feature, support for, wish" },
+    { "name": "other", "hint": "" }
+  ]
+}

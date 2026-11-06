@@ -1,0 +1,36 @@
+{"id":"g001","text":"Need a copy of the invoice for ORD-7529 for my records.","label":"billing"}
+{"id":"g002","text":"The dashboard freezes after login on Android.","label":"bug"}
+{"id":"g003","text":"Please change the email address on my profile to ravi94@example.com.","label":"account"}
+{"id":"g004","text":"My package for ORD-9848 has not arrived, tracking shows no update.","label":"shipping"}
+{"id":"g005","text":"Would love a dark mode option in the web app.","label":"feature_request"}
+{"id":"g006","text":"What are your opening hours during the holidays?","label":"other"}
+{"id":"g007","text":"My card payment of $55.29 failed but the invoice says paid. Contact me at asha37@example.com.","label":"billing"}
+{"id":"g008","text":"Export button is broken since the last update.","label":"bug"}
+{"id":"g009","text":"Please change the email address on my profile to john41@example.com.","label":"account"}
+{"id":"g010","text":"The courier says delivery failed, can you reship ORD-4727?","label":"shipping"}
+{"id":"g011","text":"Please add support for exporting to CSV.","label":"feature_request"}
+{"id":"g012","text":"Just wanted to say the team was very helpful today.","label":"other"}
+{"id":"g013","text":"My card payment of $56.96 failed but the invoice says paid. Contact me at priya78@example.com.","label":"billing"}
+{"id":"g014","text":"The dashboard freezes after login on Android.","label":"bug"}
+{"id":"g015","text":"I forgot my password and the reset link never arrives at meera35@example.com.","label":"account"}
+{"id":"g016","text":"My package for ORD-8604 has not arrived, tracking shows no update.","label":"shipping"}
+{"id":"g017","text":"Would love a dark mode option in the web app.","label":"feature_request"}
+{"id":"g018","text":"Just wanted to say the team was very helpful today.","label":"other"}
+{"id":"g019","text":"Why was I charged $55.86 after cancelling? I want a refund.","label":"billing"}
+{"id":"g020","text":"Getting an error 500 when saving settings, looks like a bug.","label":"bug"}
+{"id":"g021","text":"Please change the email address on my profile to omar42@example.com.","label":"account"}
+{"id":"g022","text":"Order ORD-9569 shipped a week ago, where is my package?","label":"shipping"}
+{"id":"g023","text":"Would love a dark mode option in the web app.","label":"feature_request"}
+{"id":"g024","text":"What are your opening hours during the holidays?","label":"other"}
+{"id":"g025","text":"I was charged twice for ORD-7905, please refund $120.12.","label":"billing"}
+{"id":"g026","text":"The app crashes every time I open the reports tab.","label":"bug"}
+{"id":"g027","text":"Please change the email address on my profile to ravi26@example.com.","label":"account"}
+{"id":"g028","text":"Tracking number for ORD-8896 does not work.","label":"shipping"}
+{"id":"g029","text":"Would love a dark mode option in the web app.","label":"feature_request"}
+{"id":"g030","text":"What are your opening hours during the holidays?","label":"other"}
+{"id":"g031","text":"My card payment of $134.30 failed but the invoice says paid. Contact me at omar40@example.com.","label":"billing"}
+{"id":"g032","text":"Getting an error 500 when saving settings, looks like a bug.","label":"bug"}
+{"id":"g033","text":"My account is locked after too many login attempts.","label":"account"}
+{"id":"g034","text":"My package for ORD-9354 has not arrived, tracking shows no update.","label":"shipping"}
+{"id":"g035","text":"I wish there was support for multiple currencies.","label":"feature_request"}
+{"id":"g036","text":"Just wanted to say the team was very helpful today.","label":"other"}

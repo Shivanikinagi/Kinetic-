@@ -1,0 +1,22 @@
+{
+  "kind": "tag",
+  "instructions": "Tag each support ticket with every tag that applies, and only those: refund (the customer asks for money back), login (cannot sign in), mobile (mentions the phone app, Android or iPhone), shipping (about delivery or a package). Use an empty list when none apply.",
+  "labels": [
+    {
+      "name": "refund",
+      "hint": "refund, money back"
+    },
+    {
+      "name": "login",
+      "hint": "log in, login, sign in, password"
+    },
+    {
+      "name": "mobile",
+      "hint": "android, iphone, phone app, mobile app"
+    },
+    {
+      "name": "shipping",
+      "hint": "package, delivery, shipped, courier"
+    }
+  ]
+}

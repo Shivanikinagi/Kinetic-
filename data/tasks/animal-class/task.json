@@ -1,0 +1,26 @@
+{
+  "kind": "classify",
+  "instructions": "Each sentence is about one animal. Classify the animal it is about into its class.",
+  "labels": [
+    {
+      "name": "mammal",
+      "hint": "dog, cat, elephant, whale, horse, bat, lion"
+    },
+    {
+      "name": "bird",
+      "hint": "eagle, parrot, owl, penguin, sparrow, swan"
+    },
+    {
+      "name": "fish",
+      "hint": "salmon, shark, trout, tuna, goldfish, cod"
+    },
+    {
+      "name": "reptile",
+      "hint": "snake, lizard, crocodile, turtle, iguana, gecko"
+    },
+    {
+      "name": "insect",
+      "hint": "bee, ant, butterfly, beetle, mosquito, grasshopper"
+    }
+  ]
+}

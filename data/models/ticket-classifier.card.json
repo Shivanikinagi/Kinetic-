@@ -1,0 +1,42 @@
+{
+  "id": "kinetic/ticket-classifier",
+  "version": "1.0.2",
+  "name": "Support Ticket Classifier",
+  "description": "Routes customer support tickets to billing, bug, account, shipping, feature_request or other. Runs on 0G's own TeeML model (0gm-1.0-35b-a3b), so every provider serving it runs on 0G Compute nodes.",
+  "license": "apache-2.0",
+  "task": {
+    "kind": "classify",
+    "instructions": "Classify each customer support ticket into exactly one category.",
+    "labels": [
+      {
+        "name": "billing",
+        "hint": "refund, charged, invoice, payment, card"
+      },
+      {
+        "name": "bug",
+        "hint": "crash, error, broken, bug, freezes"
+      },
+      {
+        "name": "account",
+        "hint": "password, login, locked, two-factor, email address"
+      },
+      {
+        "name": "shipping",
+        "hint": "delivery, package, tracking, shipped, courier"
+      },
+      {
+        "name": "feature_request",
+        "hint": "would love, please add, feature, support for, wish"
+      },
+      {
+        "name": "other",
+        "hint": ""
+      }
+    ]
+  },
+  "runtime": {
+    "engine": "0g",
+    "model": "0gm-1.0-35b-a3b"
+  },
+  "royaltyBps": 500
+}

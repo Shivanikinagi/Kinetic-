@@ -1,0 +1,9 @@
+{
+  "kind": "extract",
+  "instructions": "Extract the customer's email, the order id (format ORD-1234) and any money amount from each ticket. Use null when a field is missing.",
+  "fields": [
+    { "name": "email", "hint": "customer email address" },
+    { "name": "order_id", "hint": "order id like ORD-1234", "pattern": "ORD-\\d{4}" },
+    { "name": "amount", "hint": "money amount with currency symbol" }
+  ]
+}

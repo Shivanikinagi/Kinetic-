@@ -1,0 +1,16 @@
+{
+  "kind": "extract",
+  "instructions": "From each support ticket extract the customer's email address and the order id (format ORD- followed by four digits). Copy them exactly as written. Use null when a field is not in the ticket.",
+  "fields": [
+    {
+      "name": "email",
+      "hint": "customer email address",
+      "pattern": "[\\w.+-]+@[\\w-]+\\.[\\w.-]+"
+    },
+    {
+      "name": "order_id",
+      "hint": "order id like ORD-1234",
+      "pattern": "ORD-\\d{4}"
+    }
+  ]
+}

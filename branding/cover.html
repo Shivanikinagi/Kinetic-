@@ -1,0 +1,74 @@
+<!doctype html><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1920px;height:1080px;background:#07090e;position:relative;overflow:hidden;font-family:"Segoe UI",Arial,sans-serif;color:#f4f5f7}
+.bg{position:absolute;inset:0;background:radial-gradient(1100px 700px at 85% 0%,rgba(255,149,31,.16),transparent 62%),linear-gradient(180deg,#07090e 0%,#0c111b 100%)}
+.hex{position:absolute;inset:0;opacity:.5;background-image:linear-gradient(#ffffff06 1px,transparent 1px),linear-gradient(90deg,#ffffff06 1px,transparent 1px);background-size:80px 80px;-webkit-mask-image:linear-gradient(90deg,transparent 30%,#000 100%)}
+.top{position:absolute;left:120px;right:120px;top:90px;display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;align-items:center;gap:22px}
+.brand svg{width:76px;height:76px}
+.brand b{font-size:40px;letter-spacing:9px;font-weight:700}
+.tag{font-family:Consolas,monospace;font-size:20px;letter-spacing:4px;color:#8a92a3}
+.left{position:absolute;left:120px;top:250px;width:980px}
+.eyebrow{font-family:Consolas,monospace;font-size:22px;letter-spacing:5px;color:#ff951f;margin-bottom:34px}
+h1{font-size:96px;line-height:1.02;font-weight:700;letter-spacing:-2.5px}
+h1 span{color:#8a92a3}
+.sub{margin-top:44px;font-size:32px;line-height:1.5;color:#b8bfcc;width:780px}
+.pillars{position:absolute;left:120px;bottom:100px;display:flex;gap:32px}
+.pillars div{border-top:2px solid #ff951f;padding-top:16px;width:200px}
+.pillars strong{display:block;font-size:26px;margin-bottom:4px}
+.pillars small{font-size:19px;color:#8a92a3;font-family:Consolas,monospace}
+.card{position:absolute;right:120px;top:210px;width:640px;background:#0e131c;border:1px solid #2a2f3a;border-radius:20px;box-shadow:0 40px 100px #000a;overflow:hidden}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:22px 30px;border-bottom:1px solid #232834;font-family:Consolas,monospace;font-size:19px;color:#8a92a3;letter-spacing:2px}
+.ch i{font-style:normal;color:#3ddc97}
+.row{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:18px;padding:22px 30px;border-bottom:1px solid #1b202b}
+.dot{width:14px;height:14px;border-radius:50%}
+.row b{display:block;font-size:26px;font-weight:600}
+.row small{font-family:Consolas,monospace;font-size:18px;color:#8a92a3}
+.badge{font-family:Consolas,monospace;font-size:18px;padding:7px 16px;border-radius:999px;border:1px solid}
+.g{background:#3ddc97}.gb{color:#3ddc97;border-color:#3ddc9755;background:#3ddc9712}
+.r{background:#ff5a5a}.rb{color:#ff6b6b;border-color:#ff5a5a55;background:#ff5a5a12}
+.o{background:#ff951f}.ob{color:#ff951f;border-color:#ff951f55;background:#ff951f12}
+.y{background:#edcd8c}.yb{color:#edcd8c;border-color:#edcd8c55;background:#edcd8c12}
+.sum{display:grid;grid-template-columns:1fr 1fr;padding:26px 30px;gap:12px;background:#0a0e15}
+.sum small{font-family:Consolas,monospace;font-size:17px;color:#8a92a3;letter-spacing:2px;display:block;margin-bottom:6px}
+.sum strong{font-size:40px;color:#edcd8c;font-weight:600}
+.foot{position:absolute;right:120px;bottom:100px;width:640px;display:flex;justify-content:space-between;font-family:Consolas,monospace;font-size:20px;color:#8a92a3;letter-spacing:3px}
+.foot span{color:#f4f5f7}
+</style>
+<div class="bg"></div><div class="hex"></div>
+<div class="top">
+  <div class="brand">
+    <svg viewBox="40 40 432 432"><defs>
+<linearGradient id="hx" gradientUnits="userSpaceOnUse" x1="120" y1="60" x2="400" y2="450"><stop offset="0" stop-color="#ffb04a"/><stop offset=".55" stop-color="#e8710f"/><stop offset="1" stop-color="#7a3208"/></linearGradient>
+<linearGradient id="ck" gradientUnits="userSpaceOnUse" x1="172" y1="326" x2="396" y2="142"><stop offset="0" stop-color="#9aa3b5"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+<radialGradient id="in" gradientUnits="userSpaceOnUse" cx="256" cy="230" r="220"><stop offset="0" stop-color="#232b3f"/><stop offset="1" stop-color="#0a0d14"/></radialGradient>
+</defs><polygon points="256,66 420.5,161 420.5,351 256,446 91.5,351 91.5,161" fill="url(#in)"/>
+<polygon points="256,112 380,184 380,328 256,400 132,328 132,184" fill="none" stroke="#ff951f" stroke-opacity=".14" stroke-width="3"/>
+<path d="M420.5 205 V351 L256 446 L91.5 351 V161 L256 66 L338 113.5" fill="none" stroke="url(#hx)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M172 266 L230 326 L396 142" fill="none" stroke="url(#ck)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="436" cy="100" r="20" fill="#edcd8c"/></svg>
+    <b>KINETIC</b>
+  </div>
+  <div class="tag">VERIFIABLE AI COMPUTE</div>
+</div>
+<div class="left">
+  <div class="eyebrow">THE TRUST LAYER FOR AI COMPUTE</div>
+  <h1>Trustless AI compute.<br><span>Pay only for proof.</span></h1>
+  <p class="sub">Hidden checks verify every provider. Cheaters are slashed on-chain, buyers are refunded automatically, and the work reroutes.</p>
+</div>
+<div class="pillars">
+  <div><strong>Split</strong><small>pay per chunk</small></div>
+  <div><strong>Verify</strong><small>hidden canaries</small></div>
+  <div><strong>Enforce</strong><small>slash and refund</small></div>
+  <div><strong>Recover</strong><small>auto-reroute</small></div>
+</div>
+<div class="card">
+  <div class="ch"><span>JOB LEDGER · 16 CHUNKS</span><span><i>●</i> LIVE TESTNET</span></div>
+  <div class="row"><div class="dot g"></div><div><b>BluePeak</b><small>0G Compute · TeeML</small></div><div class="badge gb">VERIFIED · PAID</div></div>
+  <div class="row"><div class="dot g"></div><div><b>Riverstone</b><small>0G Compute · TeeML</small></div><div class="badge gb">VERIFIED · PAID</div></div>
+  <div class="row"><div class="dot r"></div><div><b>QuickCompute</b><small>failed known answers</small></div><div class="badge rb">SLASHED</div></div>
+  <div class="row"><div class="dot o"></div><div><b>EdgeRelay</b><small>offline holding a payment</small></div><div class="badge ob">REROUTED</div></div>
+  <div class="row"><div class="dot y"></div><div><b>BudgetGPU</b><small>never calls a model</small></div><div class="badge yb">REJECTED</div></div>
+  <div class="sum"><div><small>BUYER REFUNDED</small><strong>0.003 ℏ</strong></div><div><small>BOND BURNED</small><strong>0.997 ℏ</strong></div></div>
+</div>
+<div class="foot"><div>BUILT ON <span>HEDERA</span> · <span>0G</span> · <span>ARKIV</span> · <span>SWARM</span></div></div>

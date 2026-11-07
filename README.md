@@ -13,6 +13,8 @@ You pay only for chunks that complete and pass verification, and every result an
 
 - **Model hub:** creators publish a signed model card; a quorum of verifiers runs malware checks on the weights, benchmarks the model and fingerprints it, then signs its **Model Passport**. Buyers click **Run via KINETIC**, only providers that checked the model serve it, and the creator is paid a royalty on the accepted chunks, never on refunded ones.
 
+**Status: complete.** Every part described here is built and runs on the live testnets: the model hub, paid jobs over x402, hidden checks on 0G, quorum slashing and refunds, rerouting, Sign in with 0G, the Compute and Model Passports, and the dashboard. See [Live testnet evidence](#live-testnet-evidence) for the records and [Sponsor requirements](#sponsor-requirements) for where each prize requirement is met.
+
 ### How it's made
 
 - **Hedera:** x402 per-chunk payments in HBAR, x402 model listing fees and creator royalties, provider bonds, slashing and exact refunds; HCS audit receipts (including every Model Passport and royalty); HCS-14 agent identities.
@@ -664,8 +666,6 @@ data/                             sample tickets and task specs
 | | Open-source license and how AI was used | [LICENSE](LICENSE), [How AI was used](#how-ai-was-used) |
 | **Arkiv × Swarm** | Uses both; Swarm references kept encrypted off public entities | [arkiv/swarm.md](arkiv/swarm.md), [Swarm and privacy](#swarm-and-privacy) |
 | | One Swarm reference to open | the Compute Passport in [evidence/README.md § 5](evidence/README.md#5-swarm-stores-the-files) |
-
-Still for the team to add at submission: demo video, live demo link, and team names with Telegram and X.
 
 ## Known limits
 

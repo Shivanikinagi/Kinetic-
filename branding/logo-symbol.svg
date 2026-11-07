@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 40 432 432" width="512" height="512"><defs>
+<linearGradient id="hx" gradientUnits="userSpaceOnUse" x1="120" y1="60" x2="400" y2="450"><stop offset="0" stop-color="#ffb04a"/><stop offset=".55" stop-color="#e8710f"/><stop offset="1" stop-color="#7a3208"/></linearGradient>
+<linearGradient id="ck" gradientUnits="userSpaceOnUse" x1="172" y1="326" x2="396" y2="142"><stop offset="0" stop-color="#9aa3b5"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+<radialGradient id="in" gradientUnits="userSpaceOnUse" cx="256" cy="230" r="220"><stop offset="0" stop-color="#232b3f"/><stop offset="1" stop-color="#0a0d14"/></radialGradient>
+</defs><polygon points="256,66 420.5,161 420.5,351 256,446 91.5,351 91.5,161" fill="url(#in)"/>
+<polygon points="256,112 380,184 380,328 256,400 132,328 132,184" fill="none" stroke="#ff951f" stroke-opacity=".14" stroke-width="3"/>
+<path d="M420.5 205 V351 L256 446 L91.5 351 V161 L256 66 L338 113.5" fill="none" stroke="url(#hx)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M172 266 L230 326 L396 142" fill="none" stroke="url(#ck)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="436" cy="100" r="20" fill="#edcd8c"/></svg>

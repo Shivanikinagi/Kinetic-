@@ -7,7 +7,7 @@
 #
 # Two networks. `sandbox` is internal: Ollama sits only there, so it can't reach the internet even
 # if a model misbehaved. The provider node sits on both: it talks to Ollama over `sandbox` and to
-# Hedera, Arkiv, Swarm and buyers over the default network. Weights are mounted read-only from the
+# Hedera, Arkiv, 0G and buyers over the default network. Weights are mounted read-only from the
 # provider's cache, where KINETIC put them only after checking every file's sha256 against the
 # Model Passport and running the malware checks on the exact bytes.
 

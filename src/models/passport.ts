@@ -13,7 +13,7 @@ import type { ScanCheck, ScannedFile } from "./safetensors.js";
 //   - a behavioural fingerprint: the model's answers on borderline inputs, which later tell
 //     whether a provider really runs this model;
 //   - signatures from a quorum of the bond vault's verifiers, each of which re-ran the checks.
-// It goes on Swarm (public), its digest on HCS, and the listing that points to it on Arkiv.
+// It goes on 0G Storage (public), its digest on HCS, and the listing that points to it on Arkiv.
 
 export const MODEL_PASSPORT_KIND = "kinetic.model-passport.v1";
 
@@ -55,7 +55,12 @@ export interface ModelPassportBody {
   weights: WeightsCheck;
   benchmark: ModelBenchmark;
   fingerprint?: ModelFingerprint;
-  references: { hcsTopic: string; swarmGateway: string; vault?: string };
+  /**
+   * storageGateway: the 0G Storage indexer the passport is served from. Passports issued before
+   * 2026-11-11 name a `swarmGateway` instead: they were moved to 0G Storage unchanged, so their
+   * signed bytes, and that field, stay as they were.
+   */
+  references: { hcsTopic: string; storageGateway?: string; swarmGateway?: string; vault?: string };
   /** What this passport does not prove. */
   limitations: string[];
 }

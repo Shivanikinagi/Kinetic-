@@ -64,7 +64,8 @@ console.log(report.results, report.passport);`,
 
 const API: [string, string, string][] = [
   ["GET", "/models", "every listed model with its passport digest"],
-  ["GET", "/models/:key/passport", "a Model Passport, from Swarm"],
+  ["GET", "/models/:key/passport", "a Model Passport, from 0G Storage"],
+  ["GET", "/passports/:root", "any stored passport by its 0G Storage root, checked against it"],
   ["POST", "/models", "publish a card (x402 listing fee)"],
   ["POST", "/jobs", "register a job (x402 verification fee)"],
   ["GET", "/models/reviews/:key", "a model's review, step by step"],

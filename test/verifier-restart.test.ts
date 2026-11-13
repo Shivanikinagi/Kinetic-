@@ -34,9 +34,7 @@ async function registration(jobId: string): Promise<JobRegistration> {
   const { task, items } = loadJob("data/classify-tickets.task.json", "data/tickets.jsonl");
   const jobKey = randomKey();
   const parts = [items.slice(0, 2), items.slice(2, 4)];
-  const chunks = await Promise.all(
-    parts.map(async (part, idx) => ({ idx, swarmRef: await svc.swarm.upload(encryptJson(deriveKey(jobKey, `chunk:${idx}`), part)), itemIds: part.map((i) => i.id) })),
-  );
+  const chunks = parts.map((part, idx) => ({ idx, data: toBase64(encryptJson(deriveKey(jobKey, `chunk:${idx}`), part)), itemIds: part.map((i) => i.id) }));
   return { jobId, buyer, task, chunks, jobKey: toBase64(jobKey) };
 }
 

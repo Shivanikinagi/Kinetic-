@@ -35,14 +35,6 @@ export interface NetworkConfig {
    */
   arkiv: { rpcUrl: string; apiKey?: string; chainId: number; explorerUrl: string };
   /**
-   * Swarm via a Bee API. encrypt: Bee-side encryption (128-hex refs that carry their own key),
-   * refused on a public gateway. postageBatchId: a paid batch; through a public gateway it only
-   * works with stampKey (the batch owner's key, stamps signed client-side) and postageDepth.
-   * redundancy: erasure-coding level (swarm-redundancy-level) for passports. feeds: publish one
-   * feed per model whose latest entry is its newest Model Passport.
-   */
-  swarm: { beeUrl: string; gatewayUrl: string; postageBatchId?: string; encrypt: boolean; stampKey?: Hex; postageDepth?: number; redundancy: number; feeds: boolean };
-  /**
    * 0G router. trustMode is for ordinary calls; canaryTrustMode for canary reference runs
    * ("private": TeeML only), with canaryFallback ("verified", or "none") used, and recorded,
    * when no TeeML provider is free. teeRpcUrl is the 0G chain the router's providers are
@@ -55,8 +47,9 @@ export interface NetworkConfig {
    */
   zgCompute: { rpcUrl: string };
   /**
-   * 0G Storage, where model weights can live (built for large files): the 0G chain the storage fee
-   * is paid on (Galileo testnet) and the indexer that finds storage nodes.
+   * 0G Storage, where model weights, Model Passports and Compute Passports live: the 0G chain the
+   * storage fee is paid on (Galileo testnet) and the indexer that finds storage nodes and serves
+   * stored files over HTTP (GET /file?root=).
    */
   zgStorage: { rpcUrl: string; indexerUrl: string };
   /**
@@ -92,9 +85,6 @@ export interface NetworkConfig {
    */
   stateDir?: string;
 }
-
-/** Public Swarm gateway. It accepts small uploads without a postage batch. */
-export const SWARM_PUBLIC_GATEWAY = "https://api.gateway.ethswarm.org";
 
 /**
  * Arkiv's testnets, each with its own access keys. Rabdi is the current one, and the default.
@@ -171,17 +161,6 @@ export function loadNetworkConfig(env: Env = process.env): NetworkConfig {
       ...(env.VAULT_SCHEDULE_FEE_TINYBAR ? { vaultScheduleFeeTinybar: BigInt(env.VAULT_SCHEDULE_FEE_TINYBAR) } : {}),
     },
     arkiv: arkivNetwork(env),
-    swarm: {
-      beeUrl: env.BEE_URL || (dev ? `${devnetUrl}/bee` : SWARM_PUBLIC_GATEWAY),
-      gatewayUrl: env.SWARM_GATEWAY_URL || env.BEE_URL || (dev ? `${devnetUrl}/bee` : SWARM_PUBLIC_GATEWAY),
-      postageBatchId: env.BEE_POSTAGE_BATCH_ID || undefined,
-      // Off by default: chunks are already AES-GCM sealed, and a 128-hex ref must never reach a public gateway.
-      encrypt: env.SWARM_ENCRYPT === "true",
-      ...(env.SWARM_STAMP_KEY ? { stampKey: (env.SWARM_STAMP_KEY.startsWith("0x") ? env.SWARM_STAMP_KEY : `0x${env.SWARM_STAMP_KEY}`) as Hex } : {}),
-      ...(env.BEE_POSTAGE_DEPTH ? { postageDepth: Number(env.BEE_POSTAGE_DEPTH) } : {}),
-      redundancy: env.SWARM_REDUNDANCY_LEVEL ? Math.max(0, Math.min(4, Math.trunc(Number(env.SWARM_REDUNDANCY_LEVEL)) || 0)) : 2,
-      feeds: (env.SWARM_FEEDS ?? "true") !== "false",
-    },
     zerog: {
       baseUrl: env.ZEROG_BASE_URL || (dev ? `${devnetUrl}/0g/v1` : "https://router-api.0g.ai/v1"),
       apiKey: env.ZEROG_API_KEY || (dev ? "devnet" : ""),

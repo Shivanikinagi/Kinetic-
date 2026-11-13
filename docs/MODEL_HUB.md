@@ -3,13 +3,13 @@
 Creators publish open models and earn a royalty on every job that uses them. Buyers and agents run a listed model on community GPUs with one call. Every check that protects a plain KINETIC job still applies: admission probes, hidden known answers, 0G canaries, quorum slashing, refunds and the Compute Passport.
 
 ```
-creator ──signed card + weights──▶ 0G Storage (or Swarm)
+creator ──signed card + weights──▶ 0G Storage
    │                                  │
    └──x402 listing fee──▶ verifier ──┤ review: malware checks · benchmark · fingerprint
                             │        │
               cosigners ◀───┘ each re-reviews on its own and signs
                             │
-              Model Passport ──▶ Swarm (public) · digest ──▶ HCS · listing ──▶ Arkiv
+              Model Passport ──▶ 0G Storage (public) · digest ──▶ HCS · listing ──▶ Arkiv
                                                                    │
 provider ──reads listing, checks passport + weights──▶ serves it ──┘ (offer: model.<key>)
                                                                    │
@@ -22,7 +22,7 @@ buyer ──Run via KINETIC──▶ job on that model ──▶ chunks signed f
 A **model card** names the model and its version, the task it does (labels or fields), what providers run (`0g` for a model served by 0G Compute, `openai` for a model providers run on their own GPU from its weights), the licence and the creator's royalty (0–30% of provider payments, in basis points). The creator signs it, so nobody else can list a model in their name or redirect its royalties, and the terms are fixed per version.
 
 ```bash
-npm run kinetic -- models publish --card my-model.card.json --weights ./my-model/ --storage 0g   # a model providers run themselves
+npm run kinetic -- models publish --card my-model.card.json --weights ./my-model/   # a model providers run themselves
 npm run kinetic -- models publish --card data/models/ticket-classifier.card.json      # a model served by 0G
 ```
 
@@ -36,8 +36,7 @@ await kinetic.publish({ card, files: [{ name: "model.safetensors", path: "./qwen
 
 The malware checks run on the creator's machine first, so a bad file never leaves it. Then the weights are uploaded, and the card lists each file's sha256 and where it is:
 
-- **0G Storage** (default, `--storage 0g`): built for large files, so multi-GB weights fit. Each file is addressed by its Merkle root (`zgRoot`). The creator's 0G wallet pays 0G's storage fee (about 0.13 0G per GB on Galileo testnet). Downloads need no wallet, and every party recomputes the root from the bytes it receives, because the SDK's own proof flag doesn't verify yet.
-- **Swarm** (`--storage swarm`): content-addressed and checked chunk by chunk; the public gateway suits small files only.
+- **0G Storage** (default): built for large files, so multi-GB weights fit. Each file is addressed by its Merkle root (`zgRoot`). The creator's 0G wallet pays 0G's storage fee (about 0.13 0G per GB on Galileo testnet). Downloads need no wallet, and every party recomputes the root from the bytes it receives, because the SDK's own proof flag doesn't verify yet.
 - **A source URL** (`weightsSource` in the card): for weights hosted elsewhere, still checked against the signed sha256.
 
 Weights stream through disk everywhere, so multi-GB models need disk, not memory: the creator's malware checks hash each file as a stream and read only safetensors headers and small config files; the upload goes from the file; verifiers download each file straight to a temporary folder (0G Storage segments are fetched in parallel and written at their offsets), check its sha256 and Merkle root from the file, scan it the same way and delete it; providers keep the checked files in `.kinetic/models/<key>/` and re-check a cached file's sha256 before reusing it.
@@ -46,7 +45,7 @@ Then the creator pays the verifier's listing fee over x402. A card that is incom
 
 ## 2. How a model is reviewed
 
-The verifier reviews the model itself, then asks the bond vault's other verifiers to do the same on their own: their own Swarm downloads, their own model runs, their own labelled sets. Each signs only if it reaches the same answers. The passport needs as many signatures as the vault needs to slash.
+The verifier reviews the model itself, then asks the bond vault's other verifiers to do the same on their own: their own downloads, their own model runs, their own labelled sets. Each signs only if it reaches the same answers. The passport needs as many signatures as the vault needs to slash.
 
 | Check | What it does | What it can't do |
 |---|---|---|
@@ -55,7 +54,7 @@ The verifier reviews the model itself, then asks the bond vault's other verifier
 | **Fingerprint** | The model's answers on borderline inputs where different models answer differently. Providers serving the model are later probed with these, so a provider swapping in a cheaper model shows up. | Prove which model ran: it is statistical evidence, recorded at every admission and never a slash on its own. |
 | **Quorum** | Every verifier re-runs the review and signs the passport digest. | |
 
-The **Model Passport** ([src/models/passport.ts](../src/models/passport.ts)) holds the card, the creator's signature, the malware report (each file's sha256, parameter count and dtypes), the benchmark, the fingerprint, the verifiers' signatures and its own limitations. It goes to Swarm unencrypted, its digest to HCS (a `model` receipt), and a `model` listing to Arkiv. The verifier also points the model's Swarm feed (signed by its key) at the new passport, so one stable *Latest passport* URL per model always serves the newest version (`SWARM_FEEDS=false` turns it off). Only listings written by a vault verifier are trusted. Listings expire like any Arkiv entity, so the verifier renews them daily and re-creates any that lapse from its record; the passport on Swarm and its digest on HCS don't expire with them.
+The **Model Passport** ([src/models/passport.ts](../src/models/passport.ts)) holds the card, the creator's signature, the malware report (each file's sha256, parameter count and dtypes), the benchmark, the fingerprint, the verifiers' signatures and its own limitations. The listing verifier stores it on 0G Storage unencrypted (the listing's `passportRef` is its 0G Merkle root), its digest goes to HCS (a `model` receipt), and a `model` listing to Arkiv. New passports name the 0G Storage indexer in `references.storageGateway`; passports issued before 2026-11-11 keep a legacy `references.swarmGateway` field because it is inside the signed body. Only listings written by a vault verifier are trusted. Listings expire like any Arkiv entity, so the verifier renews them daily and re-creates any that lapse from its record; the passport on 0G Storage and its digest on HCS don't expire with them.
 
 ```bash
 npm run kinetic -- models              # every listed model
@@ -92,7 +91,7 @@ A model job is a normal KINETIC job with four additions:
 3. **Every chunk is signed for the model.** The provider's result signature covers the model key; a result signed for another model is rejected.
 4. **The creator is paid after the job.** The verifier computes the royalty from the chunks it accepted as final, and the buyer pays it over x402 straight to the creator's account. Refunded, rerouted and failed chunks are never in it: a slashed provider's work earns the creator nothing. The payment gets an HCS `royalty` receipt.
 
-The **Compute Passport** gains a `model` section (the model, its passport, the royalty and its transaction), and `npm run passport:verify` checks that the terms match the agreement committed before work, that the royalty is exactly the agreed share of the accepted chunks, that it reached the creator on the ledger, that the HCS receipts match, and that the Model Passport on Swarm is the one the job ran against.
+The **Compute Passport** gains a `model` section (the model, its passport, the royalty and its transaction), and `npm run passport:verify` checks that the terms match the agreement committed before work, that the royalty is exactly the agreed share of the accepted chunks, that it reached the creator on the ledger, that the HCS receipts match, and that the Model Passport on 0G Storage is the one the job ran against.
 
 ## Settings
 
@@ -112,7 +111,6 @@ The **Compute Passport** gains a `model` section (the model, its passport, the r
 ## Limits
 
 - The review rests on the verifiers' own runs. A self-hosted model needs each verifier to run it (`VERIFIER_MODEL_URL`), and large weights need the download budget to match.
-- Swarm's public gateway keeps uploads only for a while. Production listings need a postage batch (`npm run swarm:stamp`) so passports (and any Swarm-hosted weights) stay reachable.
-- 0G Storage stores one root per file up to 4 GiB; shard larger weights (safetensors models usually are). Uploads need 0G for the storage fee; the testnet faucet gives 0.1 0G a day.
+- 0G Storage stores one root per file up to 4 GiB; shard larger weights (safetensors models usually are). Uploads need 0G for the storage fee (the creator pays for weights, the listing verifier for passports); the testnet faucet gives 0.1 0G a day.
 - Arkiv bills reads. An access key (`ARKIV_API_KEY`) has a quota; without one, or once it's used up, an IP gets about 100 queries per window. Every listing, offer and dashboard view is an Arkiv read, so a live network needs a key with quota to spare. When a quota runs out, KINETIC reads without the key and fails fast rather than waiting out Arkiv's Retry-After.
 - Royalties are paid by the buyer after the job. The verifier won't co-sign the Compute Passport of a job whose royalty is unpaid, so the buyer has no verifier-attested proof of the job without paying; nothing on-chain forces the payment beyond that.

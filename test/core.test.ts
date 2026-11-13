@@ -123,7 +123,7 @@ describe("crypto", () => {
     expect(new TextDecoder().decode(decrypt(k1, sealed))).toBe("hello");
     expect(() => decrypt(deriveKey(master, "chunk:2"), sealed)).toThrow();
   });
-  it("seals Swarm references for public storage", () => {
+  it("seals a string for a public record", () => {
     const key = randomKey();
     const ref = "ab".repeat(64);
     const sealed = sealString(key, ref);

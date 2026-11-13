@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseStrategy, rankOffers, reliabilityOf, type TrackRecord } from "../src/agent/ranking.js";
+import { parseStrategy, proofOf, rankOffers, recordFromChecks, reliabilityOf, PROOF_FRESH_SECONDS, type TrackRecord } from "../src/agent/ranking.js";
 import type { Offer } from "../src/types.js";
 
 const offer = (provider: string, price: bigint): Offer => ({ provider, payTo: provider, name: provider, endpoint: "", tasks: ["classify"], gpu: "", priceTinybar: price, bondTinybar: 100_000_000n });
@@ -49,5 +49,31 @@ describe("provider ranking", () => {
   it("rejects an unknown strategy", () => {
     expect(parseStrategy()).toBe("balanced");
     expect(() => parseStrategy("random")).toThrow(/strategy/);
+  });
+});
+
+describe("the live check record", () => {
+  const now = Math.floor(Date.now() / 1000);
+  const check = (pass: boolean, ago: number) => ({ attrs: { pass: BigInt(pass ? 1 : 0), at: BigInt(now - ago) } });
+
+  it("counts unexpired checks and says how fresh the latest pass is", () => {
+    const record = recordFromChecks([check(true, 60), check(false, 120), check(true, 3600)])!;
+    expect(record).toMatchObject({ pass: 2, fail: 1, live: true, lastPassAt: now - 60 });
+    expect(proofOf(record)).toBe("active");
+    expect(proofOf(recordFromChecks([check(true, PROOF_FRESH_SECONDS + 10)]))).toBe("stale");
+    expect(proofOf(recordFromChecks([check(false, 10)]))).toBe("unproven");
+    expect(recordFromChecks([])).toBeUndefined();
+  });
+
+  it("ranks on the live record and labels its proof", () => {
+    const offer = (provider: string): Offer => ({ provider, payTo: provider, name: provider, endpoint: "", tasks: ["classify"], gpu: "", priceTinybar: 100n, bondTinybar: 1n });
+    const records = new Map([
+      ["a", recordFromChecks([check(true, 10), check(true, 20)])!],
+      ["b", recordFromChecks([check(false, 10), check(false, 20)])!],
+    ]);
+    const [first, second, third] = rankOffers([offer("b"), offer("c"), offer("a")], records);
+    expect([first.provider, first.rank.proof]).toEqual(["a", "active"]);
+    expect([second.provider, second.rank.proof]).toEqual(["c", undefined]);
+    expect([third.provider, third.rank.proof]).toEqual(["b", "unproven"]);
   });
 });

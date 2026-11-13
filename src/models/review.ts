@@ -3,7 +3,6 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { taskHash } from "../core/agreement.js";
-import type { SwarmClient } from "../integrations/swarm.js";
 import type { ZgStorage } from "../integrations/zg-storage.js";
 import { downloadWeightFileTo, WeightsFetchError, type WeightStores } from "./weights.js";
 import { itemCorrect } from "../tasks/compare.js";
@@ -16,7 +15,7 @@ import { runInChunks, type ModelRunner } from "./runner.js";
 import { scanModelFilesOnDisk, type DiskModelFile } from "./safetensors.js";
 
 // One verifier's own review of a model, before it signs a Model Passport. The lead verifier runs
-// it to build the passport; every cosigner runs it again on its own (its own Swarm downloads,
+// it to build the passport; every cosigner runs it again on its own (its own weight downloads,
 // its own model runs, its own labelled set) and signs only if it reaches the same answers.
 
 export interface PublishRequest {
@@ -28,7 +27,6 @@ export interface PublishRequest {
 }
 
 export interface ReviewOptions {
-  swarm: SwarmClient;
   /** 0G Storage, for weights published there. */
   zg?: () => ZgStorage;
   runner: ModelRunner;
@@ -74,7 +72,7 @@ export function benchmarkSet(req: PublishRequest, gold: GoldSet[], n: number): {
 }
 
 /**
- * Downloads every weights file the card lists (0G Storage, Swarm or its source) into `dir`,
+ * Downloads every weights file the card lists (0G Storage or its source) into `dir`,
  * checking each against its sha256. Files go to disk, never wholly into memory: weights run to GBs.
  */
 export async function fetchWeights(card: ModelCard, stores: WeightStores, dir: string, maxBytes = 512 * 1024 * 1024): Promise<DiskModelFile[]> {
@@ -122,7 +120,7 @@ export async function reviewModel(req: PublishRequest, opts: ReviewOptions): Pro
     const dir = await mkdtemp(join(tmpdir(), "kinetic-review-"));
     let scan;
     try {
-      scan = await scanModelFilesOnDisk(await fetchWeights(card, { swarm: opts.swarm, ...(opts.zg ? { zg: opts.zg } : {}) }, dir, opts.maxDownloadBytes));
+      scan = await scanModelFilesOnDisk(await fetchWeights(card, opts.zg ? { zg: opts.zg } : {}, dir, opts.maxDownloadBytes));
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

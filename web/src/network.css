@@ -1,0 +1,602 @@
+/* Network ring, problem-first landing section, six-stage walkthrough and console chrome.
+   Built on DESIGN.md's tokens: teal = verified/live, coral = slashed, amber = warning,
+   orange = something you can act on, pale gold = important numbers. */
+
+/* ───────── Network ring ───────── */
+
+.ring {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  width: 100%;
+}
+
+.ring svg {
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  overflow: visible;
+}
+
+.ring-orbit {
+  fill: none;
+  stroke: var(--rule);
+  stroke-dasharray: 2 6;
+}
+
+.ring-link line {
+  stroke: var(--rule-2);
+  stroke-width: 1.25;
+  transition: stroke 300ms var(--ease), opacity 300ms var(--ease);
+}
+
+.ring-link.live line {
+  stroke: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.ring-link.busy line {
+  stroke: var(--accent);
+  stroke-width: 1.75;
+}
+
+.ring-link.slashed line {
+  stroke: color-mix(in srgb, var(--bad) 55%, transparent);
+  stroke-dasharray: 4 4;
+}
+
+.ring-link.rejected line,
+.ring-link.offline line {
+  stroke-dasharray: 2 5;
+  opacity: 0.5;
+}
+
+.ring-chunk {
+  fill: var(--dp-color-value);
+}
+
+.ring-core-halo {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent) 35%, transparent);
+  stroke-width: 1;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.ring-core {
+  fill: var(--panel-2);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.ring-core-t {
+  fill: var(--ink);
+  font: 600 13px var(--font);
+}
+
+.ring-core-s {
+  fill: var(--ink-3);
+  font: 10px var(--mono);
+}
+
+.ring-ledger rect {
+  fill: var(--panel);
+  stroke: var(--rule-2);
+  transition: stroke 300ms var(--ease), fill 300ms var(--ease);
+}
+
+.ring-ledger text {
+  fill: var(--ink-3);
+  font: 10px var(--mono);
+}
+
+.ring-node rect {
+  fill: var(--panel);
+  stroke: var(--rule-2);
+  transition: stroke 300ms var(--ease), opacity 300ms var(--ease);
+}
+
+.ring-node-t {
+  fill: var(--ink);
+  font: 600 11px var(--font);
+}
+
+.ring-node-s {
+  fill: var(--ink-3);
+  font: 9px var(--mono);
+}
+
+.ring-node.live rect {
+  stroke: color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.ring-node.busy rect {
+  stroke: var(--accent);
+  fill: var(--accent-soft);
+}
+
+.ring-node.busy .ring-node-s,
+.ring-node.live .ring-node-s {
+  fill: var(--accent);
+}
+
+.ring-node.slashed rect {
+  stroke: var(--bad);
+  fill: color-mix(in srgb, var(--bad) 12%, var(--panel));
+}
+
+.ring-node.slashed .ring-node-s {
+  fill: var(--bad);
+}
+
+.ring-node.rejected rect {
+  stroke: var(--warn);
+}
+
+.ring-node.rejected .ring-node-s {
+  fill: var(--warn);
+}
+
+.ring-node.offline {
+  opacity: 0.55;
+}
+
+/* Stage highlights for the landing walkthrough: dim everything, then bring forward what the stage is about. */
+.ring[class*="stage-"] .ring-node,
+.ring[class*="stage-"] .ring-link {
+  transition: opacity 300ms var(--ease);
+}
+
+.ring.stage-0 .ring-node:not(.rejected):not(.live):not(.busy) {
+  opacity: 0.3;
+}
+
+.ring.stage-0 .ring-node.rejected rect {
+  stroke-width: 2.5;
+}
+
+.ring.stage-1 .ring-chunk {
+  r: 4.5;
+}
+
+.ring.stage-1 .ring-node:not(.live):not(.busy),
+.ring.stage-2 .ring-node:not(.live):not(.busy) {
+  opacity: 0.3;
+}
+
+.ring.stage-2 .ring-core-halo {
+  animation: ring-pulse 1.8s ease-out infinite;
+}
+
+.ring.stage-3 .ring-node:not(.slashed),
+.ring.stage-3 .ring-link:not(.slashed) {
+  opacity: 0.25;
+}
+
+.ring.stage-3 .ring-node.slashed rect {
+  stroke-width: 2.5;
+}
+
+.ring.stage-4 .ring-link.live line,
+.ring.stage-4 .ring-link.busy line {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.ring.stage-4 .ring-link.slashed,
+.ring.stage-4 .ring-link.offline,
+.ring.stage-4 .ring-link.rejected {
+  opacity: 0.15;
+}
+
+.ring.stage-5 .ring-ledger rect {
+  stroke: var(--dp-color-value);
+  fill: color-mix(in srgb, var(--dp-color-value) 12%, var(--panel));
+}
+
+.ring.stage-5 .ring-ledger text {
+  fill: var(--dp-color-value);
+}
+
+.ring.stage-5 .ring-node {
+  opacity: 0.4;
+}
+
+@keyframes ring-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.ring-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  width: 100%;
+  max-width: 560px;
+  margin: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.ring-stats > div {
+  padding: 10px 12px;
+  background: var(--panel);
+}
+
+.ring-stats dt {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.ring-stats dd {
+  margin: 2px 0 0;
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--dp-color-value);
+}
+
+.ring-stats dd small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.ring-stats .bad {
+  color: var(--bad);
+}
+
+.ring-wait {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--ink-3);
+  background: var(--panel);
+}
+
+.ring-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.ring-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ring-legend span {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  border: 1px solid var(--rule-2);
+}
+
+.ring-legend .live span {
+  border-color: var(--accent);
+}
+
+.ring-legend .busy span {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.ring-legend .slashed span {
+  border-color: var(--bad);
+  background: color-mix(in srgb, var(--bad) 40%, transparent);
+}
+
+.ring-legend .rejected span {
+  border-color: var(--warn);
+}
+
+.ring-legend .offline span {
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-chunk {
+    display: none;
+  }
+
+  .ring.stage-2 .ring-core-halo {
+    animation: none;
+  }
+}
+
+/* Console overview panel */
+.net-panel .ring {
+  padding: 8px 0 4px;
+}
+
+.net-panel .ring svg {
+  max-width: 400px;
+}
+
+/* ───────── Problem-first landing section ───────── */
+
+.pb .ak-head {
+  max-width: 44rem;
+}
+
+.pb-kicker {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--action);
+}
+
+.pb-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+  margin-top: 48px;
+}
+
+.pb-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pb-grid li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-height: 96px;
+  padding: 16px 8px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--panel);
+  color: var(--ink-4);
+}
+
+.pb-gpu {
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.pb-grid li.cheat {
+  border-color: color-mix(in srgb, var(--bad) 60%, transparent);
+  background: color-mix(in srgb, var(--bad) 8%, var(--panel));
+  color: var(--bad);
+}
+
+.pb-why {
+  font-size: 11.5px;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.pb-note {
+  position: relative;
+  padding-top: 40px;
+}
+
+.pb-arrow {
+  position: absolute;
+  top: -24px;
+  left: -48px;
+  width: 140px;
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pb-note p {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+
+.pb-note b {
+  display: block;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.pb-foot {
+  margin: 28px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-4);
+}
+
+/* ───────── Walkthrough ───────── */
+
+.wt-card {
+  position: relative;
+  padding: 24px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--panel);
+  margin-bottom: 20px;
+}
+
+.wt-count {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-4);
+}
+
+.wt-count b {
+  color: var(--action);
+  font-weight: 600;
+}
+
+.wt-card h3 {
+  margin: 8px 0 8px;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.wt-card p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.wt-card .wt-look {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.wt-nav {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  gap: 6px;
+}
+
+.wt-btn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--rule-2);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color var(--dp-motion-interaction) var(--ease), color var(--dp-motion-interaction) var(--ease);
+}
+
+.wt-btn:hover {
+  border-color: var(--action);
+  color: var(--action);
+}
+
+/* ───────── Console chrome ───────── */
+
+.balance-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--dp-radius-control);
+  background: var(--panel);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+a.balance-pill:hover {
+  border-color: var(--action-line);
+}
+
+.balance-v {
+  font-family: var(--mono);
+  color: var(--dp-color-value);
+}
+
+.ide-sources {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.ide-sources-l {
+  color: var(--ink-4);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10.5px;
+}
+
+.ide-source b {
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ide-source a {
+  text-decoration: none;
+}
+
+.ide-source a:hover b {
+  color: var(--action);
+}
+
+/* ───────── Small screens ───────── */
+
+@media (max-width: 900px) {
+  .pb-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .pb-arrow {
+    display: none;
+  }
+
+  .pb-note {
+    padding-top: 0;
+  }
+
+  .ring-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .pb-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .pb-note p {
+    font-size: 19px;
+  }
+
+  .ring-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Five figures in two columns: the last one takes the full row. */
+  .ring-stats > div:last-of-type {
+    grid-column: 1 / -1;
+  }
+
+  .wt-card h3 {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .ide-sources {
+    display: none;
+  }
+}

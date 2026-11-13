@@ -14,11 +14,12 @@ import {
   Search,
   ShieldX,
   SquareTerminal,
+  Wallet,
   Workflow,
   X,
   type LucideProps,
 } from "lucide-react";
-import { REPLAY, gpuState, listingsOf, money, setReplay, short } from "./data";
+import { REPLAY, getAgentInfo, getHbarBalance, gpuState, hashscan, hbar, listingsOf, money, setReplay, short } from "./data";
 import { go, useLive, type Snapshot } from "./live";
 import { latestPerId } from "./pages/Models";
 import { sortedJobs } from "./pages/Overview";
@@ -133,6 +134,7 @@ export function Console({ route, snap, error, children }: { route: string[]; sna
               synthetic replay · exit
             </button>
           )}
+          <BalancePill snap={snap} />
           <ZeroGAccount />
           <Panel snap={snap} problems={problems} open={panel} setOpen={setPanel} tab={panelTab} setTab={setPanelTab} />
         </div>
@@ -197,7 +199,6 @@ export function Console({ route, snap, error, children }: { route: string[]; sna
           <span className={`ide-dot ${snap ? "ok" : "run"}`} aria-hidden />
           {REPLAY ? "Synthetic replay" : snap ? `Hedera ${snap.status.network}` : "Connecting…"}
         </span>
-        <span className="ide-hide-sm">0G · Arkiv · Swarm</span>
         {snap && (
           <>
             <span>
@@ -219,6 +220,7 @@ export function Console({ route, snap, error, children }: { route: string[]; sna
           </>
         )}
         <span className="ide-status-fill" />
+        <DataSources snap={snap} />
         {snap && <span className="ide-hide-sm">Updated {new Date(snap.at).toLocaleTimeString()}</span>}
         <button className="ide-status-btn" onClick={() => setPalette(true)}>
           {MOD} K
@@ -227,6 +229,87 @@ export function Console({ route, snap, error, children }: { route: string[]; sna
 
       {palette && <Palette snap={snap} onClose={() => setPalette(false)} />}
     </div>
+  );
+}
+
+/**
+ * The buyer agent's HBAR balance (the account that pays every job), read from the Hedera mirror
+ * node every 30 s. Hidden in the replay and when the agent or the mirror node doesn't answer.
+ */
+function BalancePill({ snap }: { snap: Snapshot | null }) {
+  const [account, setAccount] = useState<string | null>(null);
+  const [balance, setBalance] = useState<number | null>(null);
+  useEffect(() => {
+    if (REPLAY) return;
+    let alive = true;
+    getAgentInfo()
+      .then((i) => alive && setAccount(i.account ?? null))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const status = snap?.status;
+  useEffect(() => {
+    if (!account || !status) return;
+    let alive = true;
+    const tick = () =>
+      getHbarBalance(status, account)
+        .then((b) => alive && setBalance(b))
+        .catch(() => {});
+    void tick();
+    const t = window.setInterval(tick, 30_000);
+    return () => {
+      alive = false;
+      window.clearInterval(t);
+    };
+  }, [account, status?.mirrorUrl]);
+  if (!account || balance === null || !status) return null;
+  const href = hashscan(status, "account", account);
+  const body = (
+    <>
+      <Wallet size={13} strokeWidth={1.75} aria-hidden />
+      <span className="balance-v">{hbar(balance)}</span>
+    </>
+  );
+  const title = `Buyer agent ${account}: pays every job. Read from the Hedera mirror node.`;
+  return href ? (
+    <a className="balance-pill" href={href} target="_blank" rel="noreferrer" title={title}>
+      {body}
+    </a>
+  ) : (
+    <span className="balance-pill" title={title}>
+      {body}
+    </span>
+  );
+}
+
+/** Where every figure in the console comes from, each linked to its public source. */
+function DataSources({ snap }: { snap: Snapshot | null }) {
+  const status = snap?.status;
+  const topic = status?.hcsTopic ? hashscan(status, "topic", status.hcsTopic) : null;
+  const sources: [string, string, string | null | undefined][] = [
+    ["Arkiv", "offers · jobs · chunks", status?.arkiv.explorerUrl],
+    ["HCS", status?.hcsTopic ? `receipts ${status.hcsTopic}` : "receipts", topic],
+    ["x402", "payments", null],
+    ["0G Storage", "passports", status?.storageGateway],
+  ];
+  return (
+    <span className="ide-sources ide-hide-sm" aria-label="Data sources">
+      <span className="ide-sources-l">Data</span>
+      {sources.map(([name, what, href]) => (
+        <span key={name} className="ide-source">
+          {href ? (
+            <a href={href} target="_blank" rel="noreferrer">
+              <b>{name}</b>
+            </a>
+          ) : (
+            <b>{name}</b>
+          )}{" "}
+          {what}
+        </span>
+      ))}
+    </span>
   );
 }
 

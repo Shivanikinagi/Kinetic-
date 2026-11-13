@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { BrainCircuit, Check, Cloud, CloudUpload, Scale } from "lucide-react";
 import { getPublish, getTemplates, startPublish, type PublishState, type Template } from "../api";
-import { hashscan, listingsOf, short, type ModelTask } from "../data";
+import { hashscan, listingsOf, short, storageLink, type ModelTask } from "../data";
 import type { Snapshot } from "../live";
 
 // Publish a model from the browser, then watch the verifier quorum review it, step by step,
@@ -265,7 +265,7 @@ export default function Publish({ snap, resume }: { snap: Snapshot; resume?: str
             <Check size={14} strokeWidth={1.75} aria-hidden /> Two more verifiers re-run it and co-sign
           </li>
           <li>
-            <Check size={14} strokeWidth={1.75} aria-hidden /> Passport to Swarm, receipt to Hedera, listing to Arkiv
+            <Check size={14} strokeWidth={1.75} aria-hidden /> Passport to 0G Storage, receipt to Hedera, listing to Arkiv
           </li>
         </ol>
         <div className="pub-action">
@@ -322,9 +322,9 @@ function Progress({ snap, state, error, onAgain }: { snap: Snapshot; state: Publ
       };
     }),
     {
-      label: "Model Passport stored on Swarm",
+      label: "Model Passport stored on 0G Storage",
       detail: passport ? (
-        status.swarmGateway ? <a className="ext mono" href={`${status.swarmGateway}/bytes/${passport.ref}`} target="_blank" rel="noreferrer">{short(passport.ref ?? "", 8)}</a> : <span className="mono">{short(passport.ref ?? "", 8)}</span>
+        storageLink(status, passport.ref) ? <a className="ext mono" href={storageLink(status, passport.ref)!} target="_blank" rel="noreferrer">{short(passport.ref ?? "", 8)}</a> : <span className="mono">{short(passport.ref ?? "", 8)}</span>
       ) : undefined,
       s: passport ? "done" : cos.length >= expected && !failed ? "active" : "todo",
       when: at(passport?.at),

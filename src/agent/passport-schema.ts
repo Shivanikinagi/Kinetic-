@@ -6,6 +6,8 @@ import { z } from "zod";
 // the payment asset's smallest unit (tinybar for HBAR); hashes are lower-case hex.
 
 const hex64 = z.string().regex(/^[0-9a-f]{64}$/);
+/** A Model Passport's 0G Storage root (0x + 64 hex); passports issued before 2026-11-11 hold a 64-hex reference. */
+const documentRef = z.string().regex(/^(0x)?[0-9a-f]{64}$/);
 const address = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
 const amount = z.string().regex(/^\d+$/);
 const attestation = z.enum(["verified", "unavailable", "invalid"]);
@@ -183,7 +185,7 @@ export const passportSchema = z
     completed: count,
     output: z.object({ resultsHash: hex64 }),
     hcsTopic: z.string(),
-    references: z.object({ x402Network: z.string(), hcsTopic: z.string(), mirrorUrl: z.string(), vault: z.string().optional(), swarmGateway: z.string(), devnetUrl: z.string().optional() }),
+    references: z.object({ x402Network: z.string(), hcsTopic: z.string(), mirrorUrl: z.string(), vault: z.string().optional(), storageGateway: z.string().optional(), swarmGateway: z.string().optional(), devnetUrl: z.string().optional() }),
     strategy: z.string().optional(),
     agreement: z.object({ v: z.literal(1), task: hex64, canaryRate: z.number(), minAgreement: z.number() }).loose(),
     outcome: z.object({ met: z.boolean(), notes: z.array(z.string()) }),
@@ -207,7 +209,7 @@ export const passportSchema = z
         key: z.string().regex(/^m[0-9a-f]{15}$/),
         id: z.string(),
         version: z.string(),
-        passportRef: hex64,
+        passportRef: documentRef,
         passportDigest: hex64,
         royaltyBps: count,
         payTo: z.string(),

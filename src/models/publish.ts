@@ -8,8 +8,8 @@ import type { ModelPassport } from "./passport.js";
 import { scanModelFiles, scanModelFilesOnDisk, type DiskModelFile, type ModelFile } from "./safetensors.js";
 
 // Publishing a model, from the creator's side: the malware checks run here first (so a bad file
-// never leaves the machine), the weights go to Swarm as public content-addressed files, the card
-// names each file's sha256 and Swarm reference, the creator signs it, and the verifier is paid
+// never leaves the machine), the weights go to 0G Storage as public content-addressed files, the
+// card names each file's sha256 and 0G Storage root, the creator signs it, and the verifier is paid
 // its listing fee over x402 to review it with the other verifiers. The review runs in the
 // background (minutes, on real networks); this waits for it to list the model or refuse it.
 
@@ -20,9 +20,6 @@ export type CardDraft = Omit<ModelCard, "kind" | "creator" | "createdAt" | "weig
   /** For weights hosted elsewhere instead of uploaded: a base URL that serves each file by name. */
   weightsSource?: string;
 };
-
-/** Where to put the weights: 0G Storage (built for large files; pays 0G's storage fee) or Swarm. */
-export type WeightsStore = "0g" | "swarm";
 
 export interface PublishInput {
   card: CardDraft;
@@ -38,8 +35,6 @@ export interface PublishInput {
   maxFeeTinybar?: bigint;
   /** How long to wait for the verifier quorum's review (default 20 minutes). */
   timeoutMs?: number;
-  /** Where the weights go (default 0G Storage when this role has a 0G Storage client, else Swarm). */
-  storage?: WeightsStore;
 }
 
 export interface PublishResult {
@@ -64,22 +59,18 @@ export async function publishModel(svc: Services, verifierUrl: string, input: Pu
     if (!scan.ok) throw new Error(`malware checks failed locally, nothing was uploaded: ${scan.problems.join("; ")}`);
     log(`malware checks passed locally: ${scan.files.length} files, ${scan.params.toLocaleString("en-US")} parameters`);
     const files = [];
-    const store: WeightsStore = input.storage ?? (svc.zgStorage ? "0g" : "swarm");
     for (const f of input.files) {
       const scanned = scan.files.find((s) => s.name === f.name)!;
       const base = { name: f.name, sha256: scanned.sha256, bytes: scanned.bytes };
       const bytes = async () => ("bytes" in f ? f.bytes : new Uint8Array(await readFile(f.path)));
       if (weightsSource) files.push(base);
-      else if (store === "0g") {
+      else {
+        // Weights go to 0G Storage, built for large files; the upload pays 0G's storage fee.
         if (!svc.zgStorage) throw new Error("0G Storage isn't configured for this role");
         const zg = svc.zgStorage();
-        const { root, tx } = "path" in f ? await zg.uploadFile(f.path) : await zg.upload(f.bytes);
+        const { root, tx } = "path" in f ? await zg.uploadFile(f.path) : await zg.upload(await bytes());
         files.push({ ...base, zgRoot: root });
         log(`uploaded ${f.name} to 0G Storage: root ${root}${tx ? ` (tx ${tx})` : " (already stored)"}`);
-      } else {
-        const swarmRef = await svc.swarm.upload(await bytes(), { encrypt: false });
-        files.push({ ...base, swarmRef });
-        log(`uploaded ${f.name} to Swarm: ${swarmRef}`);
       }
     }
     weights = { format: "safetensors", files, ...(weightsSource ? { source: weightsSource } : {}) };

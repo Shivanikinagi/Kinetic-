@@ -395,7 +395,7 @@ export function replayModelPassport(listing: ModelListing): ModelPassport {
     weights: { checked: false, reason: `Served by 0G (${listing.card.runtime.model}); its weights aren't published.` },
     benchmark: { task: hex(rng("task"), 64), source: "verifier", items: 12, itemsHash: hex(rng("items"), 64), correct: 12, accuracy: 1, minAccuracy: 0.7, ranOn: ["0g:0gm-1.0-35b-a3b (request replay-1)", "0g:0gm-1.0-35b-a3b (request replay-2)"] },
     fingerprint: { task: hex(rng("task"), 64), answers: Object.fromEntries(Array.from({ length: 18 }, (_, i) => [`f${String(i + 1).padStart(3, "0")}`, LABELS[i % LABELS.length]])) },
-    references: { hcsTopic: "0.0.11212792", swarmGateway: "replay://swarm" },
+    references: { hcsTopic: "0.0.11212792", storageGateway: "replay://0g-storage" },
     limitations: [
       "The benchmark scored 12 of 12 labelled examples (100%). It measures accuracy on this task, not safety.",
       `Served by 0G (${listing.card.runtime.model}); its weights aren't published. The file checks don't apply; the passport rests on the benchmark and fingerprint.`,

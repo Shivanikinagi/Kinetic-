@@ -113,6 +113,9 @@
         "vault": {
           "type": "string"
         },
+        "storageGateway": {
+          "type": "string"
+        },
         "swarmGateway": {
           "type": "string"
         },
@@ -123,8 +126,7 @@
       "required": [
         "x402Network",
         "hcsTopic",
-        "mirrorUrl",
-        "swarmGateway"
+        "mirrorUrl"
       ],
       "additionalProperties": false
     },
@@ -1296,7 +1298,7 @@
         },
         "passportRef": {
           "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "pattern": "^(0x)?[0-9a-f]{64}$"
         },
         "passportDigest": {
           "type": "string",

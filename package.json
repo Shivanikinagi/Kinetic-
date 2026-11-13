@@ -49,12 +49,11 @@
     "smoke:hedera": "tsx scripts/smoke-hedera.ts",
     "fingerprint": "tsx scripts/fingerprint.ts",
     "cosigner": "tsx src/verifier/cosigner-server.ts",
-    "swarm:stamp": "tsx scripts/swarm-stamp.ts",
-    "swarm:roundtrip": "tsx scripts/swarm-roundtrip.ts",
     "register:hol": "tsx scripts/register-hol.ts",
     "passport:schema": "tsx scripts/passport-schema.ts",
     "bonds": "tsx scripts/bonds.ts",
-    "gold:check": "tsx scripts/gold-check.ts"
+    "gold:check": "tsx scripts/gold-check.ts",
+    "migrate:passports": "tsx scripts/migrate-passports.ts"
   },
   "engines": {
     "node": ">=20"

@@ -197,16 +197,16 @@ export class Kinetic {
     return resolveModel(this.svc.arkiv, (await this.svc.vault.info()).verifiers, ref);
   }
 
-  /** A listed model's Model Passport from Swarm, and every check on it (card, creator, malware checks, benchmark, quorum). */
+  /** A listed model's Model Passport from 0G Storage, and every check on it (card, creator, malware checks, benchmark, quorum). */
   async passport(ref: string): Promise<{ listing: ModelListing; passport: ModelPassport; checks: Check[] }> {
     const listing = await this.model(ref);
-    const passport = await loadModelPassport(this.svc.swarm, listing);
+    const passport = await loadModelPassport(this.svc.storage, listing);
     const info = await this.svc.vault.info();
     return { listing, passport, checks: await verifyModelPassport(passport, { verifiers: info.verifiers, threshold: info.threshold }) };
   }
 
   /**
-   * Publishes a model: malware checks here first, weights to Swarm, a signed card, and the
+   * Publishes a model: malware checks here first, weights to 0G Storage, a signed card, and the
    * listing fee to the verifier, which reviews it with the other verifiers and lists it.
    */
   async publish(input: PublishInput): Promise<PublishResult> {

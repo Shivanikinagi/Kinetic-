@@ -18,15 +18,14 @@ You pay only for chunks that complete and pass verification, and every result an
 ### How it's made
 
 - **Hedera:** x402 per-chunk payments in HBAR, x402 model listing fees and creator royalties, provider bonds, slashing and exact refunds; HCS audit receipts (including every Model Passport and royalty); HCS-14 agent identities.
-- **0G:** providers do their work on 0G Compute (`0gm-1.0-35b-a3b`, TeeML); the verifier checks them against a different 0G model (`glm-5.3`, TeeML). Users sign in with their 0G account and their credits can pay for their own agent.
+- **0G:** providers do their work on 0G Compute (`0gm-1.0-35b-a3b`, TeeML); the verifier checks them against a different 0G model (`glm-5.3`, TeeML). 0G Storage holds model weights, Model Passports and Compute Passports (public). Users sign in with their 0G account and their credits can pay for their own agent.
 - **Arkiv:** the model registry (listings renewed by the verifier), expiring provider offers (with the models each serves), chunk claims, job state and reputation, all read by the live dashboard.
-- **Swarm:** model weights and Model Passports (public), encrypted chunk data referenced from Arkiv entities (references are encrypted first), and Compute Passports.
 
 ---
 
 ## Everything is real
 
-KINETIC runs only on the real networks: Hedera testnet, Arkiv (the Rabdi testnet), Swarm and 0G. The only exception is an opt-in, clearly labelled [synthetic replay](#synthetic-replay-fallback) in the dashboard, kept as a fallback for when the networks can't be reached (the automated tests use a local emulator; see [Tests](#tests)). Five provider nodes bond real HBAR and publish real offers, and every one does its work on **0G Compute**:
+KINETIC runs only on the real networks: Hedera testnet, Arkiv (the Rabdi testnet) and 0G. The only exception is an opt-in, clearly labelled [synthetic replay](#synthetic-replay-fallback) in the dashboard, kept as a fallback for when the networks can't be reached (the automated tests use a local emulator; see [Tests](#tests)). Five provider nodes bond real HBAR and publish real offers, and every one does its work on **0G Compute**:
 
 | Provider | Price / chunk | Runs | Behaviour | What happens |
 |---|---|---|---|---|
@@ -74,7 +73,7 @@ If the testnets, 0G or the local services are down, the dashboard can run on syn
 
 - It runs entirely in the browser ([web/src/replay.ts](web/src/replay.ts)) and makes no network calls. Every page, the Run form and the kill switch work.
 - Starting a job plays the same story as the real runs in [out/](out/): BudgetGPU is rejected at admission, QuickCompute fails three hidden checks and is slashed by 2 of 3 verifiers with the buyer refunded, EdgeRelay goes down holding a payment, and the affected chunks are rerouted. Later jobs run cleanly on BluePeak and Riverstone. `?replay&speed=2` plays it twice as fast.
-- Provider names, prices, addresses and the policy match the testnet deployment. Every transaction id, hash, 0G request id and passport reference is invented, so nothing links to HashScan or Swarm.
+- Provider names, prices, addresses and the policy match the testnet deployment. Every transaction id, hash, 0G request id and passport reference is invented, so nothing links to HashScan or 0G Storage.
 - A **synthetic replay** badge stays in the top bar, and the status bar and overview say so.
 
 ---
@@ -91,10 +90,10 @@ npm run kinetic -- run --model kinetic/ticket-classifier --items tickets.jsonl  
 PROVIDER_MODELS=kinetic/ticket-classifier npm run provider                          # serve it, after checking it
 ```
 
-- **Publish:** a creator-signed card (id, version, task, runtime, weights hashes, licence, royalty of 0–30%). Weights must be safetensors and go to 0G Storage (multi-GB files, addressed by Merkle root) or Swarm; the malware checks run on the creator's machine first. Weights stream through disk at every step, so a 3 GB model needs disk, not memory.
+- **Publish:** a creator-signed card (id, version, task, runtime, weights hashes, licence, royalty of 0–30%). Weights must be safetensors and go to 0G Storage (multi-GB files, addressed by Merkle root) or are fetched from a source URL; the malware checks run on the creator's machine first. Weights stream through disk at every step, so a 3 GB model needs disk, not memory.
 - **ERC-8004 on 0G Chain:** the verifier and every GPU register themselves as Trustless Agents (Identity Registry on Galileo, agent card on-chain). After each job the verifier gives each GPU feedback in the Reputation Registry: the share of hidden checks it passed, with the evidence attached, plus a record of any executed slash. The GPUs page reads the averages back from 0G.
 - **Listed on testnet:** 11 models with quorum-signed passports: a ticket classifier, review sentiment, spam, intent, news topic, language and animal classifiers, invoice and ticket-field extractors and a ticket tagger (all on 0G Compute), plus SmolLM2-135M weights on 0G Storage. The cards are in [data/models/](data/models/); `npm run live` lists any that aren't yet.
-- **Review:** the verifier and each of the vault's other verifiers, on their own: malware checks on the exact bytes (no pickle or code, no custom model code, headers that exactly tile each file), a benchmark on labelled examples the creator never saw (70% to list), and a behavioural fingerprint. The Model Passport needs as many signatures as a slash does. It goes to Swarm, its digest to HCS, and the listing to Arkiv.
+- **Review:** the verifier and each of the vault's other verifiers, on their own: malware checks on the exact bytes (no pickle or code, no custom model code, headers that exactly tile each file), a benchmark on labelled examples the creator never saw (70% to list), and a behavioural fingerprint. The Model Passport needs as many signatures as a slash does. The listing verifier stores it on 0G Storage, its digest goes to HCS, and the listing to Arkiv.
 - **Serve:** providers check the passport, every weights file's sha256 and the malware checks again before they offer a model; [docker/ollama-sandbox.compose.yml](docker/ollama-sandbox.compose.yml) runs the model on a network with no route out.
 - **Run:** a model job uses only providers serving the model, admits them with probes and the model's fingerprint, commits the model and its royalty in the agreement on HCS, and requires every chunk to be signed for the model. Afterwards the buyer pays the creator over x402: the agreed share of the accepted chunks, computed by the verifier, never including refunded or rerouted work. The verifier won't co-sign the Compute Passport until it's paid, and `passport:verify` checks the royalty on the ledger.
 
@@ -104,16 +103,16 @@ PROVIDER_MODELS=kinetic/ticket-classifier npm run provider                      
  Buyer agent                       Providers (community GPUs)          Verifier agent (0G credits)
  ───────────                       ──────────────────────────          ───────────────────────────
  1 split into chunks
-   encrypt each (own key) ──► Swarm
-   seal Swarm refs ─────────► Arkiv: job + chunk entities
- 2 register job + x402 fee ─────────────────────────────────────────► pick hidden canaries
+   encrypt each (own key)
+   job + chunk entities ────► Arkiv
+ 2 register job + sealed chunks + x402 fee ──────────────────────────► pick hidden canaries
                                                                         commit hash ──► HCS
                                                                         0G verified runs on canaries
  3 discover offers ◄──────── Arkiv: offer entities (expire unless renewed)
    check bonds ◄──────────── Hedera: KineticBondVault
  4 per chunk:
    claim (2 min lease) ─────► Arkiv
-   POST /v1/chunks ─────────► 402 quote
+   POST /v1/chunks (data) ──► 402 quote
    x402 payment ────────────► verify ─► run on GPU ─► settle (HBAR)
    signed result ◄──────────
  5 submit result + payment ──────────────────────────────────────────► check signature
@@ -128,7 +127,7 @@ PROVIDER_MODELS=kinetic/ticket-classifier npm run provider                      
    failed canary / slashed provider / offline: requeue chunk elsewhere
  6 finalize ─────────────────────────────────────────────────────────► reveal canary set ──► HCS
    Compute Passport ────────────────────────────────────────────────────► co-sign if it matches
-   signed passport ─────────► Swarm (reference on the job entity)
+   signed passport ────────────────────────────────────────────────────► store on 0G Storage (root on the job entity)
 ```
 
 **Evaluate, monitor, reroute, enforce.** KINETIC acts on benchmark harnesses to test inference vendors and publish the scores:
@@ -250,7 +249,7 @@ The dashboard's **Run a job** form sets the strategy and the provider count per 
 
 ### Compute Passport
 
-Every finished job gets a **Compute Passport** (`kinetic.passport.v2`): one public JSON file on Swarm ([src/agent/passport.ts](src/agent/passport.ts)) that says how the results were produced, checked and paid for. It holds no input data and no keys. Its format is published as JSON Schema in [docs/compute-passport.schema.json](docs/compute-passport.schema.json) (`npm run passport:schema` regenerates it from the same definition the checker uses), so another application can check a passport without KINETIC's code or dashboard.
+Every finished job gets a **Compute Passport** (`kinetic.passport.v2`): one public JSON file on 0G Storage, addressed by its Merkle root ([src/agent/passport.ts](src/agent/passport.ts)) that says how the results were produced, checked and paid for. It holds no input data and no keys. Its format is published as JSON Schema in [docs/compute-passport.schema.json](docs/compute-passport.schema.json) (`npm run passport:schema` regenerates it from the same definition the checker uses), so another application can check a passport without KINETIC's code or dashboard.
 
 For every chunk it keeps two questions apart ([src/agent/assurance.ts](src/agent/assurance.ts)):
 
@@ -267,10 +266,10 @@ A TEE attestation says a response came out of a 0G service; it says nothing abou
 - **Anyone can check it**, without keys:
 
 ```bash
-npm run passport:verify -- <swarm reference> --results out/<jobId>.json
+npm run passport:verify -- <0G root> --results out/<jobId>.json
 ```
 
-Offline, it checks the schema, both signatures, the canary and known-answer reveals against their commitments, every provider's signature on its result hash, that every authenticity and correctness claim and the summary follow from the evidence, every canary's 0G TEE signature, that spending stayed within the firm quote, and that your results file is exactly what the providers signed. Online (the default; `--offline` skips it), it also finds the job's receipts on HCS, the payments on the mirror node, and each slash's status and the co-signer among the verifiers in the vault, and that each canary's TEE signer is the one 0G's serving contract registers (`--zg-rpc` overrides the 0G mainnet RPC). It fetches the passport chunk by chunk and checks each against its Swarm address. Editing any field breaks the signatures; older `v1` passports still check.
+Offline, it checks the schema, both signatures, the canary and known-answer reveals against their commitments, every provider's signature on its result hash, that every authenticity and correctness claim and the summary follow from the evidence, every canary's 0G TEE signature, that spending stayed within the firm quote, and that your results file is exactly what the providers signed. Online (the default; `--offline` skips it), it also finds the job's receipts on HCS, the payments on the mirror node, and each slash's status and the co-signer among the verifiers in the vault, and that each canary's TEE signer is the one 0G's serving contract registers (`--zg-rpc` overrides the 0G mainnet RPC). It fetches the passport by its 0G root and checks the bytes against that root. Editing any field breaks the signatures; older `v1` passports still check.
 
 ### Firm quote
 
@@ -323,7 +322,7 @@ The **Sign in with 0G** button signs a user into their own 0G account (the one h
 | **Hedera HCS** | Receipts for job commitment, every paid chunk, every canary, every slash, and the reveal; read back via mirror node | [src/integrations/hcs.ts](src/integrations/hcs.ts) |
 | **0G Private Computer** | Providers run their chunks on 0G Compute (`0gm-1.0-35b-a3b`, TeeML). The verifier pays reference runs on `glm-5.3` (TeeML) from its 0G credits with `X-0G-Provider-Trust-Mode: verified`, keeps the `request_id`, the serving 0G node and the sealed end-to-end encryption marker (`X-0G-E2EE`), and earns an x402 fee per verified chunk | [src/provider/backend.ts](src/provider/backend.ts), [src/integrations/zerog.ts](src/integrations/zerog.ts), [src/verifier/service.ts](src/verifier/service.ts) |
 | **Arkiv** | offers, claims, jobs, chunks, reputation, and one expiring entity per check (the live record buyers rank on); batched writes with `@arkiv-network/sdk`; buyers discover offers by query; the dashboard reads Arkiv through the verifier's cached `GET /arkiv/:kind` (one query per kind for every viewer, access key kept server-side) | [src/integrations/arkiv.ts](src/integrations/arkiv.ts), [src/verifier/service.ts](src/verifier/service.ts), [web/src/data.ts](web/src/data.ts) |
-| **Swarm** | AES-GCM chunk and result blobs via Bee `/bytes` (plain 64-hex refs: never a Swarm-encrypted ref on the public gateway); refs sealed before going on Arkiv; downloads checked chunk by chunk against their content address; erasure-coded Model and Compute Passports; one signed feed per model whose stable `/bzz` URL serves its newest Model Passport, re-checked in the browser (SOC signature and BMT); client-side postage stamps for our own batch (`npm run swarm:stamp -- --onchain`, [docs/SWARM_STAMP.md](docs/SWARM_STAMP.md)) | [src/integrations/swarm.ts](src/integrations/swarm.ts), [src/integrations/swarm-bmt.ts](src/integrations/swarm-bmt.ts), [src/integrations/swarm-feed.ts](src/integrations/swarm-feed.ts), [src/agent/buyer.ts](src/agent/buyer.ts) |
+| **0G Storage** | Model weights, Model Passports and Compute Passports, each addressed by its 0G Merkle root and checked against it on every download; the verifier stores passports and pays the storage fee from its own 0G wallet, and serves them at `GET /passports/:root` because 0G's indexer sends no CORS headers | [src/integrations/zg-storage.ts](src/integrations/zg-storage.ts), [src/integrations/storage.ts](src/integrations/storage.ts), [src/verifier/service.ts](src/verifier/service.ts) |
 
 ### Arkiv entities
 
@@ -334,12 +333,12 @@ Every entity has an `app` attribute (default `kinetic`) and is written through a
 | `offer` | provider | `provider`, `pay_to`, `name`, `endpoint`, `gpu`, `price`, `bond`, `uaid`, `task.classify` / `task.extract` / `task.tag`, `adversarial` on an adversarial test provider, and `hcs10_inbound` once listed in the Hashgraph Online registry | 90 s, renewed every 30 s by the provider's heartbeat, so a dead node disappears | compute, declared backend (e.g. `0g:0gm-1.0-35b-a3b`), network, HCS-14 profile |
 | `claim` | buyer | `job_id`, `idx`, `provider` | 2 min lease | — |
 | `job` | buyer | `job_id`, `task`, `status`, `total`, `done`, `rerouted`, `paid`, `refunded`, `fee`, `audit_ref` | 7 days | task kind, label names |
-| `chunk` | buyer | `job_id`, `idx`, `status` (`pending`/`claimed`/`done`/`verified`), `provider` | 7 days | **sealed** Swarm refs for input and result |
+| `chunk` | buyer | `job_id`, `idx`, `status` (`pending`/`claimed`/`done`/`verified`), `provider` | 7 days | — |
 | `reputation` | verifier | `provider`, `pass`, `fail`, `score`, `status` (`ok`/`slashed`), `window` (recent checks), `adversarial` (kept after its offer expires) | 30 days, extended on every canary | — |
 | `check` | verifier | `provider`, `src` (`canary`/`format`/`execution`/`admission`), `pass` (1/0), `at`, and `job_id`, `idx` for job checks | 7 days, never extended | — |
 | `model` | verifier | `mkey`, `model_id`, `version`, `status`, `task.<kind>`, `name`, `creator`, `engine`, `passport_ref`, `passport_digest`, `royalty_bps`, `accuracy` | 30 days, renewed by the verifier | the listing: card, Model Passport reference and digest, signers |
 
-Arkiv records are public and expire: they hold coordination state and commitments, never data or keys. The permanent evidence is elsewhere: every check, slash and settlement is an HCS receipt (kept by the mirror node), and each job's Compute Passport is on Swarm (lasting as long as its postage batch). A `check` entity is a convenience index over those receipts, so its 7-day expiry loses nothing.
+Arkiv records are public and expire: they hold coordination state and commitments, never data or keys. The permanent evidence is elsewhere: every check, slash and settlement is an HCS receipt (kept by the mirror node), and each job's Compute Passport is on 0G Storage. A `check` entity is a convenience index over those receipts, so its 7-day expiry loses nothing.
 
 Each kind is written through a named Arkiv schema (`kinetic.offer`, `kinetic.check`, …) with typed columns (`addr` for addresses, `key` for links between entities), and checks are created `readonly`. Buyers only trust offers created and owned by the provider in their `provider` attribute, reputation created and owned by the verifier, and checks created by it (Arkiv's `$creator` never changes, even if an entity is handed over). A provider's live record is the count of its unexpired `check` entities: results older than 7 days drop out by themselves, so no operator has to keep a flag current. Buyers rank on that record when there is one, and label each provider `active` (a pass in the last 6 hours), `stale` or `unproven`. A query to find classification offers:
 
@@ -361,15 +360,13 @@ The wallets that write these entities:
 
 The dashboard doesn't poll Arkiv: the verifier follows Arkiv's entity events (`watchEntityEvents`), re-reads only the entity that changed with `getEntity` (not metered), and pushes each change to the dashboard over Server-Sent Events (`GET /arkiv/events`); a full read every few minutes corrects anything missed. `GET /arkiv/stats` on the verifier reports the metered reads it made against what polling would have spent.
 
-### Swarm and privacy
+### Privacy
 
-- **Data:** each chunk is encrypted with its own key, derived by HKDF from a per-job master key, then uploaded to Swarm.
-- **What each party gets:** a provider receives the plain Swarm reference and that one chunk's key inside its paid request, and the key is **wrapped to the provider's own public key** (ECIES on secp256k1, published in its Arkiv offer) and bound to that job, chunk and provider, so only that provider can open it and it can't be replayed into another request ([src/util/wrap.ts](src/util/wrap.ts)). The buyer sends no unwrapped key unless `AGENT_ALLOW_PLAIN_KEYS=true`. The verifier gets the job key, because it opens canary chunks for 0G and plants known answers.
-- **What revocation can and can't do:** every chunk has its own key, so a provider that is slashed, quarantined or goes offline never gets the keys of later chunks: that is revocation for future work. It can't take back a chunk a provider already opened: the plaintext and the key are with it, and Swarm has no server-side revocation of a reference. Treat any chunk a provider received as seen by it.
-- **What goes on Arkiv:** references are public there only after they are sealed with a separate derived key, so only the parties given the key can find a chunk. Chunks go up as plain `/bytes` (64-hex references): they are already AES-GCM sealed, and Swarm's own encryption returns 128-hex references whose second half is the decryption key, which the docs say never to send to a public gateway. `SWARM_ENCRYPT=true` is honoured only on your own Bee node.
-- **Downloads don't trust the gateway:** a 64-hex reference is fetched chunk by chunk from `/chunks`, and every chunk is checked against its content address (BMT hash), including erasure-coded trees as the public gateway stores them. Older 128-hex references still download (unchecked by address, but everything KINETIC stored under one is AES-GCM sealed, so a changed byte fails to decrypt) ([src/integrations/swarm-bmt.ts](src/integrations/swarm-bmt.ts)).
-- **Storage that lasts:** the public gateway keeps uploads only for a while, and it ignores `swarm-postage-batch-id`. It does forward stamps signed client-side, so with a batch bought on Gnosis Chain (`npm run swarm:stamp -- --onchain`; about 5.4 xBZZ for depth 19 and 30 days) and `BEE_POSTAGE_BATCH_ID`, `BEE_POSTAGE_DEPTH` and `SWARM_STAMP_KEY` set, every upload is stamped by KINETIC and is paid storage. With your own Bee node, `BEE_URL` and `BEE_POSTAGE_BATCH_ID` are enough. Steps, costs and what the gateway accepts: [docs/SWARM_STAMP.md](docs/SWARM_STAMP.md). Our batch, `a0ad7c32…6360`, is a depth-19, 14-day batch bought on 2026-11-06 through our own Bee node; its details are in [arkiv/swarm.md](arkiv/swarm.md#postage-batch-and-bee-node).
-- **What is public on purpose:** each finished job uploads an unencrypted [Compute Passport](#compute-passport) (hashes, signatures, canary commitment and reveal, payments, refunds and slash transactions; no data, no keys). Its 64-hex reference goes on the job entity as `audit_ref`, so anyone can open it from the dashboard. Jobs from before the passport have a plain audit bundle (`kinetic.audit.v1`) there instead.
+- **Data:** each chunk is encrypted (AES-256-GCM) with its own key, derived by HKDF from a per-job master key. Nothing is uploaded: the sealed chunk travels as base64 in the `data` field of the paid `POST /v1/chunks` request, and to the verifier when the job registers.
+- **What each party gets:** a provider receives the sealed chunk and that one chunk's key inside its paid request, and the key is **wrapped to the provider's own public key** (ECIES on secp256k1, published in its Arkiv offer) and bound to that job, chunk and provider, so only that provider can open it and it can't be replayed into another request ([src/util/wrap.ts](src/util/wrap.ts)). The buyer sends no unwrapped key unless `AGENT_ALLOW_PLAIN_KEYS=true`. The verifier gets the job key, because it opens canary chunks for 0G and plants known answers.
+- **What revocation can and can't do:** every chunk has its own key, so a provider that is slashed, quarantined or goes offline never gets the keys of later chunks: that is revocation for future work. It can't take back a chunk a provider already opened: the plaintext and the key are with it. Treat any chunk a provider received as seen by it.
+- **What goes on Arkiv:** nothing about a chunk's contents. Chunk entities hold only the job, index, status and provider.
+- **What is public on purpose:** each finished job has an unencrypted [Compute Passport](#compute-passport) (hashes, signatures, canary commitment and reveal, payments, refunds and slash transactions; no data, no keys). The buyer signs it, the verifier co-signs it, and the buyer sends it to the verifier's `POST /jobs/:id/passport`; the verifier stores it on 0G Storage, paying the fee from its own 0G wallet, and only if it is signed by the job's buyer and, when the verifier co-signed, is the exact passport it co-signed. Its 0G root goes on the job entity as `audit_ref`, so anyone can open it from the dashboard or at `https://indexer-storage-testnet-turbo.0g.ai/file?root=<root>`. If storing fails, the job still completes and the report says the passport wasn't stored. Jobs from before the passport have a plain audit bundle (`kinetic.audit.v1`) there instead.
 
 ---
 
@@ -404,26 +401,26 @@ On the quorum vault [`0x11d7…b294`](https://hashscan.io/testnet/contract/0x11d
 
 | Job | Tier | What happened |
 |---|---|---|
-| `job-mvwaz0se-30ab3a` | standard | 12/12 chunks. `cheapo` missed the planted known answer in 3 chunks; both cosigners re-checked and co-signed; the slash was [proposed with 3 signatures](https://hashscan.io/testnet/transaction/0x20838849dc59e35d877cd4be7c8ec8693f9f080e29c9c00be33fa38baddf654a) and, after the window, [executed](https://hashscan.io/testnet/transaction/0x091ca9fdce8ac67e3b7ec2e12e2561b3cd1cb8d762ab8f9ab0857f18bfc5012e): 0.0018 ℏ refunded, the other 0.9982 ℏ of its bond burned. Passport [`de9e222f…`](https://api.gateway.ethswarm.org/bytes/de9e222f53e15b9263ef6a7e26dd25920c0540b19b0d24de1b6d2a238d2d584c) passes all 31 checks |
-| `job-mvwbh75h-905568` | high | 6/6 chunks, each run by `atlas` and `nimbus` and agreeing 100%; `flicker` went down holding one payment, found on the ledger. Passport [`9f7873d3…`](https://api.gateway.ethswarm.org/bytes/9f7873d3cd417498ff1262ef07829864ce4e7d132ec49f9302fec5e96673e828): tier met, every chunk ground truth, and authenticity `none` (the 0G router returns no per-chunk attestation, so none is claimed) |
+| `job-mvwaz0se-30ab3a` | standard | 12/12 chunks. `cheapo` missed the planted known answer in 3 chunks; both cosigners re-checked and co-signed; the slash was [proposed with 3 signatures](https://hashscan.io/testnet/transaction/0x20838849dc59e35d877cd4be7c8ec8693f9f080e29c9c00be33fa38baddf654a) and, after the window, [executed](https://hashscan.io/testnet/transaction/0x091ca9fdce8ac67e3b7ec2e12e2561b3cd1cb8d762ab8f9ab0857f18bfc5012e): 0.0018 ℏ refunded, the other 0.9982 ℏ of its bond burned. The passport passed all 31 checks |
+| `job-mvwbh75h-905568` | high | 6/6 chunks, each run by `atlas` and `nimbus` and agreeing 100%; `flicker` went down holding one payment, found on the ledger. The passport: tier met, every chunk ground truth, and authenticity `none` (the 0G router returns no per-chunk attestation, so none is claimed) |
 | (not started) | confidential | refused before registering or paying: no provider runs on an attestable TeeML 0G node |
 
 **Ten tasks, live (2026-10-31).** One standard-tier job per task through the dashboard network (`npm run live -- --serve`, jobs started from its agent service), 18 items in 6 chunks each. Every job completed, every chunk answered its planted known answer (6/6 on each), no honest provider was slashed, `shoddy` was rejected at admission on every task, and every passport passes all checks online:
 
-| Task | Job | Passport |
-|---|---|---|
-| `classify-tickets` | `job-mvwdbytl-d6a831` | [`fba2b186…`](https://api.gateway.ethswarm.org/bytes/fba2b18662cf6361949c34c650ad44657c7eef111bcc4c6a5a6b47f7dc8b34e1) |
-| `sentiment` | `job-mvwdgh3p-a7f82e` | [`df194431…`](https://api.gateway.ethswarm.org/bytes/df194431fe5df987e24e45709eecac680c19f8fd0ea24a09627d3772bd8146d7) |
-| `language` | `job-mvwdk4ib-9e6fb7` | [`0a3ece73…`](https://api.gateway.ethswarm.org/bytes/0a3ece731a5e8d1f3acbf4498e91a4438573fc4760d4035423b9ca274f1a7c26) |
-| `news-topic` | `job-mvwdof3x-20c0d4` | [`53c61d97…`](https://api.gateway.ethswarm.org/bytes/53c61d97c99b47d2522c3a35a27c00656f92236da0b933494f13e76142f60d0e) |
-| `spam` | `job-mvwdsppc-8e59cb` | [`f741e5ad…`](https://api.gateway.ethswarm.org/bytes/f741e5ad9ccccff8f1f50f3a694ad72254887f8b6a3c21c5b37cadae88b45fd9) |
-| `intent` | `job-mvwdw5ej-13522e` | [`6c43ab51…`](https://api.gateway.ethswarm.org/bytes/6c43ab51fb16f1653dc829eb523bd12430c5872b5eda22cc6457092b3d1c36c7) |
-| `animal-class` | `job-mvwe1qcq-ac305e` | [`2070bc4a…`](https://api.gateway.ethswarm.org/bytes/2070bc4add1b0ed0cce418e6ed3979113b9868eb2d569386cf416bf238f200f4) |
-| `ticket-tags` | `job-mvwe4ybh-0bd1c0` | [`0d71e551…`](https://api.gateway.ethswarm.org/bytes/0d71e5514882216163d983a9f7b6998725018e88f9d1ece33720ad05771624c5) |
-| `ticket-fields` | `job-mvwe8tfm-1c298f` | [`86a164ea…`](https://api.gateway.ethswarm.org/bytes/86a164ea49f330f92588729d7c0f970e0129dc55cedc0f431aecff8517e7c0f2) |
-| `invoice-fields` | `job-mvwec1fa-3f98c4` | [`1c9c10a1…`](https://api.gateway.ethswarm.org/bytes/1c9c10a1e465558ac0404aabbd9d669e8df05f57b4cce248a6720ec34eead61a) |
+| Task | Job |
+|---|---|
+| `classify-tickets` | `job-mvwdbytl-d6a831` |
+| `sentiment` | `job-mvwdgh3p-a7f82e` |
+| `language` | `job-mvwdk4ib-9e6fb7` |
+| `news-topic` | `job-mvwdof3x-20c0d4` |
+| `spam` | `job-mvwdsppc-8e59cb` |
+| `intent` | `job-mvwdw5ej-13522e` |
+| `animal-class` | `job-mvwe1qcq-ac305e` |
+| `ticket-tags` | `job-mvwe4ybh-0bd1c0` |
+| `ticket-fields` | `job-mvwe8tfm-1c298f` |
+| `invoice-fields` | `job-mvwec1fa-3f98c4` |
 
-Seen on the way: the public x402.org facilitator answered HTTP 520 to several verify and settle calls (one provider missed admission, a few chunks were rerouted, none charged), and the public Swarm gateway timed out once, which is why Swarm calls now retry. A tampered copy of the standard passport (inflated summary, a TEE it never had) fails `passport:verify` on both claims and both signatures.
+Seen on the way: the public x402.org facilitator answered HTTP 520 to several verify and settle calls (one provider missed admission, a few chunks were rerouted, none charged). A tampered copy of the standard passport (inflated summary, a TEE it never had) fails `passport:verify` on both claims and both signatures.
 
 ### Before the quorum vault: providers on 0G Compute, paid in HBAR
 
@@ -446,7 +443,7 @@ Result: 20/20 chunks; providers paid 0.025 ℏ, refunded 0.0042 ℏ, verifier fe
 - Slash with refund (`cheapo`): [0x577d…bd11](https://hashscan.io/testnet/transaction/0x577d009bdac7af38b7f7c1989621bc9bd3dc46c3c78757aef0714a688caabd11)
 - 0G reference runs on `glm-5.3`, e.g. requests `d9ca9fe9-17cb-4f85-b19a-2710b8794d11`, `fd09083e-54ac-4899-a70d-ef676d050776`
 - Arkiv: the buyer [`0x8ed8…73a6`](https://tiramisu.explorer.arkiv.network/address/0x8ed8a58f08a2caa800cbb4083e3691e5ca1e73a6), the verifier [`0xa19c…adc8`](https://tiramisu.explorer.arkiv.network/address/0xa19cc96ea9f0e414cebb149918e4c5549554adc8), `cheapo`'s new account [`0x29a7…9005`](https://tiramisu.explorer.arkiv.network/address/0x29a727ad41ed785ceff13833123d3b33cd1f9005). Query: `app = str('kinetic') AND kind = str('job') AND job_id = str('job-mvuj3yuh-f230e4')`
-- Compute Passport on Swarm: [7380fd9e…dbead](https://api.gateway.ethswarm.org/bytes/7380fd9e996e3585b094a202f15e12ad37ffa665eb5805c6b2f496fb0b6dbead) (public gateway, so it may expire; the evidence file is `out/live-job-mvuj3yuh-f230e4.md`)
+- Evidence file: `out/live-job-mvuj3yuh-f230e4.md`
 
 ### Earlier runs
 
@@ -471,11 +468,10 @@ Result: 20/20 chunks; providers paid 0.0298 KUSD, verifier fee 0.002 KUSD, refun
 - x402 verification fee in KUSD: [0.0.9185802-1793265395-911030960](https://hashscan.io/testnet/transaction/0.0.9185802-1793265395-911030960)
 - Slash with refund: [0x7701…3453](https://hashscan.io/testnet/transaction/0x77014040725c9eff004b691df0fbecea006a4d8b1dc6ae72ff78316a4f013453)
 - HCS receipts #89–#134 on [0.0.11212792](https://hashscan.io/testnet/topic/0.0.11212792): chunk and close receipts name the token (`"asset":"0.0.11220110"`), slash and admission receipts carry the provider's HCS-14 UAID.
-- Swarm audit bundle: [8ab1ba06…784a](https://api.gateway.ethswarm.org/bytes/8ab1ba069b9d893ae9b8e782b7bf560d0c963530f78968b649d1bede298d784a)
 
 ### Paid in HBAR
 
-Job `job-mvsji5xu-9915f8` labelled 60 tickets in 20 chunks on Hedera testnet, Arkiv Tiramisu, Swarm and 0G Private Computer, with five real provider accounts:
+Job `job-mvsji5xu-9915f8` labelled 60 tickets in 20 chunks on Hedera testnet, Arkiv Tiramisu and 0G Private Computer, with five real provider accounts:
 
 | Provider | Admission (known answers) | What happened |
 |---|---|---|
@@ -494,17 +490,16 @@ Result: 20/20 chunks complete; providers paid 0.026 ℏ, refunded 0.0036 ℏ, ve
   - Slash with refund to the buyer: [0x8f4f…8c27](https://hashscan.io/testnet/transaction/0x8f4f088b6463cafeab34c78a3d5455d02ba004dc996ebe95df42addb5c8b8c27)
 - **0G Private Computer**: verified reference runs, for example request `0533d7b7-547c-49f2-932f-ce7fd09c2a3d` (`qwen3.7-flash`, TeeTLS).
 - **Arkiv**: entities written by the buyer [`0x8ed8…73a6`](https://tiramisu.explorer.arkiv.network/address/0x8ed8a58f08a2caa800cbb4083e3691e5ca1e73a6), the verifier [`0xa19c…adc8`](https://tiramisu.explorer.arkiv.network/address/0xa19cc96ea9f0e414cebb149918e4c5549554adc8), and each provider. Query: `app = str('kinetic') AND kind = str('job') AND job_id = str('job-mvsji5xu-9915f8')`.
-- **Swarm**: this run's audit bundle (`9d0bf43a…f7e7`) went through the public gateway without a postage batch and is no longer retrievable. The bundles of the KUSD run above and the Ollama run below still open.
 
 The honest providers in the two runs above used the 0G model as a stand-in for a community GPU (no local model server was running). The known-answer admission check is what keeps that from being circular: it's scored against true labels, not against 0G.
 
 ### On a local model (Ollama, CPU only)
 
-Job `job-mvterakx-44ac85` ran with every provider on **Ollama `qwen2.5:3b-instruct` on a CPU-only laptop** (Intel integrated graphics, 16 GB RAM), paid in KUSD: 10/10 chunks, atlas-4090 and nimbus-a100 admitted at 100% of known answers, shoddy-1060 rejected at 33%, and all three hidden canaries agreed 100% with 0G's `qwen3.7-flash` (0G requests `f241f41a…`, `5df8eed9…`, `1d27d379…`). `npm run calibrate` on the same setup: 100% of known answers, 100% agreement with 0G over 6 chunks, a lazy provider at most 33%, about 12 s per chunk. Compute Passport on Swarm: [c3d81b88…c788](https://api.gateway.ethswarm.org/bytes/c3d81b885d6811ab6cb649389f1dc88e3166218f1af39dcd6e5d49b2955ec788).
+Job `job-mvterakx-44ac85` ran with every provider on **Ollama `qwen2.5:3b-instruct` on a CPU-only laptop** (Intel integrated graphics, 16 GB RAM), paid in KUSD: 10/10 chunks, atlas-4090 and nimbus-a100 admitted at 100% of known answers, shoddy-1060 rejected at 33%, and all three hidden canaries agreed 100% with 0G's `qwen3.7-flash` (0G requests `f241f41a…`, `5df8eed9…`, `1d27d379…`). `npm run calibrate` on the same setup: 100% of known answers, 100% agreement with 0G over 6 chunks, a lazy provider at most 33%, about 12 s per chunk.
 
 ## Running on testnets
 
-Everything below talks to the real networks: Hedera testnet (x402 through the public testnet facilitators, `x402.org` first with Blocky402 and Launa as failover, set by `X402_FACILITATOR_URLS`; HCS, the vault on the EVM through Hashio), Arkiv Rabdi, Swarm, and 0G Private Computer.
+Everything below talks to the real networks: Hedera testnet (x402 through the public testnet facilitators, `x402.org` first with Blocky402 and Launa as failover, set by `X402_FACILITATOR_URLS`; HCS, the vault on the EVM through Hashio), Arkiv Rabdi, and 0G (Private Computer and Storage).
 
 **What you need (KINETIC cannot create these for you):**
 
@@ -514,7 +509,6 @@ Everything below talks to the real networks: Hedera testnet (x402 through the pu
 | One Arkiv testnet wallet with gas | [hub.arkiv.network/faucet](https://hub.arkiv.network/faucet) (fund the Hedera key's EVM address, or any key) | gives every role gas for Arkiv writes |
 | An Arkiv access key (recommended) | [hub.arkiv.network/access-keys](https://hub.arkiv.network/access-keys), set as `ARKIV_API_KEY` | lifts the anonymous RPC rate limit that five providers plus a dashboard can hit |
 | A 0G Private Computer API key with credits | [pc.0g.ai](https://pc.0g.ai) | providers' work and verifier reference runs |
-| Swarm | nothing: the public gateway accepts small uploads and feed updates, but keeps them only for a while. For paid storage, see [docs/SWARM_STAMP.md](docs/SWARM_STAMP.md) (`BEE_POSTAGE_BATCH_ID` + `SWARM_STAMP_KEY` + `BEE_POSTAGE_DEPTH` through the gateway, or `BEE_URL` + `BEE_POSTAGE_BATCH_ID` on your own node) | chunk data, passports and their feeds |
 
 **Three commands:**
 
@@ -525,7 +519,7 @@ Everything below talks to the real networks: Hedera testnet (x402 through the pu
 OPERATOR_ID=0.0.xxxx OPERATOR_KEY=0x... ARKIV_FUNDER_KEY=0x... ARKIV_API_KEY=... ZEROG_API_KEY=... npm run setup:testnet
 
 # 2. Read-only preflight: accounts, aliases, balances, topic, vault verifiers and quorum, facilitator,
-#    0G model verifiability and credits, Arkiv gas
+#    0G model verifiability and credits, 0G Storage (indexer reachable, verifier has 0G for fees), Arkiv gas
 npm run doctor
 
 # 3a. Run one real job end to end and write the evidence file
@@ -544,7 +538,7 @@ Slashing is permanent for an address, so after a run where `QuickCompute` is sla
 - HashScan links for x402 payments, the verifier fee, the slash and the HCS topic.
 - 0G request ids for the canaries.
 - The Arkiv wallet addresses that wrote entities, with a query to run.
-- The Compute Passport on Swarm, and the command to check it.
+- The Compute Passport's 0G Storage root and link, and the command to check it.
 
 **Your own GPU instead of 0G.** A provider can run on its operator's own OpenAI-compatible server (Ollama, vLLM, llama.cpp) instead of 0G Compute. It then declares that backend, and if the server isn't answering at startup the provider doesn't start. On a laptop without a GPU:
 
@@ -601,7 +595,7 @@ npm test          # 159 tests: the vault contract in an in-process EVM, everythi
 npm run typecheck
 ```
 
-The suites run on a local emulator of Hedera, Arkiv, Swarm and 0G in [test/support/](test/support/), so they're fast and free. It speaks the same wire formats as the real networks and enforces the same rules (entity ownership and expiry, quorum-signed slashing with its dispute window, content-addressed Swarm chunks), with a deterministic keyword model in place of 0G so answers are checkable. It exists only for the tests: KINETIC refuses `KINETIC_NETWORK=devnet` outside the test runner.
+The suites run on a local emulator of Hedera, Arkiv and 0G in [test/support/](test/support/), so they're fast and free. It speaks the same wire formats as the real networks and enforces the same rules (entity ownership and expiry, quorum-signed slashing with its dispute window, files addressed by their 0G root), with a deterministic keyword model in place of 0G so answers are checkable. It exists only for the tests: KINETIC refuses `KINETIC_NETWORK=devnet` outside the test runner.
 
 - [test/core.test.ts](test/core.test.ts): chunking, canary selection, commit and reveal, the slash window, scoring, prompt parsing, encryption, format validation; providers run exactly the backend they declare, and only adversarial ones are labelled.
 - [test/integration.test.ts](test/integration.test.ts): the x402 gate. It covers the 402 quote, settlement, no charge on failure, budget refusal, replay rejection, and reconciling a payment whose response was lost. It also checks Arkiv ownership and expiry.
@@ -612,7 +606,7 @@ The suites run on a local emulator of Hedera, Arkiv, Swarm and 0G in [test/suppo
   - The lazy provider is slashed and refunded in full; the offline one is routed around.
   - Adversarial providers carry their label in the report, and are still admitted and paid until they're caught.
   - The buyer's balance falls by exactly paid minus refunded plus the verifier's fee.
-  - The Compute Passport is co-signed by the verifier and passes every offline and online check; a changed result fails.
+  - The Compute Passport is co-signed by the verifier, stored on 0G Storage, and passes every offline and online check; a changed result fails.
   - The HCS reveal matches the commitment.
   - With two providers at once, reserves step in when the first choices are slashed or go offline, and the job still completes.
   - A buyer's stricter rules and own examples are committed on HCS, applied, charged for, and met; a deadline that passes stops paid work and the passport says the agreement wasn't met.
@@ -622,8 +616,6 @@ The suites run on a local emulator of Hedera, Arkiv, Swarm and 0G in [test/suppo
 - [test/known.test.ts](test/known.test.ts): known answers. The labelled set splits into disjoint admission and planting halves; one item is planted per chunk under a lookalike id and committed; the lazy provider is slashed on missed known answers, which stay out of the results; the passport reveals where they were and passes every check; with the 0G reference disagreeing with every honest answer, honest providers are never slashed, and under the old rule they are.
 - [test/tiers.test.ts](test/tiers.test.ts): assurance tiers. Fees and quotes by tier; basic runs no canaries and says its results are format-only; high keeps a chunk only when two independent providers agree, and pays each chunk at least twice; confidential uses only TeeML-attested 0G nodes (a TeeTLS relay is excluded) and every kept chunk's attestation verified.
 - [test/wrap.test.ts](test/wrap.test.ts): wrapped chunk keys open only with the provider's key and the same job, chunk and provider, and refuse tampering.
-- [test/swarm-verify.test.ts](test/swarm-verify.test.ts): Swarm addresses match Bee's, multi-level trees rebuild, a changed chunk is refused, an erasure-coded root reads past its parity references; the live check record and its `active`/`stale`/`unproven` label.
-- [test/swarm-feed.test.ts](test/swarm-feed.test.ts): feed updates are signed single-owner chunks (a forged or changed one is refused), a model's passports land on one feed with a stable manifest, client-side postage stamps are checked and never reuse a slot across clients, and Swarm encryption is never used on the public gateway.
 - [test/ranking.test.ts](test/ranking.test.ts): provider ranking by price, track record and speed for each strategy.
 - [test/passport.test.ts](test/passport.test.ts): passport v2 matches its schema and derives every claim from the evidence; TeeML and TeeTLS stay separate; a passport that claims more correctness, a TEE it didn't have, or a rosier summary is caught even when re-signed. It also detects edits, results that differ from what providers signed, unbacked "verified" claims, a bad canary reveal, chunks below the agreed pass mark and an overstated outcome; agreements never go below the network's rules and must match what the verifier receives.
 
@@ -633,7 +625,7 @@ The suites run on a local emulator of Hedera, Arkiv, Swarm and 0G in [test/suppo
 contracts/KineticBondVault.sol   bonds, quorum slashing, disputes, refunds and burns (Hedera EVM)
 src/core/                         chunking, canaries (commit/reveal), slash policy and signed verdicts, job agreement, tiers
 src/tasks/                        prompts, output parsing, scoring
-src/integrations/                 x402, HCS, vault, Arkiv, Swarm, 0G, mirror node
+src/integrations/                 x402, HCS, vault, Arkiv, 0G (Compute, Storage), mirror node
 src/provider/                     provider node: bond, Arkiv offer, x402-gated /v1/chunks
 src/verifier/                     verifier agent: known answers, canaries, 0G references, slashing; cosigners that re-check
 src/agent/                        buyer agent: rank, split, pay, verify, reroute; Compute Passport v2 and its schema
@@ -642,7 +634,7 @@ src/live.ts                       the whole system on the real networks
 test/support/                     the tests' local emulator, scenario runner and keyword model
 web/                              live dashboard (Vite + React)
 scripts/                          setup:testnet, doctor, passport:verify, keys, vault deploy, HCS topic, dataset,
-                                  swarm:stamp, register:hol
+                                  migrate:passports, register:hol
 arkiv/                            how KINETIC uses Arkiv: schema, rationale, feedback
 data/                             sample tickets and task specs
 ```
@@ -659,13 +651,11 @@ data/                             sample tickets and task specs
 | **0G · Build with iAI** | Credits spent inside the app or by an agent, on 0G Private Computer | on 0G Private Computer: every provider does its work on 0G Compute ([src/provider/backend.ts](src/provider/backend.ts)); the verifier pays every canary's reference run on a different 0G model ([src/verifier/verifier.ts](src/verifier/verifier.ts)). A signed-in user's credits can pay for their own agent's calls |
 | | A clear reason to come back and spend tomorrow's credits | [The verifier agent pays its own way](#the-verifier-agent-pays-its-own-way): credits buy checks that earn fees |
 | | Users sign into their 0G account and their credit balance is read | [Sign in with 0G](#sign-in-with-0g): Privy → router session → balance; the user's credits can pay for their agent |
-| | Contract deployment addresses | KINETIC's own contract is the bond vault on Hedera; on 0G it uses the ERC-8004 registries on Galileo (registrations and feedback transactions) and 0G Storage: [evidence/README.md § 3](evidence/README.md#3-0g-does-the-ai-work-and-the-checks) |
+| | Contract deployment addresses | KINETIC's own contract is the bond vault on Hedera; on 0G it uses the ERC-8004 registries on Galileo (registrations and feedback transactions) and 0G Storage (model weights, and every Model and Compute Passport): [evidence/README.md § 3](evidence/README.md#3-0g-does-the-ai-work-and-the-checks) |
 | **Arkiv · Build on Arkiv** | Writes to Arkiv's testnet with `@arkiv-network/sdk`, and users see data read from it | offers, claims, jobs, chunks, reputation; buyer discovery and the whole dashboard read them back |
 | | Writer wallet addresses and one query | [evidence/README.md § 4](evidence/README.md#4-arkiv-holds-and-updates-the-marketplace) |
-| | `arkiv/schema.md`, `friction.md`, `reach.md`, `why-arkiv.md`, `how-you-use-arkiv.md`, `swarm.md` | [arkiv/](arkiv/) |
+| | `arkiv/schema.md`, `friction.md`, `reach.md`, `why-arkiv.md`, `how-you-use-arkiv.md` | [arkiv/](arkiv/) |
 | | Open-source license and how AI was used | [LICENSE](LICENSE), [How AI was used](#how-ai-was-used) |
-| **Arkiv × Swarm** | Uses both; Swarm references kept encrypted off public entities | [arkiv/swarm.md](arkiv/swarm.md), [Swarm and privacy](#swarm-and-privacy) |
-| | One Swarm reference to open | the Compute Passport in [evidence/README.md § 5](evidence/README.md#5-swarm-stores-the-files) |
 
 ## Known limits
 
@@ -680,11 +670,10 @@ data/                             sample tickets and task specs
 - **No model hashes.** `authenticity.model.hash` is always `null`: neither 0G nor OpenAI-compatible servers publish one, and the passport doesn't invent it.
 - **No delisting yet.** A listed model's status is only `reviewing`, `listed` or `refused`: a model that misbehaves on live jobs fails its chunks and its providers' checks, but isn't taken off the hub.
 - **The provider sandbox is declared, not enforced.** `PROVIDER_SANDBOX` is a label in the provider's own offer; [docker/ollama-sandbox.compose.yml](docker/ollama-sandbox.compose.yml) is provided, but nothing checks that a provider uses it.
-- **Revocation is for future chunks only.** A chunk key, once a provider has opened it, can't be taken back; nor can a Swarm reference.
+- **Revocation is for future chunks only.** A chunk key, once a provider has opened it, can't be taken back; nor can a sealed chunk it has received.
 - **One operator runs every provider.** The two honest and three adversarial providers are separate accounts and nodes, but they're all run by us, on one machine, to show the checks working. The adversarial ones label themselves. Anyone can run a provider ([Run a provider of your own](#running-on-testnets)); none has yet.
 - **Testnets only.** Nothing has run with real funds. Arkiv has no mainnet yet.
 - **One x402 payment per recipient.** The verifier's fee is a separate payment from each chunk's: the x402 `exact` scheme on Hedera, as the public facilitator verifies it, rejects a payment that credits more than the one `payTo` (`invalid_exact_hedera_payload_extra_positive_transfers`), so a split payment would need a facilitator of our own.
-- **Swarm storage on the public gateway is temporary.** Without our own postage batch, the gateway's own stamps keep uploads only for a while. Our batch lasts until about 2026-11-20 and has to be topped up after that, and it only stamps uploads while our Bee node runs; anyone running KINETIC without a node falls back to the gateway's own batch ([arkiv/swarm.md](arkiv/swarm.md#postage-batch-and-bee-node)). Client-stamped uploads have no erasure coding, and the passport's `/bzz` copy and feed manifest are still gateway-stamped. Old 128-hex references (from before uploads became plain) can't be checked against their address; they rely on KINETIC's AES-GCM sealing.
 - **0G sign-in needs 0G's Privy app id.** It's shared with teams at the event; the management-key path works without it.
 - **0G trust verdict.** No 0G route we tried returns the router's own `tee_verified` verdict, TeeML included, so KINETIC doesn't rely on it. The verifier checks each canary's TEE signature itself against the signer in 0G's serving contract ([The verifier agent pays its own way](#the-verifier-agent-pays-its-own-way)). The router seals requests end to end (`X-0G-E2EE: sealed`), though, so the TEE signs hashes of the ciphertext. The signature proves the registered enclave served that exchange, but KINETIC can't bind it to the plaintext answer.
 

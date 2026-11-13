@@ -38,10 +38,10 @@ export function SiteFooter({ snap }: { snap: Snapshot | null }) {
           {snap ? (
             <>
               <span className="ak-live" aria-hidden />
-              {REPLAY ? "Synthetic replay" : `Hedera ${snap.status.network}`} · 0G · Arkiv · Swarm · Updated {new Date(snap.at).toLocaleTimeString()}
+              {REPLAY ? "Synthetic replay" : `Hedera ${snap.status.network}`} · 0G · Arkiv · Updated {new Date(snap.at).toLocaleTimeString()}
             </>
           ) : (
-            "Hedera · 0G · Arkiv · Swarm"
+            "Hedera · 0G · Arkiv"
           )}
         </span>
       </div>

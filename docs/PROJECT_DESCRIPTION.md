@@ -4,9 +4,9 @@
 
 ## In one paragraph
 
-KINETIC lets AI apps and agents run batch AI work, such as labelling, tagging and extraction, on cheap community GPUs without having to trust whoever runs them. Each job is split into small chunks, and each chunk is paid for separately over x402 on Hedera, only after its result comes back. Hidden questions with known answers are planted inside the work, so a provider that skips the work is caught. Its bond is then slashed by a quorum of verifiers, and the buyer is refunded automatically from that bond. Chunks from providers that fail or go offline move to others. Every job ends with a signed, public **Compute Passport** that anyone can check without trusting KINETIC. It runs live on Hedera testnet, 0G, Arkiv and Swarm.
+KINETIC lets AI apps and agents run batch AI work, such as labelling, tagging and extraction, on cheap community GPUs without having to trust whoever runs them. Each job is split into small chunks, and each chunk is paid for separately over x402 on Hedera, only after its result comes back. Hidden questions with known answers are planted inside the work, so a provider that skips the work is caught. Its bond is then slashed by a quorum of verifiers, and the buyer is refunded automatically from that bond. Chunks from providers that fail or go offline move to others. Every job ends with a signed, public **Compute Passport** that anyone can check without trusting KINETIC. It runs live on Hedera testnet, 0G and Arkiv.
 
-**Short version:** *Use community GPUs for AI without the risk: pay per chunk, every result checked, cheaters refund you automatically. Live on Hedera, 0G, Arkiv and Swarm.*
+**Short version:** *Use community GPUs for AI without the risk: pay per chunk, every result checked, cheaters refund you automatically. Live on Hedera, 0G and Arkiv.*
 
 ---
 
@@ -37,13 +37,13 @@ KINETIC makes cheap compute safe to buy with four steps that run on every job:
 ## How a job runs
 
 1. **Ask.** The buyer starts a job from the dashboard, from the command line or from code.
-2. **Lock in the rules.** The buyer agent splits the job into chunks, encrypts each with its own key and uploads it to Swarm. It registers the job with the verifier and pays a small verification fee over x402. The job's rules are committed on Hedera HCS before any work starts: the share of chunks checked, the pass mark and a firm price quote. The verifier also commits, in secret, to which chunks it will check.
+2. **Lock in the rules.** The buyer agent splits the job into chunks, and encrypts each with its own key. It registers the job with the verifier, sending it the sealed chunks, and pays a small verification fee over x402. The job's rules are committed on Hedera HCS before any work starts: the share of chunks checked, the pass mark and a firm price quote. The verifier also commits, in secret, to which chunks it will check.
 3. **Find providers.** The buyer discovers provider offers on Arkiv. Offers expire unless the provider keeps renewing them, so a dead node disappears on its own. It checks each provider's bond in the vault and its HCS-14 agent identity, then ranks the providers on price, track record and speed.
 4. **Admit.** The verifier pays each provider for a probe chunk of known-answer items. The probe looks exactly like real work. Providers that answer wrong are rejected.
-5. **Work and pay.** For each chunk, the buyer claims it on Arkiv and sends a paid x402 request on Hedera. The provider runs it on 0G Compute (or its own GPU), returns a signed result, and settles the payment only on success.
+5. **Work and pay.** For each chunk, the buyer claims it on Arkiv and sends a paid x402 request on Hedera that carries the sealed chunk. The provider runs it on 0G Compute (or its own GPU), returns a signed result, and settles the payment only on success.
 6. **Check.** The verifier checks the result's signature, the payment on the Hedera mirror node, the format and the planted known answer, and compares sampled chunks with a 0G reference run. Every check becomes an HCS receipt and updates the provider's reputation on Arkiv.
 7. **Enforce and recover.** At the failure limit (3 of a provider's last 10 checks), the cosigning verifiers re-check the evidence independently, and 2 of 3 sign a slash in the bond vault. After a dispute window, the buyer is refunded and the rest of the bond is burned. The provider's chunks are redone elsewhere.
-8. **Prove.** The verifier reveals its hidden check set on HCS. Then a Hedera PRNG seed, drawn only after the reveal, picks finished chunks to re-check on 0G, and the verifier anchors one Merkle root over the job's finished chunks on HCS (`hcs.merkleRootAnchor`). The buyer signs a **Compute Passport**, the verifier co-signs it only if it matches its own records, and it's published on Swarm.
+8. **Prove.** The verifier reveals its hidden check set on HCS. Then a Hedera PRNG seed, drawn only after the reveal, picks finished chunks to re-check on 0G, and the verifier anchors one Merkle root over the job's finished chunks on HCS (`hcs.merkleRootAnchor`). The buyer signs a **Compute Passport**, the verifier co-signs it only if it matches its own records, and the verifier stores it on 0G Storage.
 
 ---
 
@@ -60,12 +60,12 @@ KINETIC makes cheap compute safe to buy with four steps that run on every job:
 - **A buyer can't fake a refund.** Results are signed by the provider. Refunds are sized from the transfers the Hedera mirror node shows, not from what the buyer claims.
 - **Privacy:**
   - Each chunk is encrypted with its own key, and that key is wrapped so only the assigned provider can open it, for that job and chunk only.
-  - Swarm references are sealed before they go on public Arkiv entities.
+  - Chunk data never goes on public Arkiv entities; it travels only inside the paid request.
   - A provider that is slashed, quarantined or goes offline never receives keys for later chunks.
 
 ## The Compute Passport
 
-Every finished job produces a **Compute Passport** (`kinetic.passport.v2`): one public, signed JSON file on Swarm, published with a JSON Schema so any application can check it without KINETIC's code.
+Every finished job produces a **Compute Passport** (`kinetic.passport.v2`): one public, signed JSON file on 0G Storage, addressed by its Merkle root and published with a JSON Schema so any application can check it without KINETIC's code.
 
 - **Contents:**
   - For every chunk: which provider ran it, its signed result hash, its payment, and which checks it passed.
@@ -75,7 +75,7 @@ Every finished job produces a **Compute Passport** (`kinetic.passport.v2`): one 
   - A list of what the passport does **not** prove.
 - **Two questions kept apart:** *where and how it ran* (0G node, TEE guarantee) and *whether the answer was right* (ground truth, two providers agreeing, model agreement, or format only). An attested model can still give a wrong answer, and a correct answer doesn't prove which model produced it.
 - **Signatures:** the buyer and the verifier both sign it. The verifier refuses to sign if anything differs from its own records.
-- **Anyone can check it:** `npm run passport:verify -- <swarm reference>` checks the signatures, the reveals, the summary and the spending. Online, it also checks HCS, the mirror node and the vault. Editing any field breaks it.
+- **Anyone can check it:** `npm run passport:verify -- <0G root>` checks the bytes against the root, the signatures, the reveals, the summary and the spending. Online, it also checks HCS, the mirror node and the vault. Editing any field breaks it.
 
 ---
 
@@ -105,7 +105,7 @@ Every finished job produces a **Compute Passport** (`kinetic.passport.v2`): one 
 - **Smart provider choice:** providers are ranked on price, track record and speed (`cheapest`, `balanced` or `fastest`). Reserves step in when a provider is slashed or drops out.
 - **Model check (fingerprinting):** borderline items that different models answer differently reveal whether a provider swapped in a smaller model. It is recorded as evidence and never used to slash.
 - **Job agreement:** the buyer sets the share of chunks checked, the pass mark, its own labelled examples and a deadline, all committed on HCS before work.
-- **Model hub:** creators publish open models (safetensors weights on 0G Storage or Swarm) and earn a royalty on every accepted chunk. Three verifiers scan and benchmark each model and sign its Model Passport before it is listed. See [MODEL_HUB.md](MODEL_HUB.md).
+- **Model hub:** creators publish open models (safetensors weights on 0G Storage) and earn a royalty on every accepted chunk. Three verifiers scan and benchmark each model and sign its Model Passport before it is listed. See [MODEL_HUB.md](MODEL_HUB.md).
 - **Self-funding verifier:** the verifier spends daily 0G credits on checks and earns HBAR fees for them, a reason to come back and use each day's credits.
 
 ---
@@ -115,11 +115,10 @@ Every finished job produces a **Compute Passport** (`kinetic.passport.v2`): one 
 | | How KINETIC uses it |
 |---|---|
 | **Hedera** | x402 payments in HBAR (per chunk, listing fees, royalties) through public facilitators, with failover between x402.org, Blocky402 and Launa. `KineticBondVault` on Hedera EVM holds bonds and handles quorum slashing, disputes, refunds and burns, and executes a slash itself when its dispute window closes (HIP-1215 scheduled call). Its Hedera PRNG seed picks the post-job spot checks. HCS is the audit log for every payment, check, slash and reveal, plus one Merkle anchor per job. The mirror node re-checks payments. Every agent has an HCS-14 identity. |
-| **0G** | Providers do their work on 0G Compute (`0gm-1.0-35b-a3b`, TeeML). The verifier checks them against a different 0G model (`glm-5.3`, TeeML; canaries run in 0G's `private` trust mode), paid from its 0G credits, and verifies each enclave's signature itself. 0G Storage holds multi-GB model weights. ERC-8004 on 0G Chain gives every GPU and the verifier an agent identity and each GPU its measured reputation. Users can sign in with 0G and pay with their own credits. |
+| **0G** | Providers do their work on 0G Compute (`0gm-1.0-35b-a3b`, TeeML). The verifier checks them against a different 0G model (`glm-5.3`, TeeML; canaries run in 0G's `private` trust mode), paid from its 0G credits, and verifies each enclave's signature itself. 0G Storage holds multi-GB model weights and every Model and Compute Passport. ERC-8004 on 0G Chain gives every GPU and the verifier an agent identity and each GPU its measured reputation. Users can sign in with 0G and pay with their own credits. |
 | **Arkiv** | Expiring provider offers, chunk claims with leases, job and chunk state, reputation, model listings, and one expiring, readonly entity per check. Buyers find providers by query, and the dashboard reads from Arkiv, with changes pushed through the verifier's stream of Arkiv entity events. |
-| **Swarm** | Encrypted chunk data and results, downloads checked against their content address, the public Compute Passport for every job, and Model Passports with a signed feed per model. |
 
-**Tech:** TypeScript and Node.js (agents, providers, verifiers, CLI, SDK), Solidity (bond vault), React and Vite (dashboard), Vitest (210 tests on a local emulator of all four networks, plus the vault contract in an in-process EVM). MIT licensed.
+**Tech:** TypeScript and Node.js (agents, providers, verifiers, CLI, SDK), Solidity (bond vault), React and Vite (dashboard), Vitest (206 tests on a local emulator of all three networks, plus the vault contract in an in-process EVM). MIT licensed.
 
 ---
 
@@ -139,7 +138,6 @@ Result: **20/20 chunks**, agreement met, 0.0252 ℏ paid to providers, 0.003 ℏ
 - Chunk payment on HashScan: [0.0.9185802-1793523703-790308673](https://hashscan.io/testnet/transaction/0.0.9185802-1793523703-790308673)
 - Slash proposed (3 signatures): [0xd4101e26…2798](https://hashscan.io/testnet/transaction/0xd4101e264b910d5e2e08229f710b240b9d837edf0cc3ce197761cafff2f72798)
 - Slash executed, refund to the buyer: [0xcc1989d4…1f3f](https://hashscan.io/testnet/transaction/0xcc1989d4ab3032c631c273b0783625327b01cadbad3c71c2f6a2e1b6194e1f3f)
-- Compute Passport on Swarm: [1d3cf8a5…af5](https://api.gateway.ethswarm.org/bytes/1d3cf8a5a50ffe76c5925b8a510e9cd059d3e85b6e0374ed3b8a3669db404af5)
 - HCS audit topic: [0.0.11212792](https://hashscan.io/testnet/topic/0.0.11212792)
 - Bond vault (2 of 3 verifiers to slash): [0x11d7…b294](https://hashscan.io/testnet/contract/0x11d76cec886b06d5f8e7f4e7d9a5fa2c9808b294)
 

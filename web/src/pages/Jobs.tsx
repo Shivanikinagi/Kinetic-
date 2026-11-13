@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { amountOf, getCanaries, hbar, jobStartedAt, listingsOf, refundsOf, short, type CanaryResult, type Entity, type ModelListing, type Receipt } from "../data";
+import { amountOf, getCanaries, hbar, isStorageRef, jobStartedAt, listingsOf, refundsOf, short, storageLink, type CanaryResult, type Entity, type ModelListing, type Receipt } from "../data";
 import { go, useLive, type Snapshot } from "../live";
 import { ChunkGrid, Diff, Meter, Progress, ProviderName, ReceiptText, StatusTag, Tag, TxLink, receiptTag, receiptTone, timeOf } from "../ui";
 import { sortedJobs } from "./Overview";
@@ -292,9 +292,9 @@ export function JobDetail({ snap, jobId }: { snap: Snapshot; jobId: string }) {
           {tab === "chunks" && (
             <>
               <h3 className="h3">
-                Chunks <Tag>{`${own.length} on Swarm`}</Tag>
+                Chunks <Tag>{`${own.length} sealed`}</Tag>
               </h3>
-              <p className="note" title="Encrypted on Swarm. Hover a chunk for its state and provider.">
+              <p className="note" title="Each chunk is sealed with its own key and travels only inside the paid request to its GPU. Hover a chunk for its state and provider.">
                 {rerouted ? `${rerouted} chunk${rerouted === 1 ? "" : "s"} moved to another provider.` : "No chunk had to be rerouted."}
               </p>
               <ChunkGrid chunks={own} label={label} failed={canaryByIdx} />
@@ -658,16 +658,20 @@ export function JobDetail({ snap, jobId }: { snap: Snapshot; jobId: string }) {
               ) : null}
               <li>
                 <span className="muted">Compute Passport</span>
-                {job.attrs.audit_ref && status.swarmGateway ? (
-                  <a className="ext mono" href={`${status.swarmGateway}/bytes/${job.attrs.audit_ref}`} target="_blank" rel="noreferrer" title={String(job.attrs.audit_ref)}>
+                {storageLink(status, String(job.attrs.audit_ref ?? "")) ? (
+                  <a className="ext mono" href={storageLink(status, String(job.attrs.audit_ref))!} target="_blank" rel="noreferrer" title={`On 0G Storage: ${String(job.attrs.audit_ref)}`}>
                     {short(String(job.attrs.audit_ref), 6)}
                   </a>
+                ) : job.attrs.audit_ref ? (
+                  <span className="mono muted" title="Stored before passports moved to 0G Storage: this reference can't be opened here">
+                    {short(String(job.attrs.audit_ref), 6)}
+                  </span>
                 ) : (
-                  <span className="muted">uploaded at close</span>
+                  <span className="muted">stored at close</span>
                 )}
               </li>
             </ul>
-            {job.attrs.audit_ref ? (
+            {isStorageRef(String(job.attrs.audit_ref ?? "")) ? (
               <details className="more">
                 <summary>Verify the passport yourself</summary>
                 <pre className="cmd">{`npm run passport:verify -- ${String(job.attrs.audit_ref)}`}</pre>

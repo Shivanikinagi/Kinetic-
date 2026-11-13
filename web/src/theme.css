@@ -35,8 +35,6 @@
   --topbar: rgba(11, 12, 14, 0.92);
   --zg-bg: rgba(169, 212, 245, 0.12);
   --zg-ink: #a9d4f5;
-  --swarm-bg: rgba(217, 167, 94, 0.12);
-  --swarm-ink: #d9a75e;
   --r: 10px;
   --r-chip: 6px;
   --shadow: none;
@@ -826,11 +824,6 @@ button.store {
 .checks li.ok,
 .checks li.na {
   color: var(--ink);
-}
-
-.store.swarm {
-  background: var(--swarm-bg);
-  color: var(--swarm-ink);
 }
 
 .checks {

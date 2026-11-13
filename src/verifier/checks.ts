@@ -20,7 +20,7 @@ export interface SlashPacket {
   /** The verdict to sign, refund as a decimal string. */
   verdict: { provider: string; buyer: string; jobId: string; chunk: number; resultHash: string; refundTinybar: string; evidence: string };
   /** The job as the buyer registered it, job key included so canary chunks can be re-run. */
-  registration: { jobId: string; buyer: string; task: TaskSpec; chunks: { idx: number; swarmRef: string; itemIds?: string[] }[]; jobKey: string };
+  registration: { jobId: string; buyer: string; task: TaskSpec; chunks: { idx: number; data: string; itemIds?: string[] }[]; jobKey: string };
   /** The canary set and salt, checked against the commitment on HCS. */
   canaries: { indices: number[]; salt: string };
   /** Where known answers were planted, checked against the job's `known` commitment on HCS. */

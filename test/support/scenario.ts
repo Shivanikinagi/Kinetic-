@@ -72,7 +72,7 @@ export interface ScenarioOptions {
    * quorum), the providers named in `serve` (default all) load it after checking its passport and
    * weights, and the buyer runs the job on that model and pays the creator's royalty.
    */
-  modelHub?: { royaltyBps?: number; serve?: string[]; storage?: "0g" | "swarm" };
+  modelHub?: { royaltyBps?: number; serve?: string[] };
 }
 
 export interface Scenario {
@@ -191,7 +191,6 @@ export async function runScenario(opts: ScenarioOptions = {}): Promise<Scenario>
         royaltyBps: opts.modelHub.royaltyBps ?? 500,
       },
       files: tinyModelFiles(),
-      ...(opts.modelHub.storage ? { storage: opts.modelHub.storage } : {}),
     });
     hub = { creator, published };
   }

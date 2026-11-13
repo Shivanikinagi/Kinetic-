@@ -46,7 +46,7 @@ async function makePassport(): Promise<Passport> {
     payment: { id: "0.0.0", symbol: "HBAR", decimals: 8 },
     verificationFee: { tinybar: "20000" },
     providers: [report],
-    references: { x402Network: "kinetic:devnet", hcsTopic: "0.0.5005", mirrorUrl: "", swarmGateway: "" },
+    references: { x402Network: "kinetic:devnet", hcsTopic: "0.0.5005", mirrorUrl: "", storageGateway: "" },
     agreement: makeAgreement({ task, policy: { canaryRate: 0.25, minAgreement: 0.8 }, budget: { asset: "0.0.0", maxSpend: "1000000", maxPricePerChunk: "100000" }, input: { minAgreement: 0.9 } }),
     outcome: { met: true, notes: ["all 2 chunks finished within the budget"] },
   });

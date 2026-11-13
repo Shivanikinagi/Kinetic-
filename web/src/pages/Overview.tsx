@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { REPLAY, gpuState, hbar, jobStartedAt, listingsOf, refundsOf, short } from "../data";
 import { go, useLive, type Snapshot } from "../live";
+import { NetworkRing } from "../netring";
 import { ReceiptText, StatusTag, Tag, receiptTag, receiptTone, timeOf } from "../ui";
 import { latestPerId } from "./Models";
 
@@ -70,6 +71,18 @@ export default function Overview({ snap }: { snap: Snapshot }) {
           <b>{status.network}</b>
           <span>Network</span>
         </div>
+      </section>
+
+      <section className="panel section net-panel" aria-labelledby="net-h">
+        <div className="panel-head">
+          <span className="label" id="net-h">
+            Network
+          </span>
+          <a className="link small" href="#/providers">
+            All GPUs →
+          </a>
+        </div>
+        <NetworkRing />
       </section>
 
       <div className="grid-2 section">

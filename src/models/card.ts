@@ -28,8 +28,6 @@ export interface ModelWeightsFile {
   name: string;
   sha256: string;
   bytes: number;
-  /** Public (unencrypted) Swarm reference to the file. */
-  swarmRef?: string;
   /** 0G Storage root hash of the file (0x + 64 hex), for weights stored on 0G. */
   zgRoot?: string;
 }
@@ -106,10 +104,9 @@ export function cardProblems(card: ModelCard): string[] {
     if (files.length === 0 || files.length > 64) p.push("weights must list 1 to 64 files");
     for (const f of files) {
       if (!f.name || !/^[0-9a-f]{64}$/.test(f.sha256 ?? "") || !Number.isSafeInteger(f.bytes) || f.bytes < 0) p.push(`weights file ${f.name || "?"} needs a name, sha256 and size`);
-      if (f.swarmRef !== undefined && !/^[0-9a-f]{64}$/.test(f.swarmRef)) p.push(`weights file ${f.name} has a bad Swarm reference (public, 64 hex)`);
       if (f.zgRoot !== undefined && !/^0x[0-9a-f]{64}$/.test(f.zgRoot)) p.push(`weights file ${f.name} has a bad 0G Storage root (0x + 64 hex)`);
     }
-    if (files.some((f) => !f.swarmRef && !f.zgRoot) && !card.weights.source) p.push("every weights file needs a 0G Storage root, a Swarm reference or a source to download it from");
+    if (files.some((f) => !f.zgRoot) && !card.weights.source) p.push("every weights file needs a 0G Storage root or a source to download it from");
   }
   return p;
 }

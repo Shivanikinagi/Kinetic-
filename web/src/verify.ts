@@ -1,6 +1,5 @@
 import { recoverMessageAddress, type Hex } from "viem";
-import type { ModelListing, ModelPassport } from "./data";
-import { feedTopic, fetchVerified, latestFeedUpdate, modelPassportTopicName } from "./swarm";
+import { getStoredPassport, isStorageRef, type ModelListing, type ModelPassport } from "./data";
 
 // Model Passports, checked in the browser: the same digests and signatures the verifiers sign,
 // recomputed here with WebCrypto and viem, so the page doesn't take the server's word for it.
@@ -85,55 +84,18 @@ const passportDigestOf = async (p: ModelPassport) => {
 };
 
 /**
- * The passport straight from Swarm, not from the verifier's API: every chunk checked against
- * the listing's reference (BMT), and the bytes are the passport the listing names.
+ * The passport as stored on 0G Storage, by the root the listing names. The verifier serves it and
+ * checks the bytes against that root (recomputing 0G's Merkle root needs the 0G SDK); the digest
+ * is checked here, so a different passport can't pass.
  */
-export async function verifyPassportOnSwarm(gateway: string, listing: ModelListing): Promise<BrowserCheck> {
-  const name = "Passport on Swarm matches its address and the listing";
+export async function verifyPassportStored(listing: ModelListing): Promise<BrowserCheck> {
+  const name = "Passport on 0G Storage is the one the listing names";
+  if (!isStorageRef(listing.passportRef)) return { name, ok: null, detail: "this listing's passport isn't on 0G Storage yet" };
   try {
-    const bytes = await fetchVerified(gateway, listing.passportRef);
-    const digest = await passportDigestOf(JSON.parse(new TextDecoder().decode(bytes)) as ModelPassport);
-    return { name, ok: digest === listing.passportDigest, detail: `${bytes.length.toLocaleString("en-US")} bytes, every chunk checked` };
+    const p = await getStoredPassport<ModelPassport>(listing.passportRef);
+    const digest = await passportDigestOf(p);
+    return { name, ok: digest === listing.passportDigest, detail: `root ${listing.passportRef.slice(0, 10)}… checked by the verifier, digest checked here` };
   } catch (err) {
     return { name, ok: false, detail: (err as Error).message };
-  }
-}
-
-export interface PassportFeedCheck {
-  check: BrowserCheck;
-  /** The listing the feed's newest update points at, when it is a listed passport. */
-  latest?: ModelListing;
-  /** Stable URL of the model's newest passport (the feed manifest). */
-  url?: string;
-}
-
-/**
- * The model's passport feed: its newest update is signed by a vault verifier (checked here from
- * the single-owner chunk) and points at a passport the registry lists for this model.
- */
-export async function verifyPassportFeed(gateway: string, listing: ModelListing, listings: ModelListing[], verifiers: string[]): Promise<PassportFeedCheck> {
-  const name = "Newest passport, from the model's signed feed";
-  const feed = listing.feed;
-  if (!feed) return { check: { name, ok: null, detail: "this listing has no feed" } };
-  const url = `${gateway}/bzz/${feed.manifest}/`;
-  try {
-    const topic = feedTopic(modelPassportTopicName(listing.card.id));
-    if (topic !== feed.topic) return { url, check: { name, ok: false, detail: "feed topic isn't this model's" } };
-    if (!verifiers.map((v) => v.toLowerCase().replace(/^0x/, "")).includes(feed.owner.toLowerCase())) return { url, check: { name, ok: false, detail: `feed owner 0x${feed.owner} isn't a vault verifier` } };
-    const update = await latestFeedUpdate(gateway, feed.owner, topic);
-    if (!update) return { url, check: { name, ok: false, detail: "no update found" } };
-    const res = await fetch(`${gateway}/bzz/${update.reference}/`);
-    if (!res.ok) return { url, check: { name, ok: false, detail: `newest passport: gateway answered ${res.status}` } };
-    const digest = await passportDigestOf((await res.json()) as ModelPassport);
-    const latest = listings.find((l) => l.card.id === listing.card.id && l.passportDigest === digest);
-    if (!latest) return { url, check: { name, ok: false, detail: `update ${update.index} points at a passport the registry doesn't list` } };
-    const when = new Date(update.timestamp * 1000).toISOString().slice(0, 16).replace("T", " ");
-    return {
-      url,
-      latest,
-      check: { name, ok: true, detail: `update ${update.index} (${when} UTC), signed by 0x${update.signer.slice(0, 8)}…: ${latest.key === listing.key ? "this version" : `v${latest.card.version}`}` },
-    };
-  } catch (err) {
-    return { url, check: { name, ok: false, detail: (err as Error).message } };
   }
 }

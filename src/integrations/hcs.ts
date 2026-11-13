@@ -12,7 +12,7 @@ export type Receipt =
   // `spot`: how many chunks a PRNG seed drawn after the reveal will pick to re-check (core/spot.ts).
   | { t: "job"; job: string; buyer: string; chunks: number; task: string; commitment: string; agreement?: string; known?: string; model?: string; spot?: number }
   // A Model Passport issued: the model version (key, id, version), the passport's digest and
-  // Swarm reference, its benchmark accuracy, and the verifiers whose signatures carried it.
+  // 0G Storage root, its benchmark accuracy, and the verifiers whose signatures carried it.
   | { t: "model"; model: string; id: string; version: string; creator: string; royaltyBps: number; digest: string; ref: string; accuracy: number; signers: string[] }
   // The creator's royalty for a job, paid by the buyer over x402 straight to the creator.
   // `basis`: the accepted chunk payments it was computed on. Amounts are tinybar.

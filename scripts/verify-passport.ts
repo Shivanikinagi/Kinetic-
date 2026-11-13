@@ -2,13 +2,14 @@ import "../src/env.js";
 import { existsSync, readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { verifyPassport, type Passport } from "../src/agent/passport.js";
-import { SWARM_PUBLIC_GATEWAY } from "../src/config.js";
-import { verifiedJoin } from "../src/integrations/swarm-bmt.js";
+import { loadNetworkConfig } from "../src/config.js";
+import { isStorageRef } from "../src/integrations/storage-ref.js";
+import { ZgStorageClient } from "../src/integrations/zg-storage.js";
 import type { ItemOutput } from "../src/types.js";
 
 // Checks a KINETIC Compute Passport. Anyone can run it; it needs no keys.
 //
-//   npm run passport:verify -- <swarm reference | passport.json> [--results out/<jobId>.json] [--offline]
+//   npm run passport:verify -- <0G Storage root | passport.json> [--results out/<jobId>.json] [--offline]
 //
 // Offline it checks the signatures, the canary commit/reveal, every provider's signed result
 // hash and each canary's 0G TEE signature (EIP-191, against the signer recorded with it).
@@ -24,7 +25,8 @@ const { values, positionals } = parseArgs({
   options: {
     results: { type: "string" },
     offline: { type: "boolean", default: false },
-    gateway: { type: "string", default: process.env.SWARM_GATEWAY_URL || "" },
+    // The 0G Storage indexer to fetch the passport through (default: the configured one).
+    indexer: { type: "string", default: "" },
     // The passport names its own mirror node; only an explicit flag overrides it (not .env,
     // which may point at another network).
     mirror: { type: "string", default: "" },
@@ -34,21 +36,17 @@ const { values, positionals } = parseArgs({
 
 const target = positionals[0];
 if (!target) {
-  console.error("usage: npm run passport:verify -- <swarm reference | passport.json> [--results out/<jobId>.json] [--offline]");
+  console.error("usage: npm run passport:verify -- <0G Storage root | passport.json> [--results out/<jobId>.json] [--offline]");
   process.exit(2);
 }
 
 async function load(): Promise<Passport> {
   if (existsSync(target)) return JSON.parse(readFileSync(target, "utf8"));
-  if (!/^[0-9a-f]{64}$/.test(target)) throw new Error(`${target} is neither a file nor a 64-hex Swarm reference`);
-  const gateway = (values.gateway || SWARM_PUBLIC_GATEWAY).replace(/\/$/, "");
-  // Chunk by chunk, each checked against its address: the gateway can't hand back a different passport.
-  const bytes = await verifiedJoin(target, async (address) => {
-    const res = await fetch(`${gateway}/chunks/${address}`);
-    if (!res.ok) throw new Error(`Swarm returned ${res.status} for chunk ${address.slice(0, 12)}… of ${target} (try --gateway <url>)`);
-    return new Uint8Array(await res.arrayBuffer());
-  });
-  console.log(`  ✓ passport bytes match Swarm reference ${target.slice(0, 16)}…`);
+  if (!isStorageRef(target)) throw new Error(`${target} is neither a file nor a 0G Storage root (0x + 64 hex)`);
+  const indexer = values.indexer || loadNetworkConfig().zgStorage.indexerUrl;
+  // The client recomputes the 0G Merkle root from the bytes it gets: the indexer can't hand back a different passport.
+  const bytes = await new ZgStorageClient({ indexerUrl: indexer, rpcUrl: "" }).download(target);
+  console.log(`  ✓ passport bytes match 0G Storage root ${target.slice(0, 18)}…`);
   return JSON.parse(new TextDecoder().decode(bytes)) as Passport;
 }
 

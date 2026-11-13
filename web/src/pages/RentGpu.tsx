@@ -73,7 +73,7 @@ npm run kinetic -- provider`}</pre>
               </span>
               <span>
                 Buyers' data stays private
-                <span className="d">Chunks arrive encrypted from Swarm.</span>
+                <span className="d">Chunks arrive sealed inside each paid request.</span>
               </span>
             </li>
             <li className="bad">

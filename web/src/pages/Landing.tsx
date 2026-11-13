@@ -1,12 +1,15 @@
 // Landing page. Its structure follows the Akash Network website's homepage (MIT, github.com/akash-network/website):
 // headline, "Built on" strip, auto-advancing showcase, numbered "How it works" stepper beside a
 // live window, card grid, closing band and column footer. Content, brand and visuals are KINETIC's own.
-import { useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
+// The problem-first section and the walkthrough beside the live network ring take their idea (not their
+// look) from the GPU Pool pitch: say what's broken first, then step through how the network fixes it.
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import {
   ArrowRight,
   BrainCircuit,
-  Check,
+  ChevronLeft,
   ChevronRight,
+  Cpu,
   Database,
   Gauge,
   MonitorCheck,
@@ -14,11 +17,11 @@ import {
   Pause,
   Play,
   ShieldX,
-  X,
   type LucideProps,
 } from "lucide-react";
 import { REPLAY } from "../data";
 import { HexField } from "../hexfield";
+import { NetworkRing } from "../netring";
 import { go } from "../live";
 import { Tag } from "../ui";
 
@@ -28,9 +31,8 @@ const REDUCED = typeof window !== "undefined" && window.matchMedia("(prefers-red
 
 const STACK: [string, string][] = [
   ["Hedera", "Payments"],
-  ["0G", "Compute"],
+  ["0G", "Compute · Storage"],
   ["Arkiv", "State"],
-  ["Swarm", "Storage"],
 ];
 
 const ROLES: { title: string; text: string; href: string; cta: string; shot: string; alt: string }[] = [
@@ -60,11 +62,21 @@ const ROLES: { title: string; text: string; href: string; cta: string; shot: str
   },
 ];
 
-const STEPS: [string, string][] = [
-  ["Publish", "Verifiers scan, benchmark and sign every model."],
-  ["Run", "Jobs split into chunks across community GPUs. Pay per chunk in HBAR."],
-  ["Check", "Hidden known answers and 0G canaries test every GPU."],
-  ["Refund", "Cheating GPUs are slashed. You're refunded from their bond."],
+/** The six stages every job goes through. `look` says what the ring highlights for each. */
+const STAGES: { title: string; text: string; look: string }[] = [
+  { title: "Qualify", text: "A new GPU answers known-answer probes before it's paid for anything. A GPU that fails is never paid.", look: "Rejected GPUs are marked in amber. They never get paid work." },
+  { title: "Split", text: "Each job is cut into small chunks, each paid for separately over x402, so you never have more than a few chunks at risk.", look: "Chunks travel from live GPUs to the verifier." },
+  { title: "Verify", text: "Hidden known answers and 0G TeeML canaries are mixed into real work. A GPU can't tell a check from a paid chunk.", look: "Every result passes through the verifier." },
+  { title: "Enforce", text: "A GPU that fails too many checks is slashed by a verifier quorum. You're refunded from its bond.", look: "Slashed GPUs turn red." },
+  { title: "Recover", text: "Chunks from cheating or offline GPUs move to honest ones automatically, so the job still finishes.", look: "Offline and slashed links go dark; live ones carry the work." },
+  { title: "Prove", text: "Every payment, check and slash is a receipt on Hedera HCS, and the job ends with a signed Compute Passport.", look: "Receipts land on the HCS topic." },
+];
+
+/** How cheap compute cheats. These are the three ways KINETIC's own adversarial test GPUs cheat on the live testnet. */
+const CHEATS: { at: number; what: string }[] = [
+  { at: 2, what: "never runs the model" },
+  { at: 6, what: "stops after a few chunks" },
+  { at: 9, what: "takes the payment, goes offline" },
 ];
 
 const CAPABILITIES: [Icon, string, string][] = [
@@ -115,15 +127,21 @@ export default function Landing() {
         </ul>
       </section>
 
+      <section className="ak-band" aria-labelledby="pb-h">
+        <div className="ak-wrap">
+          <Problem />
+        </div>
+      </section>
+
       <section className="ak-band" aria-labelledby="ak-about-h">
         <div className="ak-wrap">
           <Showcase />
         </div>
       </section>
 
-      <section className="ak-band" aria-labelledby="ak-how-h">
+      <section className="ak-band" aria-labelledby="wt-h">
         <div className="ak-wrap">
-          <HowItWorks />
+          <Walkthrough />
         </div>
       </section>
 
@@ -283,205 +301,81 @@ function Showcase() {
   );
 }
 
-/* ───────── How it works: numbered steps beside a live window ───────── */
+/* ───────── The problem, first ───────── */
 
-function HowItWorks() {
-  const a = useAutoplay(STEPS.length, 6000);
-  const frames = [<PublishFrame />, <RunFrame />, <CheckFrame />, <RefundFrame />];
+function Problem() {
   return (
-    <div className="ak-split flip" ref={a.ref}>
+    <div className="pb">
+      <header className="ak-head">
+        <span className="pb-kicker">The problem</span>
+        <h2 id="pb-h">Community GPUs are cheap. You can't see what they ran.</h2>
+        <p>Paying strangers for compute means trusting them to run the model you asked for, every time.</p>
+      </header>
+      <div className="pb-stage">
+        <ul className="pb-grid" aria-label="Twelve community GPUs, three of them cheating">
+          {Array.from({ length: 12 }, (_, i) => {
+            const cheat = CHEATS.find((c) => c.at === i);
+            return (
+              <li key={i} className={cheat ? "cheat" : ""}>
+                <Cpu size={22} strokeWidth={1.5} aria-hidden />
+                <span className="pb-gpu">gpu-{String(i + 1).padStart(2, "0")}</span>
+                {cheat && <span className="pb-why">{cheat.what}</span>}
+              </li>
+            );
+          })}
+        </ul>
+        <div className="pb-note">
+          <svg viewBox="0 0 160 90" className="pb-arrow" aria-hidden>
+            <path d="M 150 10 C 110 6, 60 20, 18 72" />
+            <path d="M 14 56 L 18 74 L 34 66" />
+          </svg>
+          <p>
+            <b>KINETIC checks every one.</b> If a GPU cheats, it's slashed and you're refunded from its bond.
+          </p>
+        </div>
+      </div>
+      <p className="pb-foot">Illustration. The three cheats shown are the ones KINETIC's own adversarial test GPUs commit on the live testnet, where they get caught.</p>
+    </div>
+  );
+}
+
+/* ───────── Walkthrough: the six trust stages beside the live network ───────── */
+
+function Walkthrough() {
+  const a = useAutoplay(STAGES.length, 6500);
+  const s = STAGES[a.cur];
+  const n = (i: number) => String(i + 1).padStart(2, "0");
+  return (
+    <div className="ak-split wt" ref={a.ref}>
       <div className="ak-split-text">
         <header className="ak-head">
-          <h2 id="ak-how-h">How it works</h2>
-          <p>From model to verified result in four steps.</p>
+          <h2 id="wt-h">How every job is checked</h2>
+          <p>Six stages, on the live network. The ring shows the real GPUs on Hedera testnet right now.</p>
         </header>
-        <ol className="ak-steps">
-          {STEPS.map(([title, text], i) => (
-            <li key={title} className={i === a.cur ? "on" : ""}>
-              <button className="ak-step-head" onClick={() => a.goTo(i)} aria-expanded={i === a.cur}>
-                <span className="ak-step-n" aria-hidden>
-                  {i + 1}
-                </span>
-                {title}
-              </button>
-              {i === a.cur && <p>{text}</p>}
-            </li>
-          ))}
-        </ol>
+        <div className="wt-card" aria-live="polite">
+          <div className="wt-count">
+            <b>{n(a.cur)}</b> / {n(STAGES.length - 1)}
+          </div>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+          <p className="wt-look">{s.look}</p>
+          <div className="wt-nav">
+            <button className="wt-btn" onClick={() => a.goTo((a.cur - 1 + STAGES.length) % STAGES.length)} aria-label="Previous stage">
+              <ChevronLeft size={16} aria-hidden />
+            </button>
+            <button className="wt-btn" onClick={() => a.goTo((a.cur + 1) % STAGES.length)} aria-label="Next stage">
+              <ChevronRight size={16} aria-hidden />
+            </button>
+          </div>
+        </div>
         <div className="ak-progress-row">
-          <Progress count={STEPS.length} label="Show step" cur={a.cur} fill={a.fill} playing={a.playing} goTo={a.goTo} toggle={a.toggle} />
+          <Progress count={STAGES.length} label="Show stage" cur={a.cur} fill={a.fill} playing={a.playing} goTo={a.goTo} toggle={a.toggle} />
           <a className="ak-cta-sm" href="#/console">
             Open the console <ChevronRight size={12} aria-hidden />
           </a>
         </div>
       </div>
-      <Window key={a.cur} title={STEPS[a.cur][0]}>
-        {frames[a.cur]}
-      </Window>
-    </div>
-  );
-}
-
-function Window({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="ak-window">
-      <div className="ak-window-bar">
-        <span aria-hidden />
-        <span aria-hidden />
-        <span aria-hidden />
-        <b>{title}</b>
-        <em>Example</em>
-      </div>
-      <div className="ak-window-body">{children}</div>
-    </div>
-  );
-}
-
-/** Reveals 0…n items one every `every` ms after mount (all at once with reduced motion). */
-function useReveal(n: number, every: number, delay = 300) {
-  const [shown, setShown] = useState(REDUCED ? n : 0);
-  useEffect(() => {
-    if (REDUCED) return;
-    const ts = Array.from({ length: n }, (_, i) => window.setTimeout(() => setShown(i + 1), delay + i * every));
-    return () => ts.forEach(window.clearTimeout);
-  }, [n, every, delay]);
-  return shown;
-}
-
-function Mark({ ok }: { ok: boolean }) {
-  return <span className={`ak-mark ${ok ? "ok" : "bad"}`}>{ok ? <Check size={12} strokeWidth={2.5} aria-hidden /> : <X size={12} strokeWidth={2.5} aria-hidden />}</span>;
-}
-
-function PublishFrame() {
-  const rows: [string, string][] = [
-    ["Weights scan", "safetensors · clean"],
-    ["Benchmark", "94.2% on hidden set"],
-    ["verifier-1", "signed"],
-    ["verifier-2", "signed"],
-    ["verifier-3", "signed"],
-  ];
-  const shown = useReveal(rows.length, 550);
-  return (
-    <div className="ak-frame">
-      <div className="ak-frame-card">
-        <div className="ak-frame-title">
-          <span>
-            <b>ticket-classifier</b> v1
-          </span>
-          <span className={`ak-pill ${shown === rows.length ? "ok" : ""}`}>{shown === rows.length ? "Listed" : "In review"}</span>
-        </div>
-        <ul className="ak-frame-list">
-          {rows.map(([k, v], i) => (
-            <li key={k} className={i < shown ? "in" : ""}>
-              <Mark ok />
-              <span>{k}</span>
-              <span className="mono">{v}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <p className="ak-frame-note">Model Passport · 3 of 3 signatures</p>
-    </div>
-  );
-}
-
-function RunFrame() {
-  const total = 48;
-  const done = useReveal(total, 70, 200);
-  return (
-    <div className="ak-frame">
-      <div className="ak-frame-card">
-        <div className="ak-frame-title">
-          <span>
-            <b>Job 0x3f…a2</b> · ticket-classifier
-          </span>
-          <span className="ak-pill">{done === total ? "Done" : "Running"}</span>
-        </div>
-        <div className="ak-chunks" aria-hidden>
-          {Array.from({ length: total }, (_, i) => (
-            <span key={i} className={i < done ? "ok" : i < done + 4 ? "run" : ""} />
-          ))}
-        </div>
-        <dl className="ak-frame-kv">
-          <div>
-            <dt>Chunks</dt>
-            <dd className="mono">
-              {done}/{total}
-            </dd>
-          </div>
-          <div>
-            <dt>GPUs</dt>
-            <dd className="mono">4</dd>
-          </div>
-          <div>
-            <dt>Spent</dt>
-            <dd className="mono">{(done * 0.05).toFixed(2)} HBAR</dd>
-          </div>
-        </dl>
-      </div>
-    </div>
-  );
-}
-
-function CheckFrame() {
-  const rows: [boolean, string, string][] = [
-    [true, "Known-answer probe", "gpu-a"],
-    [true, "Known-answer probe", "gpu-b"],
-    [true, "0G canary · chunk 12", "gpu-a"],
-    [true, "0G canary · chunk 19", "gpu-b"],
-    [false, "0G canary · chunk 27", "gpu-c"],
-  ];
-  const shown = useReveal(rows.length, 600);
-  return (
-    <div className="ak-frame">
-      <div className="ak-frame-card">
-        <div className="ak-frame-title">
-          <span>
-            <b>Checks</b>
-          </span>
-          <span className={`ak-pill ${shown === rows.length ? "bad" : ""}`}>{shown === rows.length ? "1 failed" : "Checking"}</span>
-        </div>
-        <ul className="ak-frame-list">
-          {rows.map(([ok, k, v], i) => (
-            <li key={k + v} className={i < shown ? "in" : ""}>
-              <Mark ok={ok} />
-              <span>{k}</span>
-              <span className="mono">{v}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-}
-
-function RefundFrame() {
-  const rows: [string, string, "bad" | "ok" | ""][] = [
-    ["gpu-c slashed", "−50 HBAR bond", "bad"],
-    ["Chunks rerouted", "gpu-c → gpu-a", ""],
-    ["Refund to you", "+1.35 HBAR", "ok"],
-    ["Receipt", "Hedera HCS", ""],
-  ];
-  const shown = useReveal(rows.length, 650);
-  return (
-    <div className="ak-frame">
-      <div className="ak-frame-card">
-        <div className="ak-frame-title">
-          <span>
-            <b>Settlement</b>
-          </span>
-          <span className={`ak-pill ${shown === rows.length ? "ok" : ""}`}>{shown === rows.length ? "Settled" : "Settling"}</span>
-        </div>
-        <ul className="ak-frame-list">
-          {rows.map(([k, v, tone], i) => (
-            <li key={k} className={i < shown ? "in" : ""}>
-              <span className={`ak-dot ${tone}`} aria-hidden />
-              <span>{k}</span>
-              <span className={`mono ${tone}`}>{v}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <NetworkRing stage={a.cur} />
     </div>
   );
 }

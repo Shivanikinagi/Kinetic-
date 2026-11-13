@@ -6,7 +6,6 @@ import { quorumSignatures, resolutionDigest, signDigest, verdictDigest, type Sla
 import { attrStr, type ArkivStore } from "../integrations/arkiv.js";
 import { readJobReceipts } from "../integrations/hcs.js";
 import { creditedAmount } from "../integrations/mirror.js";
-import type { SwarmClient } from "../integrations/swarm.js";
 import type { BondVault } from "../integrations/vault.js";
 import type { ZeroGClient } from "../integrations/zerog.js";
 import { agreement } from "../tasks/compare.js";
@@ -38,7 +37,6 @@ import { itemCorrect } from "../tasks/compare.js";
 export interface CosignerDeps {
   cfg: NetworkConfig;
   account: LocalAccount;
-  swarm: SwarmClient;
   zerog: ZeroGClient;
   arkiv: ArkivStore;
   vault: BondVault;
@@ -160,7 +158,7 @@ export class Cosigner implements SlashReviewer, ModelReviewer {
       if (!set) return "this verifier has no labelled set for this task";
       let items: Item[];
       try {
-        items = decryptJson<Item[]>(deriveKey(fromBase64(reg.jobKey), `chunk:${f.idx}`), await this.deps.swarm.download(chunk.swarmRef));
+        items = decryptJson<Item[]>(deriveKey(fromBase64(reg.jobKey), `chunk:${f.idx}`), fromBase64(chunk.data));
       } catch (err) {
         return `could not open the chunk: ${(err as Error).message}`;
       }
@@ -177,7 +175,7 @@ export class Cosigner implements SlashReviewer, ModelReviewer {
     // Canary: this verifier's own 0G run on the chunk, scored by the protocol's bar.
     if (!packet.canaries.indices.includes(f.idx)) return "not a committed canary";
     try {
-      const items = decryptJson<Item[]>(deriveKey(fromBase64(reg.jobKey), `chunk:${f.idx}`), await this.deps.swarm.download(chunk.swarmRef));
+      const items = decryptJson<Item[]>(deriveKey(fromBase64(reg.jobKey), `chunk:${f.idx}`), fromBase64(chunk.data));
       const ref = await this.deps.zerog.reference(reg.task, items);
       const score = agreement(reg.task, ref.result, r.result);
       return score < cfg.policy.minAgreement ? undefined : `agrees ${Math.round(score * 100)}% with this verifier's own 0G run (${ref.requestId})`;
@@ -221,7 +219,6 @@ export class Cosigner implements SlashReviewer, ModelReviewer {
     let mine: ModelReview;
     try {
       mine = await reviewModel(req, {
-        swarm: this.deps.swarm,
         ...(this.deps.zgStorage ? { zg: this.deps.zgStorage } : {}),
         runner: this.deps.runner ?? defaultModelRunner(this.deps.zerog),
         gold: this.deps.gold ?? [],

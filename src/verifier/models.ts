@@ -6,7 +6,6 @@ import { cardDigest, cardProblems, cardSigner, modelKey, type ModelCard } from "
 import { MODEL_PASSPORT_KIND, modelPassportDigest, modelPassportLimitations, modelPassportSigners, signModelPassport, type ModelFingerprint, type ModelPassport, type ModelPassportBody } from "../models/passport.js";
 import { listingAttrs, type ListingPayload } from "../models/registry.js";
 import { ModelRejected, reviewModel, type PublishRequest, type Review, type ReviewOptions } from "../models/review.js";
-import { modelPassportTopicName } from "../integrations/swarm-feed.js";
 import { logger } from "../util/log.js";
 import { stateFile, writeJsonAtomic } from "../util/state.js";
 
@@ -15,7 +14,7 @@ import { stateFile, writeJsonAtomic } from "../util/state.js";
 // A creator sends a signed card (and pays the listing fee over x402). This verifier reviews the
 // model itself (malware checks on the weights, benchmark, fingerprint), drafts the passport and
 // asks the vault's other verifiers to re-review it on their own and sign. With a quorum of
-// signatures, the passport goes to Swarm, its digest to HCS, and a `model` listing to Arkiv.
+// signatures, the passport goes to 0G Storage, its digest to HCS, and a `model` listing to Arkiv.
 // Listings expire like any Arkiv entity, so the desk renews them, and re-creates one from its
 // record if it ever lapses.
 
@@ -40,7 +39,7 @@ const LEGACY_ARKIV_CHAIN_ID = 7738577;
 export interface ModelDeskOptions {
   svc: Services;
   receipts: ReceiptLog;
-  review: Omit<ReviewOptions, "swarm">;
+  review: ReviewOptions;
   reviewers: ModelReviewer[];
 }
 
@@ -65,7 +64,7 @@ export interface ReviewStep {
   /** Who: the verifier's address, for lead and cosigner steps. */
   by?: string;
   detail?: string;
-  /** Swarm reference, HCS sequence number or Arkiv entity key. */
+  /** 0G Storage root, HCS sequence number or Arkiv entity key. */
   ref?: string;
 }
 
@@ -165,7 +164,7 @@ export class ModelDesk {
     if (signer.toLowerCase() !== card?.creator?.address) throw new ModelRejected(["only the card's creator can publish it"]);
     let review: Review;
     try {
-      review = await reviewModel(req, { ...this.opts.review, swarm: svc.swarm, ...(svc.zgStorage ? { zg: svc.zgStorage } : {}) });
+      review = await reviewModel(req, { ...this.opts.review, ...(svc.zgStorage ? { zg: svc.zgStorage } : {}) });
     } catch (err) {
       step({ step: "lead", ok: false, by: svc.address, detail: ((err as { reasons?: string[] }).reasons ?? [(err as Error).message])[0] });
       throw err;
@@ -204,10 +203,9 @@ export class ModelDesk {
     passport.attestations.verifiers = passport.attestations.verifiers.filter((a) => signers.includes(a.address.toLowerCase()));
 
     const passportBytes = new TextEncoder().encode(JSON.stringify(passport, null, 2));
-    const passportRef = await svc.swarm.upload(passportBytes, { encrypt: false, redundancy: svc.cfg.swarm.redundancy });
+    const passportRef = await svc.storage.upload(passportBytes);
     const passportDigest = modelPassportDigest(passport);
     step({ step: "passport", ok: true, detail: `signed by ${signers.length} verifiers`, ref: passportRef });
-    const feed = await this.publishFeed(card, review.key, passportBytes);
     const payload: ListingPayload = {
       card,
       passportRef,
@@ -216,7 +214,6 @@ export class ModelDesk {
       ...(review.weights.checked ? { params: review.weights.params } : {}),
       weightsChecked: review.weights.checked,
       signers,
-      ...(feed ? { feed } : {}),
     };
     const receipt = await this.opts.receipts.submit({
       t: "model",
@@ -241,30 +238,9 @@ export class ModelDesk {
   }
 
   /**
-   * Points the model's passport feed at this passport, so /bzz/{manifest}/ always serves the
-   * newest one. The feed is signed by this verifier's key. A failure here doesn't hold up the
-   * listing: the passport itself is on Swarm, HCS and Arkiv either way.
-   */
-  private async publishFeed(card: ModelCard, key: string, passport: Uint8Array): Promise<ListingPayload["feed"]> {
-    const { svc } = this.opts;
-    if (!svc.cfg.swarm.feeds) return undefined;
-    try {
-      // The feed points at a /bzz copy (same bytes, so the same data chunks) for the manifest URL to resolve.
-      const target = await svc.swarm.uploadFile(passport, `${key}.json`, "application/json", { redundancy: svc.cfg.swarm.redundancy });
-      const known = Math.max(-1, ...[...this.listings.values()].filter((l) => l.card.id === card.id && l.feed?.owner === svc.address.slice(2)).map((l) => l.feed!.index));
-      const feed = await svc.swarm.publishFeed(svc.account, modelPassportTopicName(card.id), target, known);
-      this.log(`passport feed for ${card.id} at update ${feed.index}`, { url: svc.swarm.feedUrl(feed.manifest) });
-      return feed;
-    } catch (err) {
-      this.log("passport feed update failed", { model: card.id, error: (err as Error).message });
-      return undefined;
-    }
-  }
-
-  /**
    * Extends every listing due for renewal, and re-creates any that expired. A listing written to
    * another Arkiv network (the verifier moved, say from Tiramisu to Rabdi) is re-created on this
-   * one straight away: its passport on Swarm and receipt on HCS don't depend on Arkiv.
+   * one straight away: its passport on 0G Storage and receipt on HCS don't depend on Arkiv.
    */
   renew(now = Date.now()): Promise<void> {
     // One renewal at a time; a caller during one waits for it.
@@ -309,7 +285,7 @@ export class ModelDesk {
 }
 
 /** The passport body every verifier signs, built from the lead's review. */
-export function draftPassport(req: PublishRequest, review: Review, svc: Pick<Services, "cfg">): ModelPassportBody {
+export function draftPassport(req: PublishRequest, review: Review, svc: Pick<Services, "cfg" | "storage">): ModelPassportBody {
   const { card } = req;
   return {
     kind: MODEL_PASSPORT_KIND,
@@ -322,7 +298,7 @@ export function draftPassport(req: PublishRequest, review: Review, svc: Pick<Ser
     weights: review.weights,
     benchmark: review.benchmark,
     ...(review.fingerprint ? { fingerprint: review.fingerprint } : {}),
-    references: { hcsTopic: svc.cfg.hedera.hcsTopicId, swarmGateway: svc.cfg.swarm.gatewayUrl, ...(svc.cfg.network === "testnet" && svc.cfg.hedera.vaultAddress ? { vault: svc.cfg.hedera.vaultAddress } : {}) },
+    references: { hcsTopic: svc.cfg.hedera.hcsTopicId, storageGateway: svc.storage.gateway, ...(svc.cfg.network === "testnet" && svc.cfg.hedera.vaultAddress ? { vault: svc.cfg.hedera.vaultAddress } : {}) },
     limitations: modelPassportLimitations(card, review.weights, review.benchmark, review.fingerprint),
   };
 }

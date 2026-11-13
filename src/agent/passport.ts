@@ -7,6 +7,7 @@ import { authenticityOf, correctnessOf, summarize, type Authenticity, type Corre
 import { passportSchema } from "./passport-schema.js";
 import { readJobReceipts } from "../integrations/hcs.js";
 import { creditedAmount } from "../integrations/mirror.js";
+import { isStorageRef, storageUrl } from "../integrations/storage-ref.js";
 import { VAULT_ABI } from "../integrations/vault.js";
 import { formatHbar, type AttestationStatus, type ItemOutput, type PaymentAsset, type ProviderRank, type TaskSpec, type ZeroGExecution } from "../types.js";
 import { canonicalJson, sha256Hex } from "../util/crypto.js";
@@ -19,7 +20,7 @@ import { chunkLeaf, chunkLeaves, leafHash, merkleProof, merkleRoot, verifyMerkle
 import { spotCandidates, spotPicks, spotTag } from "../core/spot.js";
 
 // The Compute Passport: one public, signed record of how a job's results were produced and
-// checked. It replaces the plain audit bundle on Swarm and keeps its fields. It holds no input
+// checked. It replaces the plain audit bundle and keeps its fields; it's stored on 0G Storage. It holds no input
 // data and no keys: only hashes, signatures, payments, check results and their limits.
 //
 // The buyer signs it, and the verifier co-signs only after comparing it with its own records.
@@ -187,7 +188,11 @@ export interface PassportBody {
   /** sha256 of the canonical JSON of the job's results, in chunk order. */
   output: { resultsHash: string };
   hcsTopic: string;
-  references: { x402Network: string; hcsTopic: string; mirrorUrl: string; vault?: string; swarmGateway: string; devnetUrl?: string };
+  /**
+   * storageGateway: the 0G Storage indexer passports are served from. Passports issued before
+   * 2026-11-11 name a `swarmGateway` instead; it stays readable so their signatures still check.
+   */
+  references: { x402Network: string; hcsTopic: string; mirrorUrl: string; vault?: string; storageGateway?: string; swarmGateway?: string; devnetUrl?: string };
   strategy?: string;
   /** The rules agreed before any chunk ran; their hash is in the HCS `job` receipt. */
   agreement: Agreement;
@@ -381,7 +386,8 @@ export async function signPassport(account: LocalAccount, body: PassportBody): P
   return { address: account.address.toLowerCase(), signature: await account.signMessage({ message: message(body) }) };
 }
 
-async function signerOf(body: PassportBody, signature: string): Promise<string | null> {
+/** Who signed a passport body, or null for a signature that doesn't recover. */
+export async function signerOf(body: PassportBody, signature: string): Promise<string | null> {
   try {
     return (await recoverMessageAddress({ message: message(body), signature: signature as Hex })).toLowerCase();
   } catch {
@@ -742,7 +748,7 @@ async function verifyOnline(p: Passport, opts: VerifyOptions, add: (name: string
   await checkAnchorAndSpotOnline(p, opts, receipts, add);
 
   // A model job: the job receipt named the model, the royalty has its receipt and reached the
-  // creator, and the Model Passport on Swarm is the one the job ran against.
+  // creator, and the Model Passport on 0G Storage is the one the job ran against.
   if (p.model) {
     const m = p.model;
     add("HCS: the job was registered for this model", job?.t === "job" && job.model === m.key);
@@ -752,12 +758,17 @@ async function verifyOnline(p: Passport, opts: VerifyOptions, add: (name: string
       const credited = await creditedAmount(mirrorUrl, m.royalty.tx, m.payTo, p.payment.id, 2).catch(() => 0n);
       add("mirror node: the royalty reached the creator", credited >= BigInt(m.royalty.amount), `${formatHbar(credited)} to ${m.payTo}`);
     }
-    try {
-      const res = await fetch(`${p.references.swarmGateway}/bytes/${m.passportRef}`);
-      const mp = (await res.json()) as ModelPassport;
-      add("Swarm: the Model Passport is the one the job ran against", modelPassportDigest(mp) === m.passportDigest && mp.key === m.key, m.passportRef.slice(0, 12) + "…");
-    } catch (err) {
-      add("Swarm: Model Passport reachable", false, (err as Error).message);
+    if (!p.references.storageGateway || !isStorageRef(m.passportRef)) {
+      add("0G Storage: the Model Passport is the one the job ran against", null, "this passport predates 0G Storage, so its Model Passport reference can't be fetched");
+    } else {
+      try {
+        const res = await fetch(storageUrl(p.references.storageGateway, m.passportRef));
+        if (!res.ok) throw new Error(`0G Storage answered ${res.status}`);
+        const mp = (await res.json()) as ModelPassport;
+        add("0G Storage: the Model Passport is the one the job ran against", modelPassportDigest(mp) === m.passportDigest && mp.key === m.key, m.passportRef.slice(0, 12) + "…");
+      } catch (err) {
+        add("0G Storage: Model Passport reachable", false, (err as Error).message);
+      }
     }
   }
 

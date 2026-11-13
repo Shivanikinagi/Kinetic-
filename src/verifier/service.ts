@@ -3,6 +3,7 @@ import type { Request } from "express";
 import { verifierFee } from "../core/quote.js";
 import type { EntityKind } from "../integrations/arkiv.js";
 import type { Services } from "../integrations/index.js";
+import { isStorageRef } from "../integrations/storage.js";
 import { PaymentGate, ReplayGuard } from "../integrations/x402.js";
 import { createApp, listen, rawBody, route } from "../util/http.js";
 import { logger } from "../util/log.js";
@@ -244,14 +245,14 @@ export async function startVerifier(svc: Services, port: number, opts: { cosigne
     }),
   );
   app.get("/models", route(async (_req, res) => void res.json({ models: verifier.models.list().map(({ fingerprint: _f, ...m }) => m) })));
-  // The Model Passport, served from Swarm through the verifier (the dashboard can't always reach the gateway directly).
+  // The Model Passport, served from 0G Storage through the verifier (0G's indexer sends no CORS headers, so the dashboard can't fetch it directly).
   app.get(
     "/models/:key/passport",
     route(async (req, res) => {
       const listing = verifier.models.get(String(req.params.key));
       if (!listing) return void res.status(404).json({ error: "unknown model" });
       try {
-        res.type("application/json").send(Buffer.from(await svc.swarm.download(listing.passportRef)));
+        res.type("application/json").send(Buffer.from(await svc.storage.download(listing.passportRef)));
       } catch (err) {
         res.status(502).json({ error: (err as Error).message });
       }
@@ -293,6 +294,21 @@ export async function startVerifier(svc: Services, port: number, opts: { cosigne
   app.post("/jobs/:id/finalize", signed((signer, req) => verifier.finalize(String(req.params.id), signer)));
   // Co-signs the job's Compute Passport once it matches the verifier's own records.
   app.post("/jobs/:id/attest", signed((signer, req) => verifier.attest(String(req.params.id), signer, req.body)));
+  // The buyer's signed Compute Passport, stored on 0G Storage by this verifier (it pays the fee).
+  app.post("/jobs/:id/passport", signed((signer, req) => verifier.storePassport(String(req.params.id), signer, req.body)));
+  // Any stored passport by its 0G root, checked against the root, for the dashboard and verify-passport.
+  app.get(
+    "/passports/:ref",
+    route(async (req, res) => {
+      const ref = String(req.params.ref);
+      if (!isStorageRef(ref)) return void res.status(400).json({ error: "expected a 0G Storage root (0x + 64 hex)" });
+      try {
+        res.type("application/json").send(Buffer.from(await svc.storage.download(ref)));
+      } catch (err) {
+        res.status(502).json({ error: (err as Error).message });
+      }
+    }),
+  );
 
   // Fail fast if the facilitator cannot settle on this network.
   await feeGate.getRequirements();

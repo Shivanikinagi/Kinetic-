@@ -1,4 +1,4 @@
-import { PASSPORT_KIND, passportDigest, signPassport, type Attestation, type PassportBody } from "../agent/passport.js";
+import { PASSPORT_KIND, passportBody, passportDigest, signerOf, signPassport, type Attestation, type Passport, type PassportBody } from "../agent/passport.js";
 import { ensureAgent, Erc8004, type Registration } from "../integrations/erc8004.js";
 import { agreementHash, agreementProblems, taskHash, type Agreement, type GoldItem } from "../core/agreement.js";
 import { planCanaries, type CanaryPlan } from "../core/canary.js";
@@ -43,8 +43,11 @@ export interface JobRegistration {
   /** Buyer EVM address: Arkiv owner of the job and the refund recipient. */
   buyer: string;
   task: TaskSpec;
-  /** itemIds lets the verifier format-check every result without seeing the inputs. */
-  chunks: { idx: number; swarmRef: string; itemIds?: string[] }[];
+  /**
+   * Each chunk's items, AES-256-GCM sealed under its chunk key (base64). itemIds lets the verifier
+   * format-check every result without opening the chunk.
+   */
+  chunks: { idx: number; data: string; itemIds?: string[] }[];
   /** Base64 job master key, so the verifier can open canary chunks for 0G reference runs. */
   jobKey: string;
   /** The rules the buyer set for this job. Committed on HCS by hash before any chunk runs. */
@@ -193,6 +196,10 @@ interface JobState {
   spot?: JobSpot;
   /** The HCS Merkle anchor over the finished chunks, posted at finalize. */
   anchor?: JobAnchor;
+  /** Digest of the passport body this verifier co-signed. */
+  attested?: string;
+  /** The Compute Passport this verifier stored on 0G Storage for the buyer. */
+  passport?: { ref: string; digest: string };
 }
 
 /** One `hcs.merkleRootAnchor` per job (core/merkle.ts): the root over its finished chunks, and where it is on HCS. */
@@ -276,7 +283,7 @@ export interface CanaryResult {
 /**
  * A job as saved on the verifier's disk, so a restart mid-job can still judge the remaining
  * chunks and reveal the canary set it committed to. It holds the job key and the salt, so it
- * stays local: never on Arkiv or Swarm.
+ * stays local: never on Arkiv or in storage.
  */
 interface SavedJob {
   v: 1;
@@ -313,6 +320,8 @@ interface SavedJob {
   outputs?: Record<string, ItemOutput[]>;
   spot?: JobSpot;
   anchor?: JobAnchor;
+  attested?: string;
+  passport?: { ref: string; digest: string };
 }
 
 function toSaved(job: JobState): SavedJob {
@@ -350,6 +359,8 @@ function toSaved(job: JobState): SavedJob {
     ...(job.spotChecks ? { spotChecks: job.spotChecks, outputs: Object.fromEntries(job.outputs) } : {}),
     ...(job.spot ? { spot: job.spot } : {}),
     ...(job.anchor ? { anchor: job.anchor } : {}),
+    ...(job.attested ? { attested: job.attested } : {}),
+    ...(job.passport ? { passport: job.passport } : {}),
   };
 }
 
@@ -391,6 +402,8 @@ function fromSaved(s: SavedJob): JobState {
     outputs: new Map(Object.entries(s.outputs ?? {}).map(([idx, items]) => [Number(idx), items])),
     ...(s.spot ? { spot: s.spot } : {}),
     ...(s.anchor ? { anchor: s.anchor } : {}),
+    ...(s.attested ? { attested: s.attested } : {}),
+    ...(s.passport ? { passport: s.passport } : {}),
   };
 }
 
@@ -474,7 +487,7 @@ export class Verifier {
     this.admission = sets.map(admissionPool);
     this.planting = sets.map(plantingPool);
     this.fingerprintTask = tickets?.task ?? null;
-    this.reviewer = new Cosigner({ cfg: svc.cfg, account: svc.account, swarm: svc.swarm, zerog, arkiv: svc.arkiv, vault: svc.vault, gold: this.planting });
+    this.reviewer = new Cosigner({ cfg: svc.cfg, account: svc.account, zerog, arkiv: svc.arkiv, vault: svc.vault, gold: this.planting });
     try {
       this.fingerprints = JSON.parse(readFileSync(process.env.FINGERPRINTS || "data/fingerprints.json", "utf8"));
     } catch {
@@ -563,6 +576,11 @@ export class Verifier {
       const path = join(dir, f);
       try {
         const job = fromSaved(JSON.parse(readFileSync(path, "utf8")) as SavedJob);
+        // A job registered before chunks travelled inline (in the request itself) can't be checked any more.
+        if (!job.finalized && job.reg.chunks.some((c) => !c.data)) {
+          this.log(`skipping saved job ${job.reg.jobId}: its chunks predate inline delivery`);
+          continue;
+        }
         // Finished jobs are kept as long as their Arkiv job entity, for late attestations.
         if (job.finalized && Date.now() - statSync(path).mtimeMs > TTL.job * 1000) {
           unlinkSync(path);
@@ -588,10 +606,10 @@ export class Verifier {
 
   /** Starts the 0G reference run for one canary chunk. */
   private startReference(job: JobState, idx: number): void {
-    const ref = job.reg.chunks.find((c) => c.idx === idx)!.swarmRef;
+    const data = job.reg.chunks.find((c) => c.idx === idx)!.data;
     const jobKey = fromBase64(job.reg.jobKey);
     const run = this.withReferenceSlot(async () => {
-      const items = decryptJson<Item[]>(deriveKey(jobKey, `chunk:${idx}`), await this.svc.swarm.download(ref));
+      const items = decryptJson<Item[]>(deriveKey(jobKey, `chunk:${idx}`), fromBase64(data));
       return this.zerogFor(job).reference(job.reg.task, items);
     });
     run.then(
@@ -724,17 +742,15 @@ export class Verifier {
     return model;
   }
 
-  /** Opens every chunk, plants a known answer in it, and stores it again under the same chunk key. */
+  /** Opens every chunk, plants a known answer in it, and seals it again under the same chunk key. */
   private async plantKnown(reg: JobRegistration, pool: GoldSet): Promise<{ chunks: JobRegistration["chunks"]; truth: Map<string, ItemOutput>; plan: KnownPlan }> {
     const jobKey = fromBase64(reg.jobKey);
     const opened = await Promise.all(
-      reg.chunks.map(async (c) => ({ idx: c.idx, items: decryptJson<Item[]>(deriveKey(jobKey, `chunk:${c.idx}`), await this.svc.swarm.download(c.swarmRef)) })),
+      reg.chunks.map(async (c) => ({ idx: c.idx, items: decryptJson<Item[]>(deriveKey(jobKey, `chunk:${c.idx}`), fromBase64(c.data)) })),
     );
     const { chunks, truth, plan } = plant(reg.jobId, reg.task, pool, opened);
-    const stored = await Promise.all(
-      chunks.map(async (c) => ({ idx: c.idx, swarmRef: await this.svc.swarm.upload(encryptJson(deriveKey(jobKey, `chunk:${c.idx}`), c.items)), itemIds: c.items.map((i) => i.id) })),
-    );
-    return { chunks: stored, truth, plan };
+    const sealed = chunks.map((c) => ({ idx: c.idx, data: toBase64(encryptJson(deriveKey(jobKey, `chunk:${c.idx}`), c.items)), itemIds: c.items.map((i) => i.id) }));
+    return { chunks: sealed, truth, plan };
   }
 
   async submit(jobId: string, buyer: string, sub: ResultSubmission): Promise<ResultVerdict> {
@@ -1249,8 +1265,8 @@ export class Verifier {
         const output = job.outputs.get(idx);
         try {
           if (!output) throw new Error("no output kept for this chunk");
-          const ref = job.reg.chunks.find((c) => c.idx === idx)!.swarmRef;
-          const items = decryptJson<Item[]>(deriveKey(jobKey, `chunk:${idx}`), await this.svc.swarm.download(ref));
+          const data = job.reg.chunks.find((c) => c.idx === idx)!.data;
+          const items = decryptJson<Item[]>(deriveKey(jobKey, `chunk:${idx}`), fromBase64(data));
           const reference = await withTimeout(
             this.withReferenceSlot(() => this.zerogFor(job).reference(job.reg.task, items)),
             SPOT_REFERENCE_TIMEOUT_MS,
@@ -1391,8 +1407,42 @@ export class Verifier {
 
     if (problems.length > 0) throw new VerifierError(409, `won't co-sign: ${problems.join("; ")}`);
     const signed = await signPassport(this.svc.account, body);
+    job.attested = passportDigest(body);
+    this.save(job);
     this.log(`co-signed the Compute Passport for ${jobId}`);
-    return { ...signed, uaid: await this.identity(), digest: passportDigest(body) };
+    return { ...signed, uaid: await this.identity(), digest: job.attested };
+  }
+
+  /**
+   * Stores the buyer's signed Compute Passport on 0G Storage, paying the storage fee from this
+   * verifier's 0G wallet, and returns its root. Only the job's buyer may store it, signed by that
+   * buyer; if this verifier co-signed the job's passport, it must be that same passport carrying
+   * this verifier's own signature. Storing again returns the same root; a different one is refused.
+   */
+  async storePassport(jobId: string, buyer: string, passport: Passport): Promise<{ ref: string; url: string; digest: string }> {
+    const job = this.jobs.get(jobId);
+    if (!job) throw new VerifierError(404, "unknown job");
+    if (job.reg.buyer !== buyer.toLowerCase()) throw new VerifierError(403, "not this job's buyer");
+    if (!job.finalized) throw new VerifierError(409, "finalize the job first");
+    if (passport?.kind !== PASSPORT_KIND || passport.jobId !== jobId) throw new VerifierError(400, "not this job's passport");
+    const body = passportBody(passport);
+    const digest = passportDigest(body);
+    if (job.passport) {
+      if (job.passport.digest !== digest) throw new VerifierError(409, "a different passport is already stored for this job");
+      return { ...job.passport, url: this.svc.storage.url(job.passport.ref) };
+    }
+    const b = passport.attestations?.buyer;
+    if (!b || (await signerOf(body, b.signature)) !== job.reg.buyer) throw new VerifierError(400, "the passport isn't signed by this job's buyer");
+    if (job.attested) {
+      if (digest !== job.attested) throw new VerifierError(409, "this isn't the passport this verifier co-signed");
+      const v = passport.attestations?.verifier;
+      if (!v || (await signerOf(body, v.signature)) !== this.svc.address) throw new VerifierError(400, "the passport doesn't carry this verifier's signature");
+    }
+    const ref = await this.svc.storage.upload(new TextEncoder().encode(JSON.stringify(passport, null, 2)));
+    job.passport = { ref, digest };
+    this.save(job);
+    this.log(`stored the Compute Passport for ${jobId} on 0G Storage`, { ref });
+    return { ref, url: this.svc.storage.url(ref), digest };
   }
 
   /**
@@ -1578,13 +1628,13 @@ export class Verifier {
     // Wrapped like a buyer's, so a probe looks like any other chunk.
     const encKey = (await this.providerState(provider)).encKey;
     const started = Date.now();
-    const swarmRef = await this.svc.swarm.upload(encryptJson(key, items));
+    const data = toBase64(encryptJson(key, items));
     const paid = await payFetch(
       `${req.endpoint}/v1/chunks`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ jobId: probeJobId, idx: probeIdx, task: req.task, swarmRef, ...(encKey ? { wrappedKey: wrapKey(encKey, key, wrapContext(probeJobId, probeIdx, provider)) } : { chunkKey: toBase64(key) }), ...(req.model ? { model: req.model } : {}) }),
+        body: JSON.stringify({ jobId: probeJobId, idx: probeIdx, task: req.task, data, ...(encKey ? { wrappedKey: wrapKey(encKey, key, wrapContext(probeJobId, probeIdx, provider)) } : { chunkKey: toBase64(key) }), ...(req.model ? { model: req.model } : {}) }),
         signal: AbortSignal.timeout(180_000),
       },
       this.svc.payer(),
@@ -1789,7 +1839,7 @@ export class Verifier {
       vault: this.svc.cfg.network === "testnet" ? this.svc.cfg.hedera.vaultAddress : undefined,
       payment: { asset: this.svc.cfg.x402.asset, symbol: this.svc.cfg.x402.symbol, decimals: this.svc.cfg.x402.decimals },
       mirrorUrl: this.svc.cfg.hedera.mirrorUrl,
-      swarmGateway: this.svc.cfg.swarm.gatewayUrl,
+      storageGateway: this.svc.storage.gateway,
       arkiv: { app: this.svc.arkiv.app, rpcUrl: this.svc.cfg.arkiv.rpcUrl, chainId: this.svc.cfg.arkiv.chainId, explorerUrl: this.svc.cfg.arkiv.explorerUrl, devnetUrl: this.svc.cfg.network === "devnet" ? this.svc.cfg.devnetUrl : undefined },
       policy: this.svc.cfg.policy,
       quorum: await this.svc.vault.info().then(

@@ -4,7 +4,6 @@ import { readReceipts } from "../src/integrations/hcs.js";
 import { payFetch } from "../src/integrations/x402.js";
 import { MODEL_CARD_KIND, signCard, type ModelCard } from "../src/models/card.js";
 import { modelPassportDigest, verifyModelPassport, type ModelPassport } from "../src/models/passport.js";
-import { modelPassportTopicName } from "../src/integrations/swarm-feed.js";
 import { findModels } from "../src/models/registry.js";
 import { waitForReview } from "../src/models/publish.js";
 import { sha256Hex } from "../src/util/crypto.js";
@@ -19,7 +18,7 @@ import { runScenario, tinyModelFiles, type Scenario } from "./support/scenario.j
 let s: Scenario;
 
 beforeAll(async () => {
-  s = await runScenario({ basePort: 15100, chunkSize: 2, canaryRate: 0.6, quorum: { cosigners: 2, threshold: 2 }, modelHub: { royaltyBps: 500, serve: ["atlas-4090", "nimbus-a100", "cheapo-3060", "shoddy-1060"], storage: "0g" } });
+  s = await runScenario({ basePort: 15100, chunkSize: 2, canaryRate: 0.6, quorum: { cosigners: 2, threshold: 2 }, modelHub: { royaltyBps: 500, serve: ["atlas-4090", "nimbus-a100", "cheapo-3060", "shoddy-1060"] } });
 }, 120_000);
 
 afterAll(async () => {
@@ -32,7 +31,7 @@ describe("model hub on devnet", () => {
     expect(listing.key).toBe(published.key);
     // The lead and both cosigners re-ran the checks and signed.
     expect(published.signers).toHaveLength(3);
-    const passport = (await (await fetch(`${s.devnet.url}/bee/bytes/${published.passportRef}`)).json()) as ModelPassport;
+    const passport = (await (await fetch(s.buyerSvc.storage.url(published.passportRef))).json()) as ModelPassport;
     const info = await s.buyerSvc.vault.info();
     const checks = await verifyModelPassport(passport, { verifiers: info.verifiers, threshold: info.threshold });
     expect(checks.filter((c) => c.ok === false)).toEqual([]);
@@ -43,7 +42,7 @@ describe("model hub on devnet", () => {
 
   it("keeps the weights on 0G Storage, addressed by root hash", () => {
     const files = s.hub!.listing.card.weights!.files;
-    expect(files.every((f) => /^0x[0-9a-f]{64}$/.test(f.zgRoot ?? "") && !f.swarmRef)).toBe(true);
+    expect(files.every((f) => /^0x[0-9a-f]{64}$/.test(f.zgRoot ?? ""))).toBe(true);
   });
 
   it("logs the passport on HCS and keeps the listing on Arkiv", async () => {
@@ -54,14 +53,16 @@ describe("model hub on devnet", () => {
     expect(listed.map((l) => l.key)).toContain(s.hub!.published.key);
   });
 
-  it("points the model's Swarm feed, signed by the listing verifier, at the new passport", async () => {
+  it("stores the Model Passport on 0G Storage, served by its root over HTTP", async () => {
     const listed = (await findModels(s.buyerSvc.arkiv, (await s.buyerSvc.vault.info()).verifiers)).find((l) => l.key === s.hub!.published.key)!;
-    expect(listed.feed?.owner).toBe(listed.listedBy.replace(/^0x/, ""));
-    const latest = await s.buyerSvc.swarm.readFeed(listed.feed!.owner, modelPassportTopicName(listed.id));
-    expect(latest?.reference).toBe(listed.feed!.target);
-    // The feed manifest's stable URL serves this passport.
-    const served = (await (await fetch(s.buyerSvc.swarm.feedUrl(listed.feed!.manifest))).json()) as ModelPassport;
+    expect(listed.passportRef).toMatch(/^0x[0-9a-f]{64}$/);
+    // The indexer's /file?root= link, as the dashboard and verify-passport fetch it.
+    const served = (await (await fetch(s.buyerSvc.storage.url(listed.passportRef))).json()) as ModelPassport;
     expect(modelPassportDigest(served)).toBe(listed.passportDigest);
+    expect(served.references.storageGateway).toBe(s.buyerSvc.storage.gateway);
+    // And through the verifier, which checks the bytes against the root.
+    const proxied = (await (await fetch(`${s.verifierUrl}/passports/${listed.passportRef}`)).json()) as ModelPassport;
+    expect(modelPassportDigest(proxied)).toBe(listed.passportDigest);
   });
 
   it("runs the job only on providers that serve the model, every chunk signed for it", () => {
@@ -99,7 +100,7 @@ describe("model hub on devnet", () => {
     const names = checks.filter((c) => c.ok === true).map((c) => c.name);
     expect(names).toContain("creator royalty is the agreed share of the accepted chunks");
     expect(names).toContain("mirror node: the royalty reached the creator");
-    expect(names).toContain("Swarm: the Model Passport is the one the job ran against");
+    expect(names).toContain("0G Storage: the Model Passport is the one the job ran against");
   });
 
   it("refuses a provider request for a model it doesn't serve, before any payment", async () => {
@@ -107,7 +108,7 @@ describe("model hub on devnet", () => {
     const res = await fetch(`${flicker.url}/v1/chunks`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ jobId: "job-x", idx: 0, task: { kind: "classify", instructions: "x" }, swarmRef: "0".repeat(64), chunkKey: "a".repeat(44), model: s.hub!.published.key }),
+      body: JSON.stringify({ jobId: "job-x", idx: 0, task: { kind: "classify", instructions: "x" }, data: "A".repeat(44), chunkKey: "a".repeat(44), model: s.hub!.published.key }),
     });
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({ error: "model_not_served" });
@@ -124,10 +125,10 @@ describe("model hub on devnet", () => {
       const review = await waitForReview(s.verifierUrl, body.key, 60_000, 200);
       return { status: review.status === "listed" ? 200 : 400, paid: !!paid.settlement?.success, body: { reasons: review.reasons } };
     };
-    // A pickle file: uploaded straight to Swarm, so only the verifier's own checks can stop it.
+    // A pickle file: uploaded straight to 0G Storage, so only the verifier's own checks can stop it.
     const pickle = new TextEncoder().encode("cos\nsystem\n(S'echo pwned'\ntR.");
-    const ref = await creator.swarm.upload(pickle, { encrypt: false });
-    const bad: ModelCard = { ...draft, kind: MODEL_CARD_KIND, version: "1.0.1", weights: { format: "safetensors", files: [{ name: "pytorch_model.bin", sha256: sha256Hex(pickle), bytes: pickle.length, swarmRef: ref }] } };
+    const { root } = await creator.zgStorage!().upload(pickle);
+    const bad: ModelCard = { ...draft, kind: MODEL_CARD_KIND, version: "1.0.1", weights: { format: "safetensors", files: [{ name: "pytorch_model.bin", sha256: sha256Hex(pickle), bytes: pickle.length, zgRoot: root }] } };
     const refused = await post(bad, await signCard(creator.account, bad));
     expect(refused.status).toBe(400);
     expect(refused.paid).toBe(true);
@@ -150,25 +151,5 @@ describe("model hub on devnet", () => {
     const again = await post(draft, await signCard(creator.account, draft));
     expect(again.paid).toBe(false);
     expect(again.body.reasons?.join(" ")).toMatch(/already listed/);
-  });
-});
-
-// The same flow with the weights on Swarm instead: every party fetches them from there.
-describe("model hub with weights on Swarm", () => {
-  let w: Scenario;
-  beforeAll(async () => {
-    w = await runScenario({ basePort: 16100, chunkSize: 3, canaryRate: 0.5, modelHub: { royaltyBps: 1000, serve: ["atlas-4090", "nimbus-a100"], storage: "swarm" } });
-  }, 120_000);
-  afterAll(async () => {
-    await w?.close();
-  });
-
-  it("publishes, serves and pays a royalty with Swarm-hosted weights", async () => {
-    expect(w.hub!.listing.card.weights!.files.every((f) => /^[0-9a-f]{64}$/.test(f.swarmRef ?? "") && !f.zgRoot)).toBe(true);
-    expect(w.report.status).toBe("complete");
-    expect(w.report.royaltyTinybar).toBe((w.report.providers.reduce((a, p) => a + p.paidTinybar - p.refundTinybar, 0n) * 1000n) / 10_000n);
-    const passport = (await (await fetch(w.report.passport.url)).json()) as Passport;
-    const checks = await verifyPassport(passport, { results: w.report.results, online: true });
-    expect(checks.filter((c) => c.ok === false)).toEqual([]);
   });
 });

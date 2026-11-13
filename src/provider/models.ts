@@ -13,7 +13,7 @@ import { OpenAICompatibleBackend, type ModelBackend } from "./backend.js";
 
 // What a provider does before it offers a listed model:
 //   1. find the listing on Arkiv, written by one of the bond vault's verifiers;
-//   2. download its Model Passport from Swarm and check it: the creator's signature, the malware
+//   2. download its Model Passport from 0G Storage and check it: the creator's signature, the malware
 //      checks, the benchmark, and a quorum of the vault's verifiers;
 //   3. download the weights (when the model has public weights), check every file against the
 //      passport's sha256, and run the malware checks again locally before anything loads them;
@@ -52,7 +52,7 @@ export async function prepareModels(svc: Services, opts: PrepareOptions): Promis
   // One registry query for every model: Arkiv bills reads, and a provider may serve many.
   const listings = await resolveModels(svc.arkiv, info.verifiers, opts.refs);
   for (const listing of listings) {
-    const passport = await loadModelPassport(svc.swarm, listing);
+    const passport = await loadModelPassport(svc.storage, listing);
     const failed = (await verifyModelPassport(passport, { verifiers: info.verifiers, threshold: info.threshold })).filter((c) => c.ok === false);
     if (failed.length > 0) throw new Error(`${listing.id}@${listing.version}: its Model Passport fails ${failed.map((c) => c.name).join("; ")}`);
     const weightsDir = listing.card.weights ? await fetchCheckedWeights(svc, listing, opts.cacheDir ?? join(".kinetic", "models")) : undefined;
@@ -72,7 +72,7 @@ export async function prepareModels(svc: Services, opts: PrepareOptions): Promis
 export async function discoverModels(svc: Services, known: Set<string>, opts: Omit<PrepareOptions, "refs">): Promise<ServedModel[]> {
   const info = await svc.vault.info();
   const fresh = (await findModels(svc.arkiv, info.verifiers)).filter((l) => l.card.runtime.engine === "0g" && !l.card.weights && !known.has(l.key));
-  // One at a time: a model whose passport isn't reachable yet (a fresh Swarm upload) is retried
+  // One at a time: a model whose passport isn't reachable yet (a fresh upload) is retried
   // on the next pass without holding up the others.
   const out: ServedModel[] = [];
   for (const l of fresh) {
@@ -107,7 +107,7 @@ async function fetchCheckedWeights(svc: Services, listing: ModelListing, cacheRo
     const path = join(dir, f.name.replace(/[\\/]/g, "_"));
     // A cached copy is used only if it still matches; otherwise fetched from wherever the card
     // says, straight to disk (weights run to GBs).
-    if (!existsSync(path) || (await sha256OfFile(path)) !== f.sha256) await downloadWeightFileTo(listing.card, f, { swarm: svc.swarm, ...(svc.zgStorage ? { zg: svc.zgStorage } : {}) }, path);
+    if (!existsSync(path) || (await sha256OfFile(path)) !== f.sha256) await downloadWeightFileTo(listing.card, f, svc.zgStorage ? { zg: svc.zgStorage } : {}, path);
     files.push({ name: f.name, path });
   }
   // Checked here again, on the exact bytes this machine will load.

@@ -22,7 +22,7 @@ import { resolveModel, type ModelListing } from "./models/registry.js";
 import { discoverModels, prepareModels } from "./provider/models.js";
 
 // The full system on real networks: Hedera testnet (x402, HCS, vault), Arkiv (Rabdi),
-// Swarm, and 0G Private Computer. Every role uses its own account from .kinetic/testnet/
+// 0G Storage, and 0G Private Computer. Every role uses its own account from .kinetic/testnet/
 // (npm run setup:testnet). Writes an evidence file with explorer links to out/.
 
 const { values } = parseArgs({
@@ -120,7 +120,7 @@ const started = await Promise.allSettled(
     const backend = await backendFor(env);
     // Every provider serves the listed models (PROVIDER_MODELS overrides), each checked against its passport first.
     const refs = env.PROVIDER_MODELS !== undefined ? env.PROVIDER_MODELS.split(",").map((m) => m.trim()).filter(Boolean) : seeded;
-    // Each listing on its own, so one whose passport can't be fetched (an expired Swarm upload) is
+    // Each listing on its own, so one whose passport can't be fetched (a store that doesn't answer) is
     // skipped instead of leaving the provider with no models.
     const prepared = await Promise.allSettled(refs.map((ref) => prepareModels(svc, { refs: [ref], mainBackend: backend, env })));
     prepared.forEach((p, i) => p.status === "rejected" && log(`${r.provider!.name} skips model ${refs[i]}: ${(p.reason as Error).message}`));
@@ -206,7 +206,7 @@ async function runOnce() {
     ...payments.map((p) => (p.t === "chunk" ? `- x402 chunk payment #${p.idx}: ${hashscanTx(p.payTx)}` : "")),
     ...report.providers.filter((p) => p.vaultTx).map((p) => `- Slash + refund (${p.name}): ${hashscanTx(p.vaultTx!)}`),
     ...(report.model?.royalty ? [`- x402 creator royalty (buyer → creator of ${report.model.id}): ${hashscanTx(report.model.royalty.tx)}`] : []),
-    ...(report.model ? [`- Model Passport (${report.model.id}@${report.model.version}): ${buyerSvc.swarm.url(report.model.passportRef)}`] : []),
+    ...(report.model ? [`- Model Passport (${report.model.id}@${report.model.version}): ${buyerSvc.storage.url(report.model.passportRef)}`] : []),
     ``,
     `## 0G Private Computer (verified reference runs)`,
     ...canaries.map((c) => (c.t === "canary" ? `- canary #${c.idx}: ${c.pass ? "PASS" : "FAIL"} agreement ${c.agreement}, request id \`${c.ref}\`` : "")),
@@ -216,8 +216,10 @@ async function runOnce() {
     ...writers.map(([who, addr]) => `- ${who}: ${verifierSvc.cfg.arkiv.explorerUrl}/address/${addr}`),
     `- Query: \`arkiv.schema = str('kinetic.job') AND app = str('${buyerSvc.arkiv.app}') AND job_id = str('${report.jobId}')\``,
     ``,
-    `## Swarm`,
-    `- Compute Passport (${report.passport.attested ? "co-signed by the verifier" : "buyer-signed only"}): ${report.passport.url}`,
+    `## 0G Storage`,
+    report.passport.notStored
+      ? `- Compute Passport (${report.passport.attested ? "co-signed by the verifier" : "buyer-signed only"}): signed, but not stored this time (see the verifier's log)`
+      : `- Compute Passport (${report.passport.attested ? "co-signed by the verifier" : "buyer-signed only"}): ${report.passport.url}`,
     `- Check it: \`npm run passport:verify -- ${report.passport.ref} --results out/${report.jobId}.json\``,
     ``,
   ].filter((l) => l !== undefined);

@@ -76,7 +76,6 @@ const { values: flags, positionals } = parseArgs({
     card: { type: "string" },
     weights: { type: "string" },
     benchmark: { type: "string" },
-    storage: { type: "string" },
     help: { type: "boolean", short: "h", default: false },
   },
 });
@@ -415,7 +414,7 @@ async function models(sub: string | undefined, ref: string | undefined): Promise
     console.log(`  ${listing.card.description}`);
     console.log(`  creator ${listing.card.creator.address} · royalty ${listing.card.royaltyBps / 100}% to ${listing.card.creator.payTo} · licence ${listing.card.license}`);
     console.log(`  runs on ${listing.card.runtime.engine}:${listing.card.runtime.model} · task ${listing.card.task.kind}${listing.card.task.labels ? ` (${listing.card.task.labels.map((l) => l.name).join(", ")})` : ""}`);
-    console.log(`  Model Passport: ${kinetic.svc.swarm.url(listing.passportRef)}${listing.feed ? `\n  Newest passport of ${listing.id} (signed feed): ${kinetic.svc.swarm.feedUrl(listing.feed.manifest)}` : ""}\n`);
+    console.log(`  Model Passport: ${kinetic.svc.storage.url(listing.passportRef)}\n`);
     for (const c of checks) console.log(`  ${c.ok === true ? "✓" : c.ok === false ? "✗" : "·"} ${c.name}${c.detail ? `  (${c.detail})` : ""}`);
     console.log("");
     for (const l of passport.limitations) console.log(`  - ${l}`);
@@ -428,10 +427,9 @@ async function models(sub: string | undefined, ref: string | undefined): Promise
     const files = flags.weights ? readdirSync(flags.weights).filter((f) => statSync(join(flags.weights!, f)).isFile()).map((name) => ({ name, path: join(flags.weights!, name) })) : undefined;
     const benchmark = flags.benchmark ? (readItems(flags.benchmark) as PublishInput["benchmark"]) : undefined;
     console.log(`  publishing ${card.id}@${card.version}: the verifier quorum reviews it (this takes a minute)…`);
-    if (flags.storage && flags.storage !== "0g" && flags.storage !== "swarm") throw new Error("--storage must be 0g or swarm");
-    const out = await kinetic.publish({ card, ...(files ? { files } : {}), ...(benchmark ? { benchmark } : {}), ...(flags.storage ? { storage: flags.storage as "0g" | "swarm" } : {}) });
+    const out = await kinetic.publish({ card, ...(files ? { files } : {}), ...(benchmark ? { benchmark } : {}) });
     console.log(`\n  ✓ listed ${out.id}@${out.version} as ${out.key}: benchmark ${Math.round(out.accuracy * 100)}%, signed by ${out.signers.length} verifiers`);
-    console.log(`  Model Passport: ${kinetic.svc.swarm.url(out.passportRef)}`);
+    console.log(`  Model Passport: ${kinetic.svc.storage.url(out.passportRef)}`);
     if (out.feeTx) console.log(`  listing fee: ${out.feeTx}`);
     return;
   }
@@ -469,7 +467,7 @@ const HELP = `Usage: npm run kinetic -- <command>
   run --model <id>         run a listed model on your items (--items file.jsonl); pays its creator a royalty
   models [list]            the models listed in the registry, with their benchmark and royalty
   models show <id>         a model's card and Model Passport, with every check on it
-  models publish           list your model: --card card.json [--weights <folder>] [--storage 0g|swarm] [--benchmark labelled.jsonl]
+  models publish           list your model: --card card.json [--weights <folder>] [--benchmark labelled.jsonl]
   provider                 start your provider node (serve listed models with PROVIDER_MODELS)
   tasks                    list the built-in tasks
 

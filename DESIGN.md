@@ -173,7 +173,7 @@ An original hexagon lattice lit by a soft light that follows the cursor (`web/sr
 
 **2. What KINETIC is**
 A two-column split (5:7):
-- **Left:** a gold mono kicker ("Overview"), the heading, a one-sentence introduction, and a ruled "built on" strip: Payments · Hedera, Compute · 0G, State · Arkiv, Storage · Swarm.
+- **Left:** a gold mono kicker ("Overview"), the heading, a one-sentence introduction, and a ruled "built on" strip: Payments · Hedera, Compute · Storage · 0G, State · Arkiv.
 - **Right:** one ruled panel with three roles, each with an orange icon tile, a one-line description and a link: **Run AI jobs** (`#/run`), **Rent out a GPU** (`#/earn/provide`), **Publish a model** (`#/publish`).
 It stacks to one column at 800px.
 
@@ -216,7 +216,7 @@ The console isn't another page of the website. It's a professional, IDE-style wo
 │     │                   │ ACTIVITY | PROBLEMS ──────────────────────────────────────────── │
 │ ⋮   │                   │ 03:53:34 PM  closed  job-… closed · 8 chunks kept · …            │
 └─────┴───────────────────┴──────────────────────────────────────────────────────────────────┘
-  status bar: network · 0G · Arkiv · Swarm · GPUs live · running · problems · updated · Ctrl K
+  status bar: network · 0G · Arkiv · GPUs live · running · problems · updated · Ctrl K
 ```
 
 - **Title bar (48px):** the KINETIC mark with an orange `CONSOLE` chip (links back to the website), a command palette button ("Search models, jobs, GPUs or go to…", Ctrl/⌘ K), quick links to **Models** and **Website**, the replay badge and the 0G account.
@@ -229,7 +229,7 @@ The console isn't another page of the website. It's a professional, IDE-style wo
   The current item is highlighted with the orange soft fill.
 - **Editor:** every view you open becomes a **tab** (up to 8, closable), with **breadcrumbs** underneath. Pages render at a comfortable reading width (max 1240px) inside the scrolling editor.
 - **Bottom panel (Ctrl/⌘ J), docked and collapsed by default:** a 34px bar with the **Activity | Problems** tabs and a one-line preview of the newest event, like a terminal's last line. Clicking a tab, the preview or the chevron drops it open; the chevron folds it back, and a maximize button grows it to 55% of the height. The status bar's problems count opens it on Problems. **Activity** streams the live HCS receipts in a terminal-like log. **Problems** lists failed checks and slashes. The panel can be expanded or closed.
-- **Status bar (26px):** the network segment in orange-soft (or "Synthetic replay"), 0G · Arkiv · Swarm, GPUs live, jobs running, a problems count (opens the panel), last update, and a Ctrl K shortcut.
+- **Status bar (26px):** the network segment in orange-soft (or "Synthetic replay"), 0G · Arkiv, GPUs live, jobs running, a problems count (opens the panel), last update, and a Ctrl K shortcut.
 - **Command palette:** a keyboard-first dialog to go to any view, run any model, open any job or find any GPU. Arrow keys move, Enter opens, Escape closes.
 
 **Routes are unchanged:** `#/console`, `#/run`, `#/jobs`, `#/providers`, `#/publish`, `#/creators`, `#/audit`, `#/docs` and `#/earn` all open inside the workspace. **Models** (`#/models`) stays part of the website.
@@ -292,7 +292,7 @@ The Akash Network website is the reference for each component and page. KINETIC 
 
 **Landing sections, in order:**
 1. Hero inside the hexagon field: badge, a plain two-line headline (no icons or hover effects), one-line subhead, model search.
-2. "Built on" strip: Hedera, 0G, Arkiv and Swarm as text, each with its role.
+2. "Built on" strip: Hedera (Payments), 0G (Compute · Storage) and Arkiv (State) as text, each with its role.
 3. What KINETIC is: three roles (Run AI jobs, Rent out a GPU, Publish a model) that advance every 5 s, beside cross-fading console screenshots (`web/public/shots/`, captured from the synthetic replay). A pill of progress dots plus play/pause controls it; it only runs while on screen.
 4. How it works: four numbered steps (Publish, Run, Check, Refund) beside a window that plays a short example for each step. The window is labelled "Example".
 5. What every job gets: six cards in a 3/2/1-column grid.
@@ -353,7 +353,7 @@ The same Akash-referenced language, applied to the model hub and every console p
 
 ### 6.4 Tags and status
 - Keep `Tag` and `StatusTag`, with `--dp-radius-control` pills, 12–13px mono, a soft tinted fill and a hairline in the tone colour.
-- Keep the existing semantic tones (good, warn, bad, 0G, Swarm).
+- Keep the existing semantic tones (good, warn, bad, 0G).
 
 ### 6.5 Inputs
 - Rounded (`40px`) search and text inputs on `--dp-color-panel` with a hairline. Focus turns the border orange and adds a 3px orange ring at 25%.

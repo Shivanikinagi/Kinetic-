@@ -43,8 +43,11 @@ export interface ChunkRequest {
   jobId: string;
   idx: number;
   task: TaskSpec;
-  /** Plain Swarm reference. Only ever sent privately to the provider, never written to Arkiv. */
-  swarmRef: string;
+  /**
+   * The chunk's items, AES-256-GCM sealed under this chunk's key (base64). It travels only inside
+   * this paid request, so nobody but the provider holding the key can read it.
+   */
+  data: string;
   /**
    * This chunk's AES-256 key, wrapped to the provider's public key and bound to this job, chunk
    * and provider (see src/util/wrap.ts). Only that provider can open it.
@@ -95,8 +98,22 @@ export interface ZeroGExecution {
  */
 export type AttestationStatus = "verified" | "unavailable" | "invalid";
 
+/**
+ * How long the provider's model took on a chunk, and the token counts its model server reported
+ * (OpenAI `usage`). Provider-reported and NOT covered by the signature: shown as a speed figure
+ * only, never used to accept, pay or slash.
+ */
+export interface ChunkUsage {
+  /** Wall-clock time of the model call at the provider. */
+  latencyMs: number;
+  promptTokens?: number;
+  completionTokens?: number;
+}
+
 /** What a provider returns for a completed chunk. */
 export interface ChunkResponse {
+  /** Speed of the model call, provider-reported and unsigned. */
+  usage?: ChunkUsage;
   jobId: string;
   idx: number;
   result: ChunkResult;

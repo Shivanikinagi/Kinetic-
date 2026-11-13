@@ -1,23 +1,21 @@
 # What else the sponsors offer KINETIC
 
-From a full read of the official docs (0G: 85 pages via llms-full.txt; Hedera: ~450 indexed pages, ~75 read in full; Arkiv: all 28 docs pages plus the Hub, SDK changelog and skills repo; Swarm: all 86 pages plus the Bee API spec and bee-js). Effort: S = hours, M = a day, L = more.
+From a full read of the official docs (0G: 85 pages via llms-full.txt; Hedera: ~450 indexed pages, ~75 read in full; Arkiv: all 28 docs pages plus the Hub, SDK changelog and skills repo). Effort: S = hours, M = a day, L = more.
 
-## Top picks across all four
+## Top picks across all three
 
 | # | Sponsor | Feature | Why it matters for KINETIC | Effort |
 |---|---|---|---|---|
 | 1 | Hedera | **Backup x402 facilitators** (Blocky402, Launa) | Fixes the Cloudflare 520 failures from x402.org: fall back when one doesn't answer | S |
 | 2 | 0G | **`private` trust mode + self-verified canaries** | `verified` includes TeeTLS relays to centralized upstreams; `private` is TeeML only. Check the TEE signature ourselves and put it in the Compute Passport | S–M |
 | 3 | Arkiv | **Live events (`watchEntityEvents`) instead of polling** | Cuts read cost (only `arkiv_query` is metered) and makes the dashboard real-time | M |
-| 4 | Swarm | **Our own postage batch** | Passports on the public gateway aren't guaranteed to persist without one | S (Beeport) – M |
-| 5 | Hedera | **HIP-1215 scheduled contract calls** | The vault finalizes slashes itself when the dispute window ends; no keeper | M |
-| 6 | Arkiv | **`readonly` checks + `createdBy` filters** | A tamper-proof audit trail, the documented trust pattern | S |
-| 7 | Hedera | **PRNG for canary selection + Merkle anchor per job** | Spot checks nobody can predict; one HCS anchor per job, proof per chunk | S–M |
-| 8 | Swarm | **Feeds for passports** | A stable "latest passport" URL per model, signed by a publisher key | S–M |
-| 9 | Arkiv | **Named schemas, typed columns, server `orderBy`/`withCount`** | The documented data model; cheaper reads, leaderboards without paging | S–M |
-| 10 | 0G | **Storage SDK ECIES encryption for job chunks** | Encrypt each chunk to the GPU's own key with 0G's built-in scheme | S–M |
+| 4 | Hedera | **HIP-1215 scheduled contract calls** | The vault finalizes slashes itself when the dispute window ends; no keeper | M |
+| 5 | Arkiv | **`readonly` checks + `createdBy` filters** | A tamper-proof audit trail, the documented trust pattern | S |
+| 6 | Hedera | **PRNG for canary selection + Merkle anchor per job** | Spot checks nobody can predict; one HCS anchor per job, proof per chunk | S–M |
+| 7 | Arkiv | **Named schemas, typed columns, server `orderBy`/`withCount`** | The documented data model; cheaper reads, leaderboards without paging | S–M |
+| 8 | 0G | **Storage SDK ECIES encryption for job chunks** | Encrypt each chunk to the GPU's own key with 0G's built-in scheme | S–M |
 
-**Status (3 Nov):** 1–9 are built and verified live on testnet in the dashboard; 4 waits on buying a postage batch (`docs/SWARM_STAMP.md`). 10 was evaluated and not built: per-chunk uploads cost a fee and ~20 s each, the SDK's ECIES has no authentication (weaker than our AES-GCM wrap), and extra uploads would reveal which chunks are canaries. PRNG picks post-job spot checks rather than canaries, since a ledger seed is public the moment it exists.
+**Status (3 Nov):** 1–7 are built and verified live on testnet in the dashboard. 8 was evaluated and not built: per-chunk uploads cost a fee and ~20 s each, the SDK's ECIES has no authentication (weaker than our AES-GCM wrap), and extra uploads would reveal which chunks are canaries. PRNG picks post-job spot checks rather than canaries, since a ledger seed is public the moment it exists.
 
 ## 0G
 
@@ -30,9 +28,9 @@ From a full read of the official docs (0G: 85 pages via llms-full.txt; Hedera: ~
 - **ERC-8004** ([docs](https://docs.0g.ai/developer-hub/building-on-0g/agentic-id/erc8004)): done. Show agents on 8004scan.io; the Validation Registry is "still evolving", which is the gap KINETIC's verifier quorum fills.
 - **Exact cost per request**: `x_0g_trace.billing.total_cost` (neuron); `GET /v1/account/usage/history` with an `mk-` key.
 
-**Later**: provider attestation check (`verifyService`); becoming a 0G inference provider (needs TDX + H100/H200); fine-tuning to a LoRA adapter on 0G Storage, then publish it to the hub; Storage KV for a mutable model index; Storage HTTP gateway `GET /file?root=`; Router testnet (`router-api-testnet.integratenetwork.work/v1`); Goldsky subgraphs; ERC-7857 only for closed-weight models.
+**Later**: provider attestation check (`verifyService`); becoming a 0G inference provider (needs TDX + H100/H200); fine-tuning to a LoRA adapter on 0G Storage, then publish it to the hub; Storage KV for a mutable model index; Router testnet (`router-api-testnet.integratenetwork.work/v1`); Goldsky subgraphs; ERC-7857 only for closed-weight models.
 
-**Already used, to improve**: Router `verified` → `private`; files over 4 GB come back as several roots; per-agent `sk-` keys minted from a server-side `mk-` key (never in the browser); honour `X-RateLimit-*`.
+**Already used, to improve**: Router `verified` → `private`; files over 4 GB come back as several roots; per-agent `sk-` keys minted from a server-side `mk-` key (never in the browser); honour `X-RateLimit-*`. Model and Compute Passports are stored on 0G Storage (the verifier pays the fee) and linked through the indexer's `GET /file?root=`; the indexer sends no CORS headers, so the verifier also serves them (`GET /passports/:root`, checked against the root).
 
 ## Hedera
 
@@ -63,15 +61,3 @@ From a full read of the official docs (0G: 85 pages via llms-full.txt; Hedera: ~
 - **`predictEntityKeys` + `executeBatch`**: create a job and its chunks atomically, linked by key.
 
 **Later**: `changeOwnership` (hand a job to the claiming GPU); Arkiv MCP (`mcp.arkiv.network`) and agent skills; `arkiv-sync`; `arkiv-encryption`. The Hub's ecosystem page lists open challenges that fit the pitch ("pay-per-query data commons", "trigger network for expiring data").
-
-## Swarm
-
-**High value now**
-- **Own postage batch** ([buy a stamp batch](https://docs.ethswarm.org/docs/develop/tools-and-features/buy-a-stamp-batch)): needs a light/full node with xDAI + xBZZ, or Beeport (pays from a chain you hold funds on). Depth 19 holds 112 MB; about 5.4 xBZZ for 30 days at current prices (estimate). Always immutable for feeds; watch `batchTTL`.
-- **Client-side stamping**: bee-js `Stamper` + `swarm-postage-stamp` header on `/chunks`; whether the public gateway forwards it needs one test request.
-- **Feeds and feed manifests** ([dynamic content](https://docs.ethswarm.org/docs/develop/dynamic-content)): one feed per model (topic = model id), a stable `/bzz/<manifest>/` URL, SOC-signed by a publisher key.
-- **Erasure coding** ([erasure coding](https://docs.ethswarm.org/docs/develop/tools-and-features/erasure-coding)): `swarm-redundancy-level: 1–4` on `/bytes` uploads of passports.
-
-**Later**: own light node + pinning and stewardship; ACT access control for job data (own node; `/bzz` and `/bytes` only); GSOC/PSS for job notifications (full node to receive); manifests + ENS for a static verifier site. Ecosystem: swarm-ai-data-exchange, swarm-mcp, Swarm's "verifiable provenance" and "AI agent economy" papers.
-
-**Already used, to improve**: the docs say never send 128-hex (encrypted) references to a public gateway, because the second half is the decryption key; our chunks are already AES-GCM sealed, so upload them as plain 64-hex `/bytes` and keep the key in Arkiv only. **Done** (src/integrations/swarm.ts): Swarm encryption is off by default and refused on a public gateway or with client-side stamps. The docs recommend bee-js over the raw API.

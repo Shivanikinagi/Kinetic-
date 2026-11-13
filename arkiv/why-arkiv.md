@@ -8,7 +8,7 @@
 
 ## What we keep off Arkiv, and why
 
-- **Chunk data and results:** too large and private. They go to Swarm, AES-GCM encrypted with a key per chunk. Arkiv holds only *sealed* references.
+- **Chunk data and results:** too large and private. Each chunk is AES-GCM encrypted with its own key and sent only inside the paid request to the provider (and to the verifier at job registration). Nothing about a chunk's contents is written to Arkiv.
 - **Payments, bonds, slashing:** these need value transfer and finality. They live on Hedera (x402 settlements, the bond vault).
 - **The audit log:** HCS gives an ordered, timestamped log that only the verifier's key can append to.
 - **Keys:** never on any chain. Providers receive a single chunk's key only inside the paid HTTPS request.

@@ -96,7 +96,7 @@ export async function startAgentService(svc: Services, opts: AgentServiceOptions
   const asset: PaymentAsset = HBAR;
 
   app.get("/presets", async (_req, res) => {
-    res.json({ presets: presets().map(({ id, kind }) => ({ id, kind })), maxItems, defaults: opts.defaults, network: svc.cfg.network, halted, asset, uaid: await buyerUaid });
+    res.json({ presets: presets().map(({ id, kind }) => ({ id, kind })), maxItems, defaults: opts.defaults, network: svc.cfg.network, halted, asset, uaid: await buyerUaid, account: svc.identity.hederaAccountId });
   });
 
   app.get("/runs", (_req, res) => void res.json({ runs: [...runs].reverse(), halted }));

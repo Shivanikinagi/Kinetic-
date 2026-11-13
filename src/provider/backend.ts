@@ -1,12 +1,33 @@
 import type { NetworkConfig } from "../config.js";
 import { ZeroGComputeBackend, zeroGComputeClient, type DirectRun } from "../integrations/zerog-compute.js";
 import { buildMessages, parseModelOutput } from "../tasks/prompt.js";
-import type { ChunkResult, Item, TaskSpec } from "../types.js";
+import type { ChunkResult, ChunkUsage, Item, TaskSpec } from "../types.js";
+
+/** Token counts from an OpenAI-style `usage` object, when the model server sent one. */
+export function tokenUsage(body: unknown): Omit<ChunkUsage, "latencyMs"> {
+  const u = (body as { usage?: { prompt_tokens?: unknown; completion_tokens?: unknown } } | null)?.usage;
+  const n = (v: unknown) => (typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.round(v) : undefined);
+  const promptTokens = n(u?.prompt_tokens);
+  const completionTokens = n(u?.completion_tokens);
+  return { ...(promptTokens !== undefined ? { promptTokens } : {}), ...(completionTokens !== undefined ? { completionTokens } : {}) };
+}
+
+/** Token counts from the raw response bytes (base64), as returned by a direct 0G Compute run. */
+export function tokenUsageFromRaw(rawBase64: string | undefined): Omit<ChunkUsage, "latencyMs"> {
+  if (!rawBase64) return {};
+  try {
+    return tokenUsage(JSON.parse(Buffer.from(rawBase64, "base64").toString("utf8")));
+  } catch {
+    return {};
+  }
+}
 
 /** Where a provider actually runs inference: 0G Compute, or its own OpenAI-compatible server. */
 export interface ModelBackend {
   readonly name: string;
   run(task: TaskSpec, items: Item[]): Promise<ChunkResult>;
+  /** Same as run, plus how long the model took and the token counts it reported. */
+  runMeasured?(task: TaskSpec, items: Item[]): Promise<{ result: ChunkResult; usage: ChunkUsage }>;
   /** Backends that call one 0G Compute provider directly also return where the chunk ran. */
   runWithEvidence?(task: TaskSpec, items: Item[]): Promise<DirectRun>;
   /** The 0G Compute provider every chunk runs on, for direct backends. Lower-case. */
@@ -30,6 +51,11 @@ export class OpenAICompatibleBackend implements ModelBackend {
   }
 
   async run(task: TaskSpec, items: Item[]) {
+    return (await this.runMeasured(task, items)).result;
+  }
+
+  async runMeasured(task: TaskSpec, items: Item[]) {
+    const started = Date.now();
     const res = await fetch(`${this.url.replace(/\/$/, "")}/chat/completions`, {
       method: "POST",
       headers: { "content-type": "application/json", ...(this.apiKey ? { authorization: `Bearer ${this.apiKey}` } : {}) },
@@ -37,7 +63,8 @@ export class OpenAICompatibleBackend implements ModelBackend {
     });
     if (!res.ok) throw new Error(`model server returned ${res.status}`);
     const body = (await res.json()) as { choices: { message: { content: string } }[] };
-    return parseModelOutput(task, items, body.choices[0]?.message?.content ?? "");
+    const latencyMs = Date.now() - started;
+    return { result: parseModelOutput(task, items, body.choices[0]?.message?.content ?? ""), usage: { latencyMs, ...tokenUsage(body) } };
   }
 }
 

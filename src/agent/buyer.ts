@@ -5,9 +5,9 @@ import { agentProfile, uaidFor, uaidKey, verifyUaid, type AgentProfile } from ".
 import type { Services } from "../integrations/index.js";
 import { BudgetExceededError, PaymentInFlightError, payFetch, type PaymentSigner } from "../integrations/x402.js";
 import { attestable, serviceKind, zeroGDirectory } from "../integrations/zerog-compute.js";
-import { formatHbar, HBAR, type ChunkRequest, type ChunkResponse, type Item, type ItemOutput, type Offer, type PaymentAsset, type ProviderRank, type ResultVerdict, type SlashOutcome, type TaskKind, type TaskSpec } from "../types.js";
+import { formatHbar, HBAR, type ChunkRequest, type ChunkResponse, type ChunkUsage, type Item, type ItemOutput, type Offer, type PaymentAsset, type ProviderRank, type ResultVerdict, type SlashOutcome, type TaskKind, type TaskSpec } from "../types.js";
 import type { Qualification } from "../verifier/verifier.js";
-import { commitData, encryptJson, deriveKey, randomKey, sealString, toBase64 } from "../util/crypto.js";
+import { commitData, encryptJson, deriveKey, randomKey, toBase64 } from "../util/crypto.js";
 import { wrapContext, wrapKey } from "../util/wrap.js";
 import { logger, type Logger } from "../util/log.js";
 import { executionHash, recoverResultSigner, signedPost, signedRequest } from "../util/sign.js";
@@ -129,11 +129,11 @@ export interface JobReport {
   /** x402 fee paid to the verifier for checking this job. */
   verificationFeeTinybar: bigint;
   verificationFeeTx?: string;
-  /** Public (unencrypted) Swarm reference to the job's Compute Passport (formerly the audit bundle). */
+  /** 0G Storage root of the job's Compute Passport (formerly the audit bundle); empty when it couldn't be stored. */
   auditRef: string;
   auditUrl: string;
   /** The signed Compute Passport. `attested` is true when the verifier co-signed it. */
-  passport: { ref: string; url: string; digest: string; attested: boolean; coverage: PassportBody["coverage"] };
+  passport: { ref: string; url: string; digest: string; attested: boolean; coverage: PassportBody["coverage"]; notStored?: boolean };
   strategy: Strategy;
   /** The rules agreed before work, and whether the job met them. */
   agreement: Agreement;
@@ -142,6 +142,39 @@ export interface JobReport {
   commitment: string;
   canaries: number[];
   results: ItemOutput[];
+  /** One entry per accepted chunk: who ran it, what it cost, how it was checked and how fast it was. */
+  chunkLog: ChunkLogEntry[];
+}
+
+/** An accepted chunk, for the dashboard's chat and speed readouts. */
+export interface ChunkLogEntry {
+  idx: number;
+  /** Ids of the job items this chunk answered. */
+  itemIds: string[];
+  provider: string;
+  name: string;
+  payTx?: string;
+  /** In the payment asset's smallest unit. */
+  amount: string;
+  /** "verified": a canary that agreed with 0G. "format": passed the format check only. */
+  check: "verified" | "format";
+  /** Known answers planted in this chunk, and how many it got right. */
+  known?: { items: number; correct: number };
+  /** Payment, model call and result, as the buyer timed it. */
+  roundTripMs: number;
+  /** The provider's own timing and token counts. Unsigned: a speed figure only. */
+  usage?: ChunkUsage;
+}
+
+/** A provider's usage figures, kept only if they are plausible numbers (they come unsigned from the provider). */
+function cleanUsage(u: unknown): ChunkUsage | undefined {
+  const o = (u ?? {}) as Record<string, unknown>;
+  const n = (v: unknown) => (typeof v === "number" && Number.isFinite(v) && v >= 0 && v < 1e9 ? Math.round(v) : undefined);
+  const latencyMs = n(o.latencyMs);
+  if (latencyMs === undefined) return undefined;
+  const promptTokens = n(o.promptTokens);
+  const completionTokens = n(o.completionTokens);
+  return { latencyMs, ...(promptTokens !== undefined ? { promptTokens } : {}), ...(completionTokens !== undefined ? { completionTokens } : {}) };
 }
 
 type ChunkStatus = "pending" | "claimed" | "done" | "verified";
@@ -154,13 +187,15 @@ interface ChunkState {
   avoid: Set<string>;
   /** 0G Compute providers that already failed this chunk: it goes to one that is independent of them. */
   avoidUpstream: Set<string>;
-  swarmRef: string;
-  encRef: string;
+  /** The chunk's items, sealed under its chunk key (base64): sent inside the paid request to the provider. */
+  data: string;
   result?: ItemOutput[];
   /** Evidence for the accepted result, for the Compute Passport. */
   work?: PassportWork;
+  /** The kept copy's provider, price, check and speed, for the report's chunkLog. */
+  log?: ChunkLogEntry;
   /** High assurance: each provider's accepted copy, until the verifier says two agree. */
-  copies: Map<string, { result: ItemOutput[]; work: PassportWork }>;
+  copies: Map<string, { result: ItemOutput[]; work: PassportWork; log: ChunkLogEntry }>;
 }
 
 interface ProviderRun {
@@ -344,8 +379,6 @@ export class BuyerAgent {
     const jobId = `job-${Date.now().toString(36)}-${randomBytes(3).toString("hex")}`;
     hooks.onJob?.(jobId);
     const jobKey = randomKey();
-    const refKey = deriveKey(jobKey, "ref");
-    const resultKey = deriveKey(jobKey, "result");
     const arkiv = this.svc.arkiv;
     const background = (p: Promise<unknown>) => p.catch((err) => this.log("arkiv write failed", { error: (err as Error).message }));
 
@@ -399,14 +432,10 @@ export class BuyerAgent {
     };
     this.log("agreed rules", { rules: describeAgreement(agreement) });
 
-    // 2. Split, encrypt each chunk with its own key, store on Swarm. The reference is sealed
-    //    before it goes on Arkiv, because an encrypted Swarm reference carries its own key.
-    const chunks: ChunkState[] = [];
-    for (let idx = 0; idx < parts.length; idx++) {
-      const swarmRef = await this.svc.swarm.upload(encryptJson(deriveKey(jobKey, `chunk:${idx}`), parts[idx]));
-      chunks.push({ idx, status: "pending", avoid: new Set(), avoidUpstream: new Set(), swarmRef, encRef: sealString(refKey, swarmRef), copies: new Map() });
-    }
-    this.log(`job ${jobId}: ${input.items.length} items in ${chunks.length} chunks uploaded to Swarm`);
+    // 2. Split, and seal each chunk with its own key. A chunk is never stored anywhere: it goes to
+    //    the verifier at registration and to a provider inside the x402 request that pays for it.
+    const chunks: ChunkState[] = parts.map((part, idx) => ({ idx, status: "pending", avoid: new Set(), avoidUpstream: new Set(), data: toBase64(encryptJson(deriveKey(jobKey, `chunk:${idx}`), part)), copies: new Map() }));
+    this.log(`job ${jobId}: ${input.items.length} items in ${chunks.length} chunks`);
 
     // 3. Job and chunk state on Arkiv, read live by the dashboard.
     const jobKeyOnArkiv = await arkiv.create({
@@ -418,7 +447,7 @@ export class BuyerAgent {
     await Promise.all(
       chunks.map(async (c) => {
         // job_key links each chunk to its job entity (a typed Arkiv `key`).
-        c.key = await arkiv.create({ kind: "chunk", ttlSeconds: TTL.job, attrs: { job_id: jobId, job_key: jobKeyOnArkiv, idx: c.idx, status: "pending", provider: "" }, payload: { encRef: c.encRef } });
+        c.key = await arkiv.create({ kind: "chunk", ttlSeconds: TTL.job, attrs: { job_id: jobId, job_key: jobKeyOnArkiv, idx: c.idx, status: "pending", provider: "" } });
       }),
     );
 
@@ -430,7 +459,7 @@ export class BuyerAgent {
         jobId,
         buyer: this.svc.address,
         task,
-        chunks: chunks.map((c) => ({ idx: c.idx, swarmRef: c.swarmRef, itemIds: parts[c.idx].map((i) => i.id) })),
+        chunks: chunks.map((c) => ({ idx: c.idx, data: c.data, itemIds: parts[c.idx].map((i) => i.id) })),
         jobKey: toBase64(jobKey),
         agreement,
         ...(agreement.admission.source === "buyer" ? { goldSet: input.agreement?.goldSet } : {}),
@@ -441,19 +470,17 @@ export class BuyerAgent {
       budget,
     );
     if (!registration.response.ok) throw new Error(`verifier /jobs failed (${registration.response.status}): ${await registration.response.text()}`);
-    const reg = (await registration.response.json()) as { commitment: string; canaries: number; known?: string; chunks?: { idx: number; swarmRef: string; itemIds: string[] }[] };
+    const reg = (await registration.response.json()) as { commitment: string; canaries: number; known?: string; chunks?: { idx: number; data: string; itemIds: string[] }[] };
     const fee = registration.settlement?.success ? BigInt(registration.requirements!.amount) : 0n;
     const feeTx = registration.settlement?.transaction;
     this.log(`verifier committed to hidden canaries`, { commitment: reg.commitment, fee, feeTx, ...(reg.known ? { knownAnswers: "planted in every chunk" } : {}) });
-    // The verifier planted a known answer in each chunk and stored it again under the chunk's
+    // The verifier planted a known answer in each chunk and sealed it again under the chunk's
     // own key. Providers get the new chunk; the planted items never reach the results.
     for (const c of reg.chunks ?? []) {
       const chunk = chunks[c.idx];
       const mine = new Set(parts[c.idx].map((i) => i.id));
       if (!chunk || parts[c.idx].some((i) => !c.itemIds.includes(i.id)) || c.itemIds.length > mine.size + 4) throw new Error(`verifier returned a chunk #${c.idx} that doesn't hold this job's items`);
-      chunk.swarmRef = c.swarmRef;
-      chunk.encRef = sealString(refKey, c.swarmRef);
-      background(arkiv.patch(chunk.key!, {}, { encRef: chunk.encRef }));
+      chunk.data = c.data;
     }
 
     // 5. Dispatch: one sequential worker per provider pulling from a shared queue.
@@ -560,8 +587,8 @@ export class BuyerAgent {
         const chunkKey = deriveKey(jobKey, `chunk:${chunk.idx}`);
         const body: ChunkRequest = {
           ...(offer.encKey
-            ? { jobId, idx: chunk.idx, task, swarmRef: chunk.swarmRef, wrappedKey: wrapKey(offer.encKey, chunkKey, wrapContext(jobId, chunk.idx, offer.provider)) }
-            : { jobId, idx: chunk.idx, task, swarmRef: chunk.swarmRef, chunkKey: toBase64(chunkKey) }),
+            ? { jobId, idx: chunk.idx, task, data: chunk.data, wrappedKey: wrapKey(offer.encKey, chunkKey, wrapContext(jobId, chunk.idx, offer.provider)) }
+            : { jobId, idx: chunk.idx, task, data: chunk.data, chunkKey: toBase64(chunkKey) }),
           ...(model ? { model: model.key } : {}),
         };
         let response: (ChunkResponse & { payment?: unknown }) | undefined;
@@ -658,20 +685,33 @@ export class BuyerAgent {
               ? { execution: response.execution, attestation: verdict.execution?.attestation ?? "unavailable", ...(verdict.execution?.reason ? { attestationReason: verdict.execution.reason } : {}) }
               : {}),
           };
+          const log: ChunkLogEntry = {
+            idx: chunk.idx,
+            itemIds: own.map((i) => i.id),
+            provider: offer.provider,
+            name: offer.name,
+            ...(paidTx ? { payTx: paidTx } : {}),
+            amount: paidAmount.toString(),
+            check: work.check,
+            ...(verdict.known ? { known: { items: verdict.known.items, correct: verdict.known.correct } } : {}),
+            roundTripMs: Date.now() - requestStarted,
+            ...(response.usage ? { usage: cleanUsage(response.usage) } : {}),
+          };
           if (verdict.reason?.startsWith("0G reference unavailable")) unscored += 1;
           const r = verdict.redundancy;
           if (r && r.state !== "matched") {
             // High assurance: a good copy, but the chunk needs another independent provider to agree.
-            chunk.copies.set(offer.provider, { result: own, work });
+            chunk.copies.set(offer.provider, { result: own, work, log });
             chunk.avoid.add(offer.provider);
             this.log(`chunk #${chunk.idx} from ${offer.name}: copy ${r.copies} kept; ${r.state === "awaiting" ? "an independent provider runs it next" : "the copies disagree, a third provider runs it"}`);
             requeue(chunk);
           } else {
             // The kept copy is the verifier's choice: at high assurance, the earlier of the two that agreed.
-            const keep = r?.winner && r.winner !== offer.provider ? chunk.copies.get(r.winner) : { result: own, work };
+            const keep = r?.winner && r.winner !== offer.provider ? chunk.copies.get(r.winner) : { result: own, work, log };
             if (!keep) throw new Error(`verifier kept ${r!.winner}'s copy of chunk #${chunk.idx}, which this buyer doesn't have`);
             const keeper = r?.winner ?? offer.provider;
             chunk.result = keep.result;
+            chunk.log = keep.log;
             chunk.work = r ? { ...keep.work, redundancy: { with: offer.provider, agreement: r.agreement ?? 1 } } : keep.work;
             (runs.get(keeper) ?? run).completed.add(chunk.idx);
             for (const o of r?.outvoted ?? []) {
@@ -680,12 +720,6 @@ export class BuyerAgent {
             }
             if (r) this.log(`chunk #${chunk.idx}: ${offer.name} agrees with ${runs.get(keeper)?.offer.name ?? keeper} (${Math.round((r.agreement ?? 1) * 100)}%)${r.outvoted?.length ? `; outvoted ${r.outvoted.length}` : ""}`);
             setChunk(chunk, verdict.verdict === "canary_pass" ? "verified" : "done", keeper);
-            // The encrypted result backup on Swarm is a convenience for the dashboard: never worth failing the job over.
-            background(
-              this.svc.swarm
-                .upload(encryptJson(resultKey, { items: keep.result }))
-                .then((resultRef) => arkiv.patch(chunk.key!, {}, { encRef: chunk.encRef, resultRef: sealString(refKey, resultRef) })),
-            );
           }
         } else {
           if (verdict.verdict === "canary_fail") {
@@ -904,7 +938,7 @@ export class BuyerAgent {
       })),
     ];
 
-    // 7. Compute Passport on Swarm: no data and no keys, just hashes, signatures, payments and
+    // 7. Compute Passport on 0G Storage: no data and no keys, just hashes, signatures, payments and
     //    check results that anyone can verify (npm run passport:verify). Its reference is public.
     const results = chunks.flatMap((c) => c.result ?? []);
     let body = buildPassportBody({
@@ -943,8 +977,17 @@ export class BuyerAgent {
       body = { ...body, limitations: [...body.limitations, `The verifier did not co-sign this passport: ${(err as Error).message.slice(0, 200)}`] };
     }
     const passport: Passport = { ...body, attestations: { buyer: await signPassport(this.svc.account, body), ...(verifierSig ? { verifier: verifierSig } : {}) } };
-    const auditRef = await this.svc.swarm.upload(new TextEncoder().encode(JSON.stringify(passport, null, 2)), { encrypt: false, redundancy: this.svc.cfg.swarm.redundancy });
-    background(arkiv.patch(jobKeyOnArkiv, { audit_ref: auditRef, ...(royalty ? { royalty: royaltyPaid } : {}) }));
+    // The verifier stores the signed passport on 0G Storage (it pays the fee) and returns its root.
+    // Storing is never worth failing a finished job over: the report says when it didn't happen.
+    let stored: { ref: string; url: string } | undefined;
+    try {
+      stored = await this.verifierCall<{ ref: string; url: string }>(`/jobs/${jobId}/passport`, passport);
+      this.log(`Compute Passport stored on 0G Storage`, { ref: stored.ref });
+    } catch (err) {
+      this.log("the Compute Passport could not be stored on 0G Storage", { error: (err as Error).message });
+    }
+    const auditRef = stored?.ref ?? "";
+    background(arkiv.patch(jobKeyOnArkiv, { ...(auditRef ? { audit_ref: auditRef } : {}), ...(royalty ? { royalty: royaltyPaid } : {}) }));
     updateJob(complete ? "complete" : "incomplete");
     await arkiv.flush();
 
@@ -963,8 +1006,8 @@ export class BuyerAgent {
       verificationFeeTinybar: fee,
       verificationFeeTx: feeTx,
       auditRef,
-      auditUrl: this.svc.swarm.url(auditRef),
-      passport: { ref: auditRef, url: this.svc.swarm.url(auditRef), digest: passportDigest(body), attested: verifierSig !== undefined, coverage: body.coverage },
+      auditUrl: stored?.url ?? "",
+      passport: { ref: auditRef, url: stored?.url ?? "", digest: passportDigest(body), attested: verifierSig !== undefined, coverage: body.coverage, ...(stored ? {} : { notStored: true }) },
       strategy: this.policy.strategy ?? "balanced",
       agreement,
       outcome,
@@ -972,6 +1015,7 @@ export class BuyerAgent {
       canaries: summary.canaries,
       providers: providerReports,
       results,
+      chunkLog: chunks.flatMap((c) => (c.result && c.log ? [c.log] : [])),
     };
     return report;
   }
@@ -1030,7 +1074,7 @@ export class BuyerAgent {
       hcsTopic: cfg.hedera.hcsTopicId,
       mirrorUrl: cfg.hedera.mirrorUrl,
       ...(cfg.network === "testnet" && cfg.hedera.vaultAddress ? { vault: cfg.hedera.vaultAddress } : {}),
-      swarmGateway: cfg.swarm.gatewayUrl,
+      storageGateway: this.svc.storage.gateway,
       ...(cfg.network === "devnet" ? { devnetUrl: cfg.devnetUrl } : {}),
     };
   }

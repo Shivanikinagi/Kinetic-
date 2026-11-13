@@ -96,7 +96,7 @@ export function printReport(r: JobReport): void {
   if (r.providers.some((p) => p.promoted)) console.log("  * started as a reserve and stepped in when another provider dropped out");
   console.log("");
   const { coverage, attested } = r.passport;
-  console.log(`  Compute Passport on Swarm: ${r.passport.url}`);
+  console.log(r.passport.notStored ? "  Compute Passport: signed, but it couldn't be stored on 0G Storage this time" : `  Compute Passport on 0G Storage: ${r.passport.url}`);
   console.log(`  ${attested ? "signed by the buyer and co-signed by the verifier" : "signed by the buyer only (the verifier did not co-sign)"} · ${coverage.verified} of ${r.chunks} chunks checked against 0G`);
   console.log(`  check it: npm run passport:verify -- ${r.passport.ref} --results out/${r.jobId}.json`);
   console.log("");

@@ -3,8 +3,7 @@ import type { Identity, NetworkConfig } from "../config.js";
 import { accountOf } from "../util/sign.js";
 import { ArkivDevnetStore, ArkivSdkStore, type ArkivStore } from "./arkiv.js";
 import { DevnetReceiptLog, HederaReceiptLog, type ReceiptLog } from "./hcs.js";
-import { SwarmClient } from "./swarm.js";
-import { stateFile } from "../util/state.js";
+import { documentStore, type DocumentStore } from "./storage.js";
 import { DevnetBondVault, EvmBondVault, type BondVault } from "./vault.js";
 import { DevnetPaymentSigner, HederaPaymentSigner, type PaymentSigner } from "./x402.js";
 import { ZeroGClient } from "./zerog.js";
@@ -22,7 +21,8 @@ export interface Services {
   payTo: string;
   arkiv: ArkivStore;
   vault: BondVault;
-  swarm: SwarmClient;
+  /** 0G Storage for Model Passports and Compute Passports (uploads pay 0G's fee from this role's key). */
+  storage: DocumentStore;
   receipts: () => ReceiptLog;
   payer: () => PaymentSigner;
   zerog: () => ZeroGClient;
@@ -37,7 +37,7 @@ function zeroGRouter(cfg: NetworkConfig): ZeroGClient {
 
 /**
  * What a cosigning verifier needs: it only reads (Arkiv, the vault, HCS, the mirror node,
- * Swarm), runs its own 0G reference runs and signs, so it needs no Hedera account.
+ * 0G Storage), runs its own 0G reference runs and signs, so it needs no Hedera account.
  */
 export function connectCosigner(cfg: NetworkConfig, identity: Identity) {
   const account = accountOf(identity.privateKey);
@@ -49,7 +49,6 @@ export function connectCosigner(cfg: NetworkConfig, identity: Identity) {
     account,
     arkiv: dev ? new ArkivDevnetStore(account, cfg.devnetUrl) : new ArkivSdkStore(account, cfg.arkiv),
     vault: dev ? new DevnetBondVault(account, cfg.devnetUrl) : new EvmBondVault(account, cfg.hedera.vaultAddress!, cfg.hedera),
-    swarm: swarmClient(cfg),
     zerog: zeroGRouter(cfg),
     // The same labelled sets the lead plants from (GOLD_TASK/GOLD_SET and GOLD_DIR), to check known answers itself.
     gold: loadGoldSets().map(plantingPool),
@@ -58,13 +57,7 @@ export function connectCosigner(cfg: NetworkConfig, identity: Identity) {
   };
 }
 
-/** One install's roles share the postage stamp counters (same batch, same owner key). */
-export function swarmClient(cfg: NetworkConfig): SwarmClient {
-  const file = cfg.swarm.postageBatchId ? stateFile(cfg, `swarm-stamps-${cfg.swarm.postageBatchId.replace(/^0x/, "").slice(0, 16)}.json`) : undefined;
-  return new SwarmClient(cfg.swarm, file ? { stampStateFile: file } : {});
-}
-
-/** Wires every integration for one role, for either devnet or Hedera/Arkiv/Swarm/0G testnets. */
+/** Wires every integration for one role, for either devnet or Hedera/Arkiv/0G testnets. */
 export function connect(cfg: NetworkConfig, identity: Identity): Services {
   const account = accountOf(identity.privateKey);
   const address = account.address.toLowerCase();
@@ -83,7 +76,7 @@ export function connect(cfg: NetworkConfig, identity: Identity): Services {
     payTo: dev ? address : identity.hederaAccountId!,
     arkiv: dev ? new ArkivDevnetStore(account, cfg.devnetUrl) : new ArkivSdkStore(account, cfg.arkiv),
     vault: dev ? new DevnetBondVault(account, cfg.devnetUrl) : new EvmBondVault(account, cfg.hedera.vaultAddress!, cfg.hedera),
-    swarm: swarmClient(cfg),
+    storage: documentStore(cfg, identity.privateKey),
     receipts: () => {
       if (!cfg.hedera.hcsTopicId) throw new Error("HCS_TOPIC_ID is required (npm run create:topic)");
       return dev ? new DevnetReceiptLog(cfg.devnetUrl, cfg.hedera.hcsTopicId) : new HederaReceiptLog(identity, cfg.hedera.hcsTopicId);

@@ -8,7 +8,7 @@
 ## Can they try it today
 
 - `npm run live -- --serve` and the dashboard run it on the real networks: providers doing their work on 0G Compute, payments and slashing on Hedera, offers, claims and reputation on Arkiv.
-- `npm run setup:testnet && npm run live` runs it on Hedera testnet, Arkiv (Rabdi), Swarm and 0G (see the README).
+- `npm run setup:testnet && npm run live` runs it on Hedera testnet, Arkiv (Rabdi) and 0G (see the README).
 
 ## After Mumbai
 

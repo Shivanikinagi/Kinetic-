@@ -4,8 +4,6 @@ import type { Server } from "node:http";
 import express from "express";
 import { recoverMessageAddress, type Hex } from "viem";
 import { resolutionDigest, slashIdOf, verdictDigest, type SlashVerdict } from "../../src/core/verdict.js";
-import { contentAddress, swarmChunks } from "../../src/integrations/swarm-bmt.js";
-import { feedUpdateAddress, readSoc, readStamp, socAddress } from "../../src/integrations/swarm-feed.js";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import type { WireAttr } from "../../src/integrations/arkiv.js";
 import { mirrorTransactionId } from "../../src/integrations/x402.js";
@@ -16,7 +14,7 @@ import { createApp, listen, rawBody, route } from "../../src/util/http.js";
 import { verifySignedRequest } from "../../src/util/sign.js";
 
 // Local stand-in for every network KINETIC touches, so the full flow runs offline.
-// Where it is cheap, it speaks the real wire format (Bee /bytes, the x402 facilitator API,
+// Where it is cheap, it speaks the real wire format (0G Storage's /file?root=, the x402 facilitator API,
 // the Hedera mirror REST API, the 0G router), so the same client code runs against it.
 // It is a test double: no consensus and no persistence.
 
@@ -106,7 +104,6 @@ export async function startDevnet(opts: DevnetOptions): Promise<Devnet> {
   let burned = 0n;
   const topics = new Map<string, { seq: number; ts: string; message: string; running: string }[]>();
   const entities = new Map<string, Entity>();
-  const blobs = new Map<string, Buffer>();
   let credits = opts.zerogCredits ?? 1_000_000;
   let nanos = 0;
   let entityNonce = 0;
@@ -527,124 +524,16 @@ export async function startDevnet(opts: DevnetOptions): Promise<Devnet> {
     zgFiles.set(root, data);
     res.json({ root, ...(tx ? { tx } : {}) });
   });
+  // The indexer's HTTP download, as https://indexer-storage-testnet-turbo.0g.ai/file?root= serves it.
+  app.get("/zgs/file", (req, res) => {
+    const data = zgFiles.get(String(req.query.root ?? "").toLowerCase());
+    if (!data) return void res.json({ code: 101, message: "File not found", data: null });
+    res.type("text/plain").send(data);
+  });
   app.get("/zgs/:root", (req, res) => {
     const data = zgFiles.get(String(req.params.root).toLowerCase());
     if (!data) return void res.status(404).json({ error: "file not found" });
     res.type("application/octet-stream").send(data);
-  });
-
-  // ── Swarm Bee /bytes ──
-  // Unencrypted uploads are stored as real content-addressed chunks, so clients can fetch and
-  // check them chunk by chunk. An encrypted reference is 128 hex (address plus decryption key)
-  // and is kept whole.
-  const rawChunks = new Map<string, Uint8Array>();
-  app.post("/bee/bytes", express.raw({ type: () => true, limit: "20mb" }), (req, res) => {
-    const data = Buffer.from(req.body as Buffer);
-    if (String(req.get("swarm-encrypt")) === "true") {
-      const reference = sha256Hex(data) + randomBytes(32).toString("hex");
-      blobs.set(reference, data);
-      return void res.status(201).json({ reference });
-    }
-    const { reference, chunks } = swarmChunks(new Uint8Array(data));
-    for (const [address, chunk] of chunks) rawChunks.set(address, chunk);
-    blobs.set(reference, data);
-    res.status(201).json({ reference });
-  });
-  app.get("/bee/bytes/:ref", (req, res) => {
-    const data = blobs.get(req.params.ref);
-    if (!data) return void res.status(404).json({ message: "Not Found" });
-    res.type("application/octet-stream").send(data);
-  });
-  app.get("/bee/chunks/:address", (req, res) => {
-    const chunk = rawChunks.get(req.params.address.toLowerCase());
-    if (!chunk) return void res.status(404).json({ message: "Not Found" });
-    res.type("application/octet-stream").send(Buffer.from(chunk));
-  });
-
-  // Client-side postage stamps, as Bee checks them: signed for this very chunk by the batch's
-  // owner, and each (batch, bucket, slot) used once, as in an immutable batch.
-  const stampSlots = new Map<string, string>();
-  const checkStamp = async (stamp: string | undefined, address: string): Promise<string | undefined> => {
-    if (!stamp) return undefined;
-    try {
-      const s = await readStamp(stamp, address);
-      if (opts.postageBatch && (s.batchId !== opts.postageBatch.id.replace(/^0x/, "").toLowerCase() || s.issuer !== opts.postageBatch.owner.replace(/^0x/, "").toLowerCase())) return "invalid batch id";
-      const slot = `${s.batchId}:${s.bucket}:${s.slot}`;
-      if ((stampSlots.get(slot) ?? address) !== address) return "stamp index already used";
-      stampSlots.set(slot, address);
-      return undefined;
-    } catch (err) {
-      return `invalid stamp: ${(err as Error).message}`;
-    }
-  };
-  app.post("/bee/chunks", express.raw({ type: () => true, limit: "1mb" }), async (req, res) => {
-    const chunk = new Uint8Array(req.body as Buffer);
-    if (chunk.length < 8 || chunk.length > 8 + 4096) return void res.status(400).json({ message: "invalid chunk size" });
-    const address = contentAddress(chunk);
-    const bad = await checkStamp(req.get("swarm-postage-stamp"), address);
-    if (bad) return void res.status(400).json({ message: bad });
-    rawChunks.set(address, chunk);
-    res.status(201).json({ reference: address });
-  });
-
-  // Single-owner chunks and feeds (v1 updates: timestamp || reference), with Bee's lookup.
-  app.post("/bee/soc/:owner/:id", express.raw({ type: () => true, limit: "1mb" }), async (req, res) => {
-    const owner = req.params.owner.toLowerCase();
-    const id = Buffer.from(req.params.id, "hex");
-    const chunk = new Uint8Array(Buffer.concat([id, Buffer.from(String(req.query.sig ?? ""), "hex"), req.body as Buffer]));
-    const address = socAddress(id, owner);
-    try {
-      await readSoc(chunk, address);
-    } catch {
-      return void res.status(401).json({ message: "invalid chunk" });
-    }
-    const bad = await checkStamp(req.get("swarm-postage-stamp"), address);
-    if (bad) return void res.status(400).json({ message: bad });
-    rawChunks.set(address, chunk);
-    res.status(201).json({ reference: address });
-  });
-  const feedManifests = new Map<string, { owner: string; topic: string }>();
-  const bzzFiles = new Map<string, { data: Buffer; contentType: string }>();
-  const latestFeed = (owner: string, topic: string) => {
-    let i = 0;
-    while (rawChunks.has(feedUpdateAddress(owner, topic, i))) i++;
-    return i - 1;
-  };
-  const feedTarget = (owner: string, topic: string, index: number) => Buffer.from(rawChunks.get(feedUpdateAddress(owner, topic, index))!.subarray(32 + 65 + 8 + 8)).toString("hex");
-  app.get("/bee/feeds/:owner/:topic", (req, res) => {
-    const owner = req.params.owner.toLowerCase();
-    const topic = req.params.topic.toLowerCase();
-    const index = latestFeed(owner, topic);
-    if (index < 0) return void res.status(404).json({ code: 404, message: "no update found" });
-    const target = feedTarget(owner, topic, index);
-    res.set("swarm-feed-index", index.toString(16).padStart(16, "0"));
-    res.set("swarm-feed-index-next", (index + 1).toString(16).padStart(16, "0"));
-    res.type("application/octet-stream").send(blobs.get(target) ?? bzzFiles.get(target)?.data ?? Buffer.alloc(0));
-  });
-  app.post("/bee/feeds/:owner/:topic", (req, res) => {
-    const reference = sha256Hex(`feed-manifest:${req.params.owner.toLowerCase()}:${req.params.topic.toLowerCase()}`);
-    feedManifests.set(reference, { owner: req.params.owner.toLowerCase(), topic: req.params.topic.toLowerCase() });
-    res.status(201).json({ reference });
-  });
-  // Single-file /bzz uploads; a feed manifest resolves to what its newest update points at.
-  app.post("/bee/bzz", express.raw({ type: () => true, limit: "20mb" }), (req, res) => {
-    // express.json (app-wide) may have parsed a JSON body already; its raw text is kept.
-    const data = Buffer.isBuffer(req.body) ? req.body : Buffer.from((req as unknown as { rawBody?: string }).rawBody ?? "", "utf8");
-    const reference = sha256Hex(`bzz:${String(req.query.name ?? "")}:${sha256Hex(data)}`);
-    bzzFiles.set(reference, { data, contentType: req.get("content-type") ?? "application/octet-stream" });
-    res.status(201).json({ reference });
-  });
-  app.get("/bee/bzz/:ref", (req, res) => {
-    let ref = req.params.ref.toLowerCase();
-    const feed = feedManifests.get(ref);
-    if (feed) {
-      const index = latestFeed(feed.owner, feed.topic);
-      if (index < 0) return void res.status(404).json({ message: "no update found" });
-      ref = feedTarget(feed.owner, feed.topic, index);
-    }
-    const file = bzzFiles.get(ref);
-    if (!file) return void res.status(404).json({ message: "Not Found" });
-    res.type(file.contentType).send(file.data);
   });
 
   // ── 0G router (OpenAI-compatible) ──

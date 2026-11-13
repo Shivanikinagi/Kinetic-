@@ -30,6 +30,23 @@ describe("end to end on devnet", () => {
     expect(s.report.results).toEqual(heuristicRun(task, items).items);
   });
 
+  it("logs every accepted chunk with its paid provider, check and speed", () => {
+    const log = s.report.chunkLog;
+    expect(log.map((c) => c.idx).sort((a, b) => a - b)).toEqual([...Array(s.report.chunks).keys()]);
+    expect(log.flatMap((c) => c.itemIds).sort()).toEqual(s.report.results.map((r) => r.id).sort());
+    for (const c of log) {
+      // Kept work only: never the slashed provider (its chunks were rerouted) or the unqualified one.
+      // flicker-t4 answers honestly until it goes offline, so its accepted chunks stay.
+      expect(["atlas-4090", "nimbus-a100", "flicker-t4"]).toContain(c.name);
+      expect(c.payTx).toBeTruthy();
+      expect(BigInt(c.amount)).toBeGreaterThan(0n);
+      expect(c.roundTripMs).toBeGreaterThanOrEqual(0);
+      // The heuristic backend reports no tokens, so the node times the call itself.
+      expect(c.usage?.latencyMs).toBeGreaterThanOrEqual(0);
+      expect(c.usage?.completionTokens).toBeUndefined();
+    }
+  });
+
   it("slashes the lazy provider and refunds everything the buyer paid it", () => {
     const lazy = s.report.providers.find((p) => p.name === "cheapo-3060")!;
     expect(lazy.status).toBe("slashed");
@@ -77,8 +94,8 @@ describe("end to end on devnet", () => {
     expect(s.balances.buyerBefore - s.balances.buyerAfter).toBe(net);
   });
 
-  it("publishes a Compute Passport on Swarm, co-signed by the verifier, that passes every check", async () => {
-    expect(s.report.auditRef).toMatch(/^[0-9a-f]{64}$/);
+  it("stores a Compute Passport on 0G Storage, co-signed by the verifier, that passes every check", async () => {
+    expect(s.report.auditRef).toMatch(/^0x[0-9a-f]{64}$/);
     expect(s.report.passport.attested).toBe(true);
     const passport = (await (await fetch(s.report.passport.url)).json()) as Passport;
     expect(passport).toMatchObject({ kind: "kinetic.passport.v2", jobId: s.report.jobId, completed: s.report.chunks });

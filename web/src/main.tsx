@@ -8,6 +8,7 @@ import "./product.css";
 import "./design.css";
 import "./site.css";
 import "./app.css";
+import "./network.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

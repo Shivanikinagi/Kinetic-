@@ -5,14 +5,14 @@ import { z } from "zod";
 import { TTL, type ArkivStore } from "../integrations/arkiv.js";
 import type { Services } from "../integrations/index.js";
 import { PaymentGate, ReplayGuard } from "../integrations/x402.js";
-import type { ChunkRequest, ChunkResponse, Item, TaskKind } from "../types.js";
+import type { ChunkRequest, ChunkResponse, ChunkResult, ChunkUsage, Item, TaskKind, ZeroGExecution } from "../types.js";
 import { canonicalJson, decryptJson, fromBase64, sha256Hex } from "../util/crypto.js";
 import { createApp, listen, route } from "../util/http.js";
 import { logger } from "../util/log.js";
 import { executionHash, signResult } from "../util/sign.js";
 import { encryptionKeyOf, unwrapKey, wrapContext } from "../util/wrap.js";
 import { stateFile } from "../util/state.js";
-import { adversarialLabel, lazyRun, type Behavior, type ModelBackend } from "./backend.js";
+import { adversarialLabel, lazyRun, tokenUsageFromRaw, type Behavior, type ModelBackend } from "./backend.js";
 import { UpstreamError } from "../integrations/zerog-compute.js";
 import type { ServedModel } from "./models.js";
 
@@ -61,7 +61,8 @@ const chunkRequestSchema = z.object({
   jobId: z.string().min(1).max(64),
   idx: z.number().int().nonnegative(),
   task: z.object({ kind: z.enum(["classify", "extract", "tag"]), instructions: z.string() }).passthrough(),
-  swarmRef: z.string().regex(/^[0-9a-f]{64}([0-9a-f]{64})?$/),
+  // The sealed chunk itself (base64). A chunk is at most 20 items, so 2 MB is far more than enough.
+  data: z.string().min(16).max(2_000_000).regex(/^[A-Za-z0-9+/]+={0,2}$/),
   wrappedKey: z.string().min(80).optional(),
   chunkKey: z.string().min(40).optional(),
   model: z.string().regex(/^m[0-9a-f]{15}$/).optional(),
@@ -108,17 +109,34 @@ export async function startProvider(opts: ProviderOptions, svc: Services): Promi
     // The chunk key arrives wrapped to this provider's own key, bound to this job and chunk.
     const key = body.wrappedKey ? unwrapKey(svc.identity.privateKey, body.wrappedKey, wrapContext(body.jobId, body.idx, svc.address)) : body.chunkKey ? fromBase64(body.chunkKey) : undefined;
     if (!key) throw new Error("no chunk key in the request");
-    const items = decryptJson<Item[]>(key, await svc.swarm.download(body.swarmRef));
+    const items = decryptJson<Item[]>(key, fromBase64(body.data));
     const lazyNow = opts.behavior.kind === "lazy" || (opts.behavior.kind === "degrade-after" && served >= opts.behavior.n);
     // A direct 0G Compute backend also says where the chunk ran; the signature covers that too.
-    const { result, execution, rawResponse } = lazyNow
-      ? { result: lazyRun(body.task, items), execution: undefined, rawResponse: undefined }
-      : backend.runWithEvidence
-        ? await backend.runWithEvidence(body.task, items)
-        : { result: await backend.run(body.task, items), execution: undefined, rawResponse: undefined };
+    // The model call is timed for the speed figure (`usage`), which is reported but never signed.
+    const started = Date.now();
+    let run: { result: ChunkResult; execution?: ZeroGExecution; rawResponse?: string; usage?: ChunkUsage };
+    if (lazyNow) run = { result: lazyRun(body.task, items) };
+    else if (backend.runWithEvidence) {
+      const r = await backend.runWithEvidence(body.task, items);
+      run = { ...r, usage: { latencyMs: r.execution.latencyMs ?? Date.now() - started, ...tokenUsageFromRaw(r.rawResponse) } };
+    } else if (backend.runMeasured) run = await backend.runMeasured(body.task, items);
+    else run = { result: await backend.run(body.task, items) };
+    const { result, execution, rawResponse } = run;
+    // A lazy provider never called a model, so it has no speed to report.
+    const usage: ChunkUsage | undefined = lazyNow ? undefined : (run.usage ?? { latencyMs: Date.now() - started });
     const resultHash = sha256Hex(canonicalJson(result));
     const signature = await signResult(svc.account, body.jobId, body.idx, resultHash, executionHash(execution), body.model);
-    return { jobId: body.jobId, idx: body.idx, result, resultHash, provider: svc.address, signature, ...(execution ? { execution, rawResponse } : {}), ...(body.model ? { model: body.model } : {}) };
+    return {
+      jobId: body.jobId,
+      idx: body.idx,
+      result,
+      resultHash,
+      provider: svc.address,
+      signature,
+      ...(execution ? { execution, rawResponse } : {}),
+      ...(body.model ? { model: body.model } : {}),
+      ...(usage ? { usage } : {}),
+    };
   };
 
   const app = createApp();

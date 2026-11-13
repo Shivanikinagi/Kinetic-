@@ -1,5 +1,5 @@
 import { attrBig, attrStr, type ArkivStore, type Attrs, type StoredEntity } from "../integrations/arkiv.js";
-import type { SwarmClient } from "../integrations/swarm.js";
+import type { DocumentStore } from "../integrations/storage.js";
 import { compareVersions, isModelKey, parseModelRef, type ModelCard } from "./card.js";
 import { modelPassportDigest, type ModelPassport } from "./passport.js";
 
@@ -7,7 +7,7 @@ import { modelPassportDigest, type ModelPassport } from "./passport.js";
 // vault's verifier set can list a model (it writes the entity after a quorum signed the Model
 // Passport), so a listing is trusted only when its owner is one of those verifiers. The entity
 // expires like any Arkiv entity; the verifier that listed it renews it, and the passport itself
-// stays on Swarm with its digest on HCS, so an expired listing can always be restored.
+// stays on 0G Storage with its digest on HCS, so an expired listing can always be restored.
 
 export interface ModelListing {
   key: string;
@@ -28,8 +28,6 @@ export interface ModelListing {
   /** The verifier that wrote the listing (its Arkiv owner). */
   listedBy: string;
   entityKey: string;
-  /** The model's passport feed on Swarm (see ListingPayload). */
-  feed?: ListingPayload["feed"];
 }
 
 export interface ListingPayload {
@@ -40,11 +38,6 @@ export interface ListingPayload {
   params?: number;
   weightsChecked: boolean;
   signers: string[];
-  /**
-   * The model's passport feed on Swarm (one per model id, signed by the listing verifier): update
-   * `index` points at a /bzz copy of this passport (`target`); /bzz/{manifest}/ is the newest.
-   */
-  feed?: { owner: string; topic: string; index: number; target: string; manifest: string };
 }
 
 /** The attributes a listing is queried by. */
@@ -84,7 +77,6 @@ export function listingFromEntity(e: StoredEntity): ModelListing | null {
     signers: p.signers ?? [],
     listedBy: e.owner,
     entityKey: e.key,
-    ...(p.feed ? { feed: p.feed } : {}),
   };
 }
 
@@ -135,10 +127,10 @@ export async function resolveModel(arkiv: ArkivStore, verifiers: string[], ref: 
   return found.sort((a, b) => compareVersions(b.version, a.version))[0];
 }
 
-/** Downloads a listing's Model Passport from Swarm and checks it is the one the listing names. */
-export async function loadModelPassport(swarm: SwarmClient, listing: Pick<ModelListing, "passportRef" | "passportDigest" | "key">): Promise<ModelPassport> {
-  const passport = JSON.parse(new TextDecoder().decode(await swarm.download(listing.passportRef))) as ModelPassport;
-  if (modelPassportDigest(passport) !== listing.passportDigest) throw new Error(`the Model Passport on Swarm for ${listing.key} doesn't match its listing`);
-  if (passport.key !== listing.key) throw new Error(`the Model Passport on Swarm is for ${passport.key}, not ${listing.key}`);
+/** Downloads a listing's Model Passport from 0G Storage and checks it is the one the listing names. */
+export async function loadModelPassport(storage: DocumentStore, listing: Pick<ModelListing, "passportRef" | "passportDigest" | "key">): Promise<ModelPassport> {
+  const passport = JSON.parse(new TextDecoder().decode(await storage.download(listing.passportRef))) as ModelPassport;
+  if (modelPassportDigest(passport) !== listing.passportDigest) throw new Error(`the Model Passport on 0G Storage for ${listing.key} doesn't match its listing`);
+  if (passport.key !== listing.key) throw new Error(`the Model Passport on 0G Storage is for ${passport.key}, not ${listing.key}`);
   return passport;
 }

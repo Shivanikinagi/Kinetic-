@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ArrowRight, Check, ShieldCheck } from "lucide-react";
-import { getModelPassport, hbar, listingsOf, REPLAY, short, type Entity, type ModelListing, type ModelPassport } from "../data";
+import { getModelPassport, hbar, listingsOf, REPLAY, short, storageLink, type Entity, type ModelListing, type ModelPassport } from "../data";
 import { useLive, type Snapshot } from "../live";
 import { StatusTag, TxLink } from "../ui";
-import { verifyPassportFeed, verifyPassportInBrowser, verifyPassportOnSwarm, type BrowserCheck, type PassportFeedCheck } from "../verify";
+import { verifyPassportInBrowser, verifyPassportStored, type BrowserCheck } from "../verify";
 import TryIt from "./TryIt";
+import Chat from "./Chat";
 
 // The model hub: every model listed by the bond vault's verifiers, each with a Model Passport
-// signed by a quorum of them. Read from Arkiv, HCS and Swarm; the passport is re-checked here.
+// signed by a quorum of them. Read from Arkiv, HCS and 0G Storage; the passport is re-checked here.
 
 /** Live offers that serve a model, and what its jobs paid its creator. */
 function useModelStats(snap: Snapshot) {
@@ -61,12 +62,7 @@ export const latestPerId = (listings: ModelListing[]) => {
 };
 
 /** Where a listing keeps its weights, if it publishes any. */
-const storeOf = (m: ModelListing): "0G Storage" | "Swarm" | null => {
-  const files = m.card.weights?.files ?? [];
-  if (files.some((f) => f.zgRoot)) return "0G Storage";
-  if (files.some((f) => f.swarmRef)) return "Swarm";
-  return null;
-};
+const storeOf = (m: ModelListing): "0G Storage" | null => ((m.card.weights?.files ?? []).some((f) => f.zgRoot) ? "0G Storage" : null);
 
 const Icon = {
   check: (
@@ -175,12 +171,12 @@ export function ModelList({ snap, query = "" }: { snap: Snapshot; query?: string
   const [q, setQ] = useState(query);
   const [task, setTask] = useState<"classify" | "extract" | "tag" | "all">("all");
   const [runtime, setRuntime] = useState<"0g" | "openai" | "all">("all");
-  const [store, setStore] = useState<"0g" | "swarm" | "none" | "all">("all");
+  const [store, setStore] = useState<"0g" | "none" | "all">("all");
   const [sort, setSort] = useState<"used" | "accuracy" | "name">("used");
   const served = (m: ModelListing) => stats.serving.get(m.key)?.length ?? 0;
   const used = (m: ModelListing) => stats.jobs.get(m.key)?.length ?? 0;
 
-  const storeIs = (m: ModelListing, s: "0g" | "swarm" | "none") => (s === "0g" ? storeOf(m) === "0G Storage" : s === "swarm" ? storeOf(m) === "Swarm" : !storeOf(m));
+  const storeIs = (m: ModelListing, s: "0g" | "none") => (s === "0g" ? storeOf(m) === "0G Storage" : !storeOf(m));
   const shown = listings
     .filter((m) => task === "all" || m.card.task.kind === task)
     .filter((m) => runtime === "all" || m.card.runtime.engine === runtime)
@@ -224,7 +220,6 @@ export function ModelList({ snap, query = "" }: { snap: Snapshot; query?: string
             count={(v) => listings.filter((m) => storeIs(m, v)).length}
             options={[
               ["0g", "0G Storage"],
-              ["swarm", "Swarm"],
               ["none", "Hosted by 0G"],
             ]}
           />
@@ -272,7 +267,7 @@ export function ModelList({ snap, query = "" }: { snap: Snapshot; query?: string
   );
 }
 
-type Tab = "card" | "try" | "files" | "passport" | "jobs";
+type Tab = "card" | "try" | "chat" | "files" | "passport" | "jobs";
 
 export function ModelDetail({ snap, modelKey }: { snap: Snapshot; modelKey: string }) {
   const { label } = useLive();
@@ -282,7 +277,6 @@ export function ModelDetail({ snap, modelKey }: { snap: Snapshot; modelKey: stri
   const [tab, setTab] = useState<Tab>("card");
   const [passport, setPassport] = useState<ModelPassport | null>(null);
   const [checks, setChecks] = useState<BrowserCheck[] | null>(null);
-  const [feed, setFeed] = useState<PassportFeedCheck | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState("");
 
@@ -291,7 +285,6 @@ export function ModelDetail({ snap, modelKey }: { snap: Snapshot; modelKey: stri
     let alive = true;
     setPassport(null);
     setChecks(null);
-    setFeed(null);
     getModelPassport(m)
       .then(async (p) => {
         if (!alive) return;
@@ -299,16 +292,9 @@ export function ModelDetail({ snap, modelKey }: { snap: Snapshot; modelKey: stri
         if (!REPLAY) {
           const c = await verifyPassportInBrowser(p, m, snap.status.quorum);
           if (alive) setChecks(c);
-          // Then from Swarm itself: the passport's chunks (BMT) and the model's signed feed.
-          const gateway = snap.status.swarmGateway;
-          if (!gateway) return;
-          const [onSwarm, f] = await Promise.all([
-            verifyPassportOnSwarm(gateway, m),
-            verifyPassportFeed(gateway, m, listings, [snap.status.verifier, ...(snap.status.quorum?.verifiers ?? [])]),
-          ]);
-          if (!alive) return;
-          setChecks([...c, onSwarm, f.check]);
-          setFeed(f);
+          // Then the copy on 0G Storage, by the root the listing names.
+          const stored = await verifyPassportStored(m);
+          if (alive) setChecks([...c, stored]);
         }
       })
       .catch((err: Error) => alive && setError(err.message));
@@ -347,12 +333,13 @@ export function ModelDetail({ snap, modelKey }: { snap: Snapshot; modelKey: stri
   const t = m.card.task;
   const store = storeOf(m);
   const cheapest = serving.length ? Math.min(...serving.map((o) => Number(o.attrs.price))) : undefined;
-  const swarm = snap.status.swarmGateway ? `${snap.status.swarmGateway}/bytes/${m.passportRef}` : undefined;
+  const passportLink = storageLink(snap.status, m.passportRef);
   const fileCount = m.card.weights?.files.length ?? 0;
 
   const TABS: [Tab, string, ReactNode?][] = [
     ["card", "Model card"],
     ["try", "Try it"],
+    ["chat", "Chat"],
     ["files", "Files", fileCount || undefined],
     ["passport", "Passport", checks ? (failed ? `${failed} failed` : "✓") : undefined],
     ["jobs", "Jobs", jobs.length || undefined],
@@ -417,6 +404,7 @@ export function ModelDetail({ snap, modelKey }: { snap: Snapshot; modelKey: stri
           )}
 
           {tab === "try" && <TryIt snap={snap} m={m} serving={serving.length} />}
+          {tab === "chat" && <Chat snap={snap} m={m} serving={serving.length} />}
 
           {tab === "files" &&
             (m.card.weights ? (
@@ -441,10 +429,6 @@ export function ModelDetail({ snap, modelKey }: { snap: Snapshot; modelKey: stri
                               <button className="store" title={`0G Storage root ${f.zgRoot}: click to copy`} onClick={() => copy(f.zgRoot!, f.name)}>
                                 {copied === f.name ? "Copied" : `0G · ${short(f.zgRoot, 4)}`}
                               </button>
-                            ) : f.swarmRef ? (
-                              <span className="store swarm" title={f.swarmRef}>
-                                Swarm · {short(f.swarmRef, 4)}
-                              </span>
                             ) : (
                               <span className="muted">source URL</span>
                             )}
@@ -475,7 +459,7 @@ export function ModelDetail({ snap, modelKey }: { snap: Snapshot; modelKey: stri
               {checks && (
                 <>
                   <p className="muted small" style={{ marginBottom: 8 }}>
-                    Re-checked in your browser: digests, signatures and Swarm chunks.
+                    Re-checked in your browser: digests and signatures, and the copy on 0G Storage.
                   </p>
                   <ul className="checks">
                     {checks.map((c) => (
@@ -598,22 +582,14 @@ export function ModelDetail({ snap, modelKey }: { snap: Snapshot; modelKey: stri
               </li>
               <li>
                 <span className="muted">Passport</span>
-                {swarm && !REPLAY ? (
-                  <a className="ext mono" href={swarm} target="_blank" rel="noreferrer">
+                {passportLink ? (
+                  <a className="ext mono" href={passportLink} target="_blank" rel="noreferrer" title="On 0G Storage">
                     {short(m.passportRef, 4)}
                   </a>
                 ) : (
                   <span className="mono">{short(m.passportRef, 4)}</span>
                 )}
               </li>
-              {m.feed && snap.status.swarmGateway && !REPLAY && (
-                <li>
-                  <span className="muted">Latest passport</span>
-                  <a className="ext" href={feed?.url ?? `${snap.status.swarmGateway}/bzz/${m.feed.manifest}/`} target="_blank" rel="noreferrer" title="Stable link to the newest passport (Swarm feed).">
-                    {feed?.latest ? (feed.latest.key === m.key ? "this version" : `v${feed.latest.card.version}`) : "feed"}
-                  </a>
-                </li>
-              )}
               <li>
                 <span className="muted">Signed by</span>
                 <span>{m.signers.length} verifiers</span>

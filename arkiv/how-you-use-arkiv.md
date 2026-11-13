@@ -27,7 +27,7 @@ Readers also check who wrote an entity, `$creator` and `$owner`, not just its ta
 | **Attribute filters** | Buyer discovery: `arkiv.schema = str('kinetic.offer') AND task.classify = u64(1)`. The dashboard reads jobs by `job_id` and slashed providers by `status` | The buyer agent picks providers from Arkiv alone, and every dashboard page reads its data from Arkiv |
 | **Entity events** | The verifier's Arkiv mirror follows live events and re-reads only what changed, then streams it to the dashboard (Server-Sent Events) | Chunk progress, claims and new offers appear on screen within seconds, without polling |
 | **Batched writes** (`executeBatch`) | One wallet means one nonce sequence. The store queues writes, merges patches to the same entity, and sends up to 40 operations in one transaction | Chunk status updates arrive in near real time without one transaction per change |
-| **Payloads** | Chunks carry *sealed* Swarm references, jobs carry `audit_ref`, listings carry the model card and passport feed | Each finished job links to its Compute Passport on Swarm, and each model page to its passport and feed ([swarm.md](swarm.md)) |
+| **Payloads** | Jobs carry `audit_ref`, listings carry the model card and passport reference | Each finished job links to its Compute Passport on 0G Storage, and each model page to its passport |
 
 ## A query you can run
 

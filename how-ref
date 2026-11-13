@@ -1,0 +1,15 @@
+  * [33m27089ba[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mclean-main[m[33m)[m codebase of the project
+* [33m6750565[m Give Rent out a GPU its own page and remove the Earn page
+* [33m0e3d09d[m codebase of project
+* [33mb378c54[m Docs: demo script and sponsor status for the new features
+* [33m53f94fd[m Show slash settlement on the job page; mark slashes Hedera executed from the vault's schedule
+* [33m0144891[m x402: retry verify on no answer (intermittent facilitator 520s); label canary chunks
+* [33mb9802b7[m ERC-8004: merge agent ids on write so concurrent roles don't overwrite each other
+* [33m459cf5e[m Sponsor features: x402 failover, HIP-1215 self-executing slashes, PRNG spot checks and Merkle anchors, 0G private-mode TEE canaries, Arkiv live events/readonly/schemas, Swarm feeds/stamps/redundancy
+* [33m2d1e68b[m docs: what else the sponsors offer KINETIC (full read of the 0G, Hedera, Arkiv and Swarm docs)
+* [33mf8864b1[m ERC-8004 in the dashboard: GPU agent ids and on-chain reputation; retries; docs
+* [33mbdd0aae[m ERC-8004 Trustless Agents on 0G Chain: identities and measured reputation
+* [33m38d2fcb[m Job page: a just-started job shows Starting, an expired one its HCS receipts
+* [33m4934333[m Publish screen says what's missing under the button
+* [33mb426cfe[m Docs page: real setup commands only; code blocks wrap under the Copy button
+* [33m2fc6095[m x402: retry settlement when the facilitator gives no answer

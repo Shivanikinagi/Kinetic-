@@ -74,7 +74,8 @@ export interface Status {
   policy: { canaryRate: number; window: number; failLimit: number; minAgreement: number };
   zerog: { referenceRuns: number; spentUsdMicro: number; model: string; trustMode: string; balance: number | null };
   earnings: { feesTinybar: string; feePayments: number; feePerChunkTinybar: string };
-  swarmGateway?: string;
+  /** The 0G Storage indexer passports are served from (GET /file?root=). */
+  storageGateway?: string;
   /** The bond vault's verifier set: who may sign slashes and Model Passports. */
   quorum?: { verifiers: string[]; threshold: number; cosigners: number };
   models?: { key: string; id: string; version: string; accuracy: number; passportRef: string; signers: number }[];
@@ -296,6 +297,17 @@ export interface AgentInfo {
   halted: boolean;
   asset?: { id: string; symbol: string; decimals: number };
   uaid?: string;
+  /** The buyer agent's Hedera account, which pays every job (agents from before this field don't send it). */
+  account?: string;
+}
+
+/** An account's HBAR balance in tinybar, from the Hedera mirror node. */
+export async function getHbarBalance(status: Status, account: string): Promise<number | null> {
+  if (REPLAY || !/^\d+\.\d+\.\d+$/.test(account)) return null;
+  const res = await fetch(`${status.mirrorUrl}/api/v1/accounts/${account}`);
+  if (!res.ok) return null;
+  const body = (await res.json()) as { balance?: { balance?: number } };
+  return typeof body.balance?.balance === "number" ? body.balance.balance : null;
 }
 
 export interface Run {
@@ -321,7 +333,27 @@ export interface Run {
     outcome?: { met: boolean; notes: string[] };
     royaltyTinybar?: string;
     model?: { key: string; id: string; version: string; royaltyBps: number; payTo: string; royalty?: { amount: string; basis: string; tx: string } };
+    paidTinybar?: string;
+    refundedTinybar?: string;
+    results?: { id: string; label?: string; tags?: string[]; fields?: Record<string, string | null> }[];
+    /** One entry per accepted chunk (agents from before chunkLog existed don't send it). */
+    chunkLog?: ChunkLogEntry[];
   };
+}
+
+/** An accepted chunk: who ran it, the x402 payment, how it was checked, and how fast it was. */
+export interface ChunkLogEntry {
+  idx: number;
+  itemIds: string[];
+  provider: string;
+  name: string;
+  payTx?: string;
+  amount: string;
+  check: "verified" | "format";
+  known?: { items: number; correct: number };
+  roundTripMs: number;
+  /** Provider-reported and unsigned: a speed figure only. */
+  usage?: { latencyMs: number; promptTokens?: number; completionTokens?: number };
 }
 
 /** Rules for a job, agreed before it starts. Anything left out uses the network's own. */
@@ -360,7 +392,7 @@ export interface ModelCard {
   creator: { address: string; payTo: string };
   task: ModelTask;
   runtime: { engine: "0g" | "openai"; model: string };
-  weights?: { format: string; files: { name: string; sha256: string; bytes: number; swarmRef?: string; zgRoot?: string }[]; source?: string };
+  weights?: { format: string; files: { name: string; sha256: string; bytes: number; zgRoot?: string }[]; source?: string };
   royaltyBps: number;
   createdAt: string;
 }
@@ -377,8 +409,6 @@ export interface ModelListing {
   params?: number;
   weightsChecked: boolean;
   signers: string[];
-  /** The model's passport feed on Swarm: update `index` points at this passport; /bzz/{manifest}/ is the newest. */
-  feed?: { owner: string; topic: string; index: number; target: string; manifest: string };
 }
 
 export interface ModelPassport {
@@ -394,7 +424,8 @@ export interface ModelPassport {
     | { checked: false; reason: string };
   benchmark: { task: string; source: "verifier" | "creator"; items: number; itemsHash: string; correct: number; accuracy: number; minAccuracy: number; ranOn: string[] };
   fingerprint?: { task: string; answers: Record<string, string> };
-  references: { hcsTopic: string; swarmGateway: string; vault?: string };
+  /** Passports issued before 2026-11-11 name a `swarmGateway` instead (kept as signed). */
+  references: { hcsTopic: string; storageGateway?: string; swarmGateway?: string; vault?: string };
   limitations: string[];
   attestations: { verifiers: { address: string; signature: string }[] };
 }
@@ -418,13 +449,12 @@ export function listingsOf(status: Status, entities: Entity[]): ModelListing[] {
       ...(p.params !== undefined ? { params: p.params } : {}),
       weightsChecked: !!p.weightsChecked,
       signers: p.signers ?? [],
-      ...(p.feed ? { feed: p.feed } : {}),
     });
   }
   return [...byKey.values()].sort((a, b) => a.card.name.localeCompare(b.card.name));
 }
 
-/** A listing's Model Passport, served from Swarm through the verifier. */
+/** A listing's Model Passport, served from 0G Storage through the verifier (0G's indexer sends no CORS headers). */
 export const getModelPassport = (listing: ModelListing) =>
   REPLAY ? replayed(() => replayModelPassport(listing)) : getJson<ModelPassport>(`${VERIFIER_URL}/models/${listing.key}/passport`);
 
@@ -493,6 +523,18 @@ export function jobStartedAt(jobId: string): number | null {
   const t = parseInt(jobId.split("-")[1] ?? "", 36);
   return Number.isFinite(t) ? t : null;
 }
+
+/** A 0G Storage root: 0x and 64 hex. Older passports and listings hold other references. */
+export const isStorageRef = (ref: string | undefined) => !!ref && /^0x[0-9a-f]{64}$/i.test(ref);
+
+/** Public link to a document on 0G Storage (the indexer's /file?root=), or null when there isn't one. */
+export function storageLink(status: Status, ref: string | undefined): string | null {
+  if (REPLAY || !status.storageGateway || !isStorageRef(ref)) return null;
+  return `${status.storageGateway.replace(/\/$/, "")}/file?root=${ref}`;
+}
+
+/** A stored passport by its 0G root, through the verifier, which checks the bytes against the root. */
+export const getStoredPassport = <T,>(ref: string) => getJson<T>(`${VERIFIER_URL}/passports/${ref}`);
 
 export function hashscan(status: Status, kind: "topic" | "transaction" | "contract" | "account" | "token", id: string): string | null {
   // Replay ids are invented; linking them would point at someone else's transaction.

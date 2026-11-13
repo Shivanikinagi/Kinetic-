@@ -6,7 +6,6 @@ import { hederaTestnet } from "viem/chains";
 import { loadNetworkConfig } from "../src/config.js";
 import { ArkivSdkStore } from "../src/integrations/arkiv.js";
 import { VAULT_ABI } from "../src/integrations/vault.js";
-import { swarmClient } from "../src/integrations/index.js";
 import { loadRoleEnv, ROLES } from "../src/testnet/roles.js";
 
 // Read-only preflight against the live networks for every role in .kinetic/testnet/.
@@ -74,14 +73,18 @@ await check("bond vault", async () => {
   );
   return `${address}: ${threshold} of ${verifiers.length} verifiers to slash, ${disputeThreshold} to decide a dispute, ${window}s dispute window; ${selfExecuting}`;
 });
-await check("Swarm", async () => {
-  const res = await fetch(`${cfg.swarm.beeUrl}/health`);
-  if (!res.ok) throw new Error(`${cfg.swarm.beeUrl} answered ${res.status}`);
-  // The public gateway keeps uploads only for a while; a Compute Passport there can expire.
-  const paid = cfg.swarm.postageBatchId && (cfg.swarm.stampKey ? `, postage batch ${cfg.swarm.postageBatchId.slice(0, 8)}… stamped client-side` : /gateway\.ethswarm\.org/.test(cfg.swarm.beeUrl) ? ", BEE_POSTAGE_BATCH_ID set but the public gateway ignores it without SWARM_STAMP_KEY (docs/SWARM_STAMP.md)" : ", postage batch set");
-  // With our own stamps, one tiny stamped upload shows the gateway takes them (it uses one slot).
-  if (cfg.swarm.stampKey) await swarmClient(cfg).upload(new TextEncoder().encode(`kinetic doctor ${new Date().toISOString()}`));
-  return `${cfg.swarm.beeUrl} healthy${paid || " (public gateway, no postage batch: passports may expire; see docs/SWARM_STAMP.md)"}`;
+await check("0G Storage", async () => {
+  // The indexer answers an unknown root with "File not found": that's enough to show it's up.
+  const res = await fetch(`${cfg.zgStorage.indexerUrl}/file?root=0x${"0".repeat(64)}`);
+  if (!res.ok) throw new Error(`${cfg.zgStorage.indexerUrl} answered ${res.status}`);
+  // The verifier stores every Compute Passport and Model Passport, so its wallet pays 0G's storage fee.
+  const key = loadRoleEnv("verifier").KINETIC_PRIVATE_KEY as Hex | undefined;
+  if (!key) return `${cfg.zgStorage.indexerUrl} reachable`;
+  const verifier = privateKeyToAccount(key).address;
+  const zg = createPublicClient({ transport: http(cfg.zgStorage.rpcUrl) });
+  const balance = await zg.getBalance({ address: verifier });
+  if (balance === 0n) throw new Error(`the verifier (${verifier}) has no 0G to pay the storage fee: top it up at https://faucet.0g.ai`);
+  return `${cfg.zgStorage.indexerUrl} reachable; the verifier has ${formatEther(balance)} 0G for storage fees`;
 });
 await check("0G model", async () => {
   const models = await getJson(`${cfg.zerog.baseUrl}/models`);
